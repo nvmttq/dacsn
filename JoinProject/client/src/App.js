@@ -6,7 +6,6 @@ function App() {
     <div className="App bg-slate-400">
       HELLO MY NAME IS MINH
       HELLO MY NAME IS MINH2
-      Hello anh Minh
     </div>
   );
 }
