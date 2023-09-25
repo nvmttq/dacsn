@@ -2,10 +2,12 @@ const mongoose = require('mongoose');
 
 const groupSchema = new mongoose.Schema({
   id: { type: String, required: false },
-  name: { type: String, required: false },
-  author: { type: String, required: false },
-  isPublic: { type: Boolean, required: false },
-  idConversation: { type: String, required: false }
+  title: { type: String, required: false },
+  creator: { type: String, default: ""},
+  participants: [{
+    idUser: { type: String, default: ""},
+    isCreator: {type: Boolean, default: false}
+  }],
 });
 
 module.exports = mongoose.model('group',groupSchema)

@@ -4,7 +4,7 @@ const courseSchema = new mongoose.Schema({
   id: { type: String, default: "" },
   title: { type: String, default: "" },
   token: { type: String, default: "" },
-  imagePath: { type: string, dafult: "" },
+  imagePath: { type: String, dafult: "" },
   assignment: { type: Number, default: 0 },
   countDownTime: { type: Date },
   contentCourse: [
