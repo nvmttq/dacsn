@@ -130,6 +130,33 @@ export default function MenuSidebar({ user, setUser }) {
     },
     {
       id: 5,
+      label: "Nội dung",
+      icon: "pi pi-fw pi-cog",
+      template: (item, options) => {
+        return (
+          /* custom element */
+          <Link
+            to="/content"
+            className={
+              options.className +
+              " " +
+              (activeMenuItem === item.id ? "active" : "")
+            }
+            onClick={(e) => setActiveMenuItem(item.id)}
+          >
+            <span
+              className={classNames(options.iconClassName, item.icon)}
+              style={{ color: "#76C044" }}
+            ></span>
+            <span className={options.labelClassName} style={{ color: "white" }}>
+              {item.label}
+            </span>
+          </Link>
+        );
+      },
+    },
+    {
+      id: 6,
       label: "Cài đặt",
       icon: "pi pi-fw pi-cog",
       template: (item, options) => {
@@ -190,6 +217,10 @@ export default function MenuSidebar({ user, setUser }) {
       />
 
       {user ? (
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
         <button
           onClick={(e) => e}
           className="w-full h-[70px] p-link flex items-center p-1"
