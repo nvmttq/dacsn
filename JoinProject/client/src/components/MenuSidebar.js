@@ -217,10 +217,7 @@ export default function MenuSidebar({ user, setUser }) {
       />
 
       {user ? (
-<<<<<<< Updated upstream
-=======
 
->>>>>>> Stashed changes
         <button
           onClick={(e) => e}
           className="w-full h-[70px] p-link flex items-center p-1"

@@ -1,14 +1,32 @@
-import React from "react";
-import { DataTable } from 'primereact/datatable';
-import { Column } from 'primereact/column';
+import React, { useState } from "react";
 import { TabMenu } from 'primereact/tabmenu';
+import { Button } from 'primereact/button';
+import { Dropdown } from 'primereact/dropdown';
 
 
 function NoiDung() {
+    const [activeIndex, setActiveIndex] = useState(3);
+    const items = [
+        { label: 'Nội dung', icon: 'pi pi-fw pi-book' },
+        { label: 'Diễn đàn', icon: 'pi pi-fw pi-comments' },
+        { label: 'Cuộc họp', icon: 'pi pi-fw pi-phone' },
+        { label: 'bảng điểm', icon: 'pi pi-fw pi-file' },
+        { label: 'Điểm danh', icon: 'pi pi-fw pi-check' }
+    ];
+
+    const [selectedCity, setSelectedCity] = useState(null);
+    const cities = [
+        { name: 'New York', code: 'NY' },
+        { name: 'Rome', code: 'RM' },
+        { name: 'London', code: 'LDN' },
+        { name: 'Istanbul', code: 'IST' },
+        { name: 'Paris', code: 'PRS' }
+    ];
+
     return (
         <div>
             <div style={{
-                border: '1px solid red',
+                // border: '1px solid red',
                 marginTop: 20,
             }}>
                 <span className="font-bold"
@@ -25,26 +43,20 @@ function NoiDung() {
                 </span>
             </div>
 
-            <div className="w-full border-2 h-20 mt-5 ">
-                <span className="ml-10 border-2" >
+            <div className="w-full h-auto mt-5 ">
+                <span className="ml-10 w-auto" >
                     <text>
                         môn học:
                     </text>
                     <text className="ml-2">
                         0
                     </text>
-                    <text className="ml-10">
-                        Lọc theo:
-                    </text>
-                    <select name="Sort" id="Sort" className="ml-1 h-8 text-xs rounded-lg">
-                        <option value="volvo" >Volvo</option>
-                        <option value="saab">Saab</option>
-                        <option value="mercedes">Mercedes</option>
-                        <option value="audi">Audi</option>
-                    </select>
+
+                    <Dropdown value={selectedCity} onChange={(e) => setSelectedCity(e.value)} options={cities} optionLabel="name"
+                        placeholder="Lọc theo" className="ml-10 text-xs/[0.2] w-auto md:w-14rem" />
                 </span>
-                <div className="rounded-lg w-1/2 h-10 mt-5 bg-white flex justify-center ">
-                
+                <div className="rounded-lg w-1/2 h-auto mt-5 ml-10 bg-white flex justify-center ">
+                    <TabMenu className="text-xs" model={items} activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)} />
                 </div>
             </div>
             <button className=" bg-sky-500  text-white text-xs px-4 py-2 mt-20 mr-20 rounded hover:bg-blue-600  absolute right-0">
