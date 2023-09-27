@@ -7,18 +7,17 @@ import { classNames } from "primereact/utils";
 import { Button } from "primereact/button";
 
 // PAGES
-import Login from '../pages/Login.js';
+import Login from "../pages/Login.js";
 
-export default function MenuSidebar({user, setUser}) {
+export default function MenuSidebar({ user, setUser }) {
   const [activeMenuItem, setActiveMenuItem] = useState(1);
 
   const [visible, setVisible] = useState(false);
 
-  const [login, setLogin] = useState(false);
-
   console.log(activeMenuItem, user);
 
 
+ 
   let items = [
     {
       id: 1,
@@ -51,7 +50,7 @@ export default function MenuSidebar({user, setUser}) {
       id: 2,
       label: "Các nhóm",
       icon: "pi pi-fw pi-users",
-    
+
       template: (item, options) => {
         return (
           /* custom element */
@@ -191,7 +190,6 @@ export default function MenuSidebar({user, setUser}) {
       />
 
       {user ? (
-      
         <button
           onClick={(e) => e}
           className="w-full h-[70px] p-link flex items-center p-1"
@@ -222,7 +220,7 @@ export default function MenuSidebar({user, setUser}) {
             onHide={() => setVisible(false)}
           >
             <section className="m-0">
-              <Login user={user} setUser={setUser}/>
+              <Login user={user} setUser={setUser} />
             </section>
           </Dialog>
         </div>

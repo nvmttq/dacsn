@@ -1,17 +1,26 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
+import { AuthContext } from "../context/AuthProvider.js";
+
+
 
 export default function GroupCard() {
+
   const [groups, setGroups] = useState([]);
+  const {user} = useContext(AuthContext);
 
   useEffect(() => {
-    fetch("http://localhost:3002/groups", {
+    if(user) {
+      fetch(`http://localhost:3002/groups/${user.username}`, {
       method: "POST",
     })
       .then((res) => res.json())
       .then((result) => setGroups(result));
-  }, []);
+    }
+
+    console.log("ABCDCD GROUPS");
+  }, [user]);
 
   const header = (
     <img
@@ -38,7 +47,7 @@ export default function GroupCard() {
               title={group.title}
               footer={footer}
               header={header}
-              className="w-[calc(33.333333%-16px)]"
+              className="w-[calc(33.333333%-16px)] h-max"
             >
               <div className="m-0">
                 <div className="course-info flex justify-between">

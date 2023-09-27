@@ -7,57 +7,52 @@ class HomeController {
     //console.log("session user in homeController", req.session.user);
     res.json({ msg: "HELLO INDEX HGOME" });
   }
-  news(req, res) {
-    res.redirect("/news");
-  }
-  async getCourse(req, res) {
-    const course = await courses.findOne({ token: req.params.courseToken });
-    if (course === null) res.json({ msg: "DON't COURSE MATCH TOKEN" });
-    else res.json(course);
-  }
-
-  async getAllCourse(req, res) {
-    try {
-      const allCourse = await courses.find({});
-      res.json(allCourse);
-    } catch (err) {
-      res.json({ msg: "DONT MATCH ANY !!!" });
-    }
-  }
 
   async getCourseWithUserName(req, res) {
     try {
-      const user = usertest.findOne({username: req.params.username});
-      
-      const course = await courses.find({ token: req.params.courseToken });
-      if (course === null) res.json({ msg: "DON't COURSE MATCH TOKEN" });
-      else res.json(course);
-    } catch (err) {
-      res.json({msg: "dont have"})
-    }
-  }
-
-  async getAllGroup(req, res) {
-    try {
-        const allGroup = await groups.find({});
-        res.json(allGroup);
-      } catch (err) {
-        res.json({ msg: "DONT MATCH ANY !!!" });
-      }
-  }
-
-  async login(req, res) {
-    try {
-      const user = await usertest.findOne({
-        username: req.body.username,
-        password: req.body.password
+      let user = await usertest.findOne({ username: req.params.username });
+      user = user.toObject();
+      console.log("USER COURSES", user);
+      let coursesOfUser = [];
+      const cc = await courses.find({});
+      cc.forEach((data) => {
+        console.log("DATA TOEKN ", data, user.courses);
+        if (user.courses.includes(data.token)) {
+          coursesOfUser.push(data);
+        }
       });
-      if(user) res.json(user);
-      else res.json({msg: "DONT MATCH"});
+      res.json(coursesOfUser);
     } catch (err) {
-      res.json({ msg: "DONT MATCH ANY !!!" });
+      res.json({ msg: "dont have cr" });
     }
   }
+
+  async getGroupWithUserName(req, res) {
+    try {
+      let user = await usertest.findOne({ username: req.params.username });
+      user = user.toObject();
+      console.log("USER GROUPS", user);
+      let groupsOfUser = [];
+      const gg = await groups.find({});
+      gg.forEach((data) => {
+        console.log("DATA ID ", data, user.groups);
+        if (user.groups.includes(data.id)) {
+          groupsOfUser.push(data);
+        }
+      });
+      res.json(groupsOfUser);
+    } catch (err) {
+      res.json({ msg: "dont have gr" });
+    }
+  }
+
+  // auth
+
+  // async getUser(req, res) {
+  //   if(req.session.user) {
+  //     res.json(req.session.user);
+  //   } else res.json({});
+  // }
 }
 
 module.exports = new HomeController();

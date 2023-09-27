@@ -3,7 +3,7 @@ import React from "react";
 import FormJoinCourse from "../components/FormJoinCourse.js";
 import GroupCard from "../components/GroupCard.js";
 
-function KhoaHoc() {
+function Nhom() {
   return (
     <div className="courses p-2 w-full flex flex-col">
       <div className="courses-header flex justify-between items-center">
@@ -17,4 +17,4 @@ function KhoaHoc() {
   );
 }
 
-export default KhoaHoc;
+export default Nhom;

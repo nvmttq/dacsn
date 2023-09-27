@@ -4,8 +4,8 @@ import { Button } from "primereact/button";
 import { Password } from "primereact/password";
 import { useNavigate } from "react-router-dom";
 export default function LoginDemo({ user, setUser }) {
-  const username = useRef(null);
-  const password = useRef(null);
+  const username = useRef("admin000");
+  const password = useRef("admin000");
   const navigate = useNavigate();
   
   // const [validUsername, setValidUsername] = useState(true);
@@ -14,7 +14,7 @@ export default function LoginDemo({ user, setUser }) {
 
   useEffect(() => {
     if (login && username && password) {
-      fetch("http://localhost:3002/login", {
+      fetch("http://localhost:3002/auth/login", {
         method: "POST",
         headers: {
           'Content-Type': 'application/json',
@@ -28,6 +28,7 @@ export default function LoginDemo({ user, setUser }) {
           return response.json();
         }).then((result) => {
           setUser(result);
+          localStorage.setItem("user", JSON.stringify(result));
           console.log(result)
           navigate("/");
         })
@@ -69,6 +70,7 @@ export default function LoginDemo({ user, setUser }) {
               <span className="p-float-label">
                 <Password
                   onChange={(e) => (password.current = e.target.value)}
+
                   toggleMask
                   className={"w-full"}
                   inputClassName={"w-full"}

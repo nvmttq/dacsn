@@ -1,43 +1,61 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext} from "react";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
+import { AuthContext } from "../context/AuthProvider.js";
+import { Link, Route, Routes, useNavigate } from "react-router-dom";
+
+import CourseDetails from "../pages/CourseDetails.js";
 
 export default function CourseCard() {
   const [courses, setCourses] = useState([]);
+  const [details, setDetails] = useState(false);
+  const navigate = useNavigate();
+
+  const {user} = useContext(AuthContext);
+
+  console.log(user)
 
   useEffect(() => {
-    fetch("http://localhost:3002/KhoaHoc", {
+    if(user) {
+      fetch(`http://localhost:3002/courses/${user.username}`, {
       method: "POST",
     })
       .then((res) => res.json())
       .then((result) => setCourses(result));
-  }, []);
+    }
+  }, [user]);
 
+
+  const handleSeeDetails = (e) => {
+    console.log(e.parentNode)
+    navigate('/courses/details');
+  }
   const header = (
     <img
       alt="Card"
       src="https://primefaces.org/cdn/primereact/images/usercard.png"
     />
   );
-  const footer = (
-    <div className="">
-      <Button label="Vào lớp" icon="pi pi-book" />
-    </div>
-  );
+  const footer = (token) => {
+    return (
+      <Link to={`/courses/details/${token}`} label="Vào lớp" icon="pi pi-book">Vào lớp</Link>
+  )};
 
   return (
     <>
+   
       {courses.length !== 0 ? (
         <div
           className="courses-content flex flex-wrap justify-center gap-2 mt-2 h-[calc(100vh-34px-25px)] bg-lime-200 "
           style={{ overflowY: "scroll" }}
         >
+          
           {courses.map((course, index) => (
             <Card
               key={index}
               title={course.title}
               subTitle="Sắp bắt đầu"
-              footer={footer}
+              footer={footer(course.token)}
               header={header}
               className="w-[calc(33.33333%-16px)] h-max"
             >
