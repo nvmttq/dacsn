@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
 const eventSchema = new mongoose.Schema({
-  idEvent: { type: String, required: false },
   eventName: { type: String, required: false },
   startTime: { type: Date, required: false },
   endTime: { type: Date, required: false },
