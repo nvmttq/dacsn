@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 
 const postSchema = new mongoose.Schema({
-  id: { type: String, required: false },
   title: { type: String, required: false },
   tags: [String],
   imagePath: { type: String, default: "" },

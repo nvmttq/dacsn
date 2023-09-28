@@ -5,6 +5,7 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const session = require('express-session');
 const bodyParser = require("body-parser");
+const posts = require("./routes/posts");
 
 const app = express();
 app.use(express.json());
@@ -20,6 +21,7 @@ app.use(
     cookie: { maxAge: 5 * 60 * 1000 },
   })
 );
+app.use(posts);
 
 // ROUTES
 const route = require("./routes/index.js");
