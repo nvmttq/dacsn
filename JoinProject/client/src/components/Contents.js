@@ -4,13 +4,14 @@ import { Button } from "primereact/button";
 function Contents() {
     const [turnButton, setTurnButton] = useState(false);
     return (
-        <>
-            <button className=" bg-sky-500  text-white text-xs px-4 py-2 mt-20 mr-20 rounded hover:bg-blue-600  absolute right-0">
-                <text className="font-bold color-white">Thêm tài nguyên</text>
-            </button>
-        </>
+        <div className="h-auto w-auto mt-4 ml-10">
+            <div className="absolute end-10">
+                <Button label="Thêm tài nguyên" style={{ fontSize: 10 }} />
+            </div>
+            <div className="h-[500px] w-[1000px] bg-white rounded-[15px]">
 
-
+            </div>
+        </div>
     )
 }
 

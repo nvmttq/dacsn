@@ -74,19 +74,7 @@ export default function NoiDung() {
           />
         </div>
       </div>
-      {activeIndex === 0 && (
-        <>
-          <div className="h-auto w-auto border-2 mt-4 ml-10">
-            <div className="absolute end-10">
-              <Button label="Thêm tài nguyên" style={{ fontSize: 10 }} />
-            </div>
-            <div className="h-80 w-4/5 border-2 border-indigo-500/100">
-
-            </div>
-          </div>
-
-        </>
-      )
+      {activeIndex === 0 && <Contents />
       }
       {activeIndex === 1 && <Posts />}
     </>
