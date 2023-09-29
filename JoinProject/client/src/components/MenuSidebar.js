@@ -9,12 +9,15 @@ import { Button } from "primereact/button";
 // PAGES
 import Login from "../pages/Login.js";
 
-export default function MenuSidebar({ user, setUser }) {
+export default function MenuSidebar() {
   const [activeMenuItem, setActiveMenuItem] = useState(1);
 
   const [visible, setVisible] = useState(false);
-
-  console.log(activeMenuItem, user);
+  let user;
+  if(sessionStorage.getItem('user')) {
+    user = JSON.parse(sessionStorage.getItem('user'));
+  }
+  console.log(activeMenuItem);
 
 
  
@@ -187,11 +190,9 @@ export default function MenuSidebar({ user, setUser }) {
       template: (item, options) => {
         return (
           /* custom element */
-          <a
-            href="https://facebook.com"
+          <Link
+            to="/meeting"
             className={options.className}
-            target={item.target}
-            onClick={(e) => options.onClick(e)}
           >
             <span
               className={classNames(options.iconClassName, "pi pi-home")}
@@ -200,7 +201,7 @@ export default function MenuSidebar({ user, setUser }) {
             <span className={options.labelClassName} style={{ color: "white" }}>
               {item.label}
             </span>
-          </a>
+          </Link>
         );
       },
     },
@@ -248,7 +249,7 @@ export default function MenuSidebar({ user, setUser }) {
             onHide={() => setVisible(false)}
           >
             <section className="m-0">
-              <Login user={user} setUser={setUser} />
+              <Login setVisible={setVisible}/>
             </section>
           </Dialog>
         </div>

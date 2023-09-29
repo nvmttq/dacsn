@@ -1,19 +1,18 @@
-import React, { useEffect, useState, useContext} from "react";
-import { Card } from "primereact/card";
-import { Button } from "primereact/button";
-import { AuthContext } from "../context/AuthProvider.js";
-import { Link, Route, Routes, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
-import CourseDetails from "../pages/CourseDetails.js";
+import { Card } from "primereact/card";
+
+
 
 export default function CourseCard() {
   const [courses, setCourses] = useState([]);
-  const [details, setDetails] = useState(false);
-  const navigate = useNavigate();
 
-  const {user} = useContext(AuthContext);
+  const user = sessionStorage.getItem("user")
+    ? JSON.parse(sessionStorage.getItem("user"))
+    : null;
 
-  console.log(user)
+
 
   useEffect(() => {
     if(user) {
@@ -23,22 +22,19 @@ export default function CourseCard() {
       .then((res) => res.json())
       .then((result) => setCourses(result));
     }
-  }, [user]);
+  }, []);
 
 
-  const handleSeeDetails = (e) => {
-    console.log(e.parentNode)
-    navigate('/courses/details');
-  }
+
   const header = (
     <img
       alt="Card"
       src="https://primefaces.org/cdn/primereact/images/usercard.png"
     />
   );
-  const footer = (token) => {
+  const footer = (courseToken) => {
     return (
-      <Link to={`/courses/details/${token}`} label="Vào lớp" icon="pi pi-book">Vào lớp</Link>
+      <Link to={`/courses/${courseToken}`} label="Vào lớp" icon="pi pi-book">Vào lớp</Link>
   )};
 
   return (

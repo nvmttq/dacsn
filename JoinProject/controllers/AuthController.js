@@ -12,8 +12,7 @@ class AuthController {
         password: req.body.password
       });
       if(user) {
-        req.session.user = user;
-        console.log(user)
+       // console.log(user)
         res.json(user);
       }
       else res.json({msg: "DONT MATCH"});

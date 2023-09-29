@@ -1,14 +1,15 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
-import { AuthContext } from "../context/AuthProvider.js";
 
 
 
 export default function GroupCard() {
 
   const [groups, setGroups] = useState([]);
-  const {user} = useContext(AuthContext);
+  const user = sessionStorage.getItem("user")
+    ? JSON.parse(sessionStorage.getItem("user"))
+    : null;
 
   useEffect(() => {
     if(user) {
@@ -19,8 +20,7 @@ export default function GroupCard() {
       .then((result) => setGroups(result));
     }
 
-    console.log("ABCDCD GROUPS");
-  }, [user]);
+  }, []);
 
   const header = (
     <img

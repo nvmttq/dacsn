@@ -9,6 +9,8 @@ const gradeSchema = new mongoose.Schema({
   status: {type: String, default: "Chưa hoàn thành"},
   grade: { type: Number},
   percent: { type: Number },
+  createAt: {type: Date, default: Date.now()},
+  endAt: {type: Date, default: Date.now()}
 });
 
 module.exports = mongoose.model("grade", gradeSchema);

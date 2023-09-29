@@ -7,47 +7,37 @@ import KhoaHoc from "./pages/KhoaHoc.js";
 import Lich from "./pages/Lich.js";
 import Nhom from "./pages/Nhom.js";
 import CourseDetails from "./pages/CourseDetails.js";
+import Grade from "./pages/Grade.js";
 
-import Login from "./pages/Login.js";
-import PageRender from "./PageRender.js";
+import Meeting from "./pages/Meeting.js";
 import NoiDung from "./pages/NoiDung.js";
-//CONTEXT
-import AuthProvider from "./context/AuthProvider.js";
-
-//COMPONETS
-
 
 
 function App() {
-  const [user, setUser] = useState(null);
-  
-  useEffect(() => {
-    const checkExitsUser = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null;
-
-    if(checkExitsUser) setUser(checkExitsUser);
-  }, [])
 
 
   return (
     <>
       <div className="w-screen h-screen flex">
         <div className="w-1/6 bg-[#222222]">
-          <MenuSidebar user={user} setUser={setUser} />
+          <MenuSidebar />
         </div>
-        <AuthProvider user={user}>
-          <div className="w-5/6 bg-red-300">
-            <Routes>
-              <Route path="/" element={<KhoaHoc/>}></Route>
-              <Route path="/courses/details/:token" element={<CourseDetails/>}/>
-              <Route path="/groups" element={<Nhom/>} />
-              <Route path="/lich" element={<Lich/>} />
-              <Route path="/" element={<KhoaHoc />} />
-              <Route path="/groups" element={<Nhom />} />
-              <Route path="/lich" element={<Lich />} />
-              <Route path="/content" element={<NoiDung />} />
-            </Routes>
-          </div>
-        </AuthProvider>
+        <div className="w-5/6 bg-red-300">
+          <Routes>
+            <Route path="/" element={<KhoaHoc />}></Route>
+            <Route path="/courses/:courseToken" element={<CourseDetails />} />
+            <Route
+              path="/courses/:courseToken/grade"
+              element={<Grade />}
+            ></Route>
+
+            <Route path="/groups" element={<Nhom />} />
+            <Route path="/lich" element={<Lich />} />
+            <Route path="/content" element={<NoiDung />} />
+
+            <Route path="/meeting" element={<Meeting />}></Route>
+          </Routes>
+        </div>
       </div>
     </>
   );
