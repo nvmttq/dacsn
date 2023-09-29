@@ -3,9 +3,12 @@ import { TabMenu } from "primereact/tabmenu";
 import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
 import Posts from "../components/Posts";
+import Contents from "../components/Contents";
 
-function NoiDung() {
+export default function NoiDung() {
+
   const [activeIndex, setActiveIndex] = useState(0);
+
   const items = [
     { label: "Nội dung", icon: "pi pi-fw pi-book" },
     { label: "Diễn đàn", icon: "pi pi-fw pi-comments" },
@@ -24,7 +27,7 @@ function NoiDung() {
   ];
 
   return (
-    <div>
+    <>
       <div
         style={{
           // border: '1px solid red',
@@ -72,13 +75,20 @@ function NoiDung() {
         </div>
       </div>
       {activeIndex === 0 && (
-        <button className=" bg-sky-500  text-white text-xs px-4 py-2 mt-20 mr-20 rounded hover:bg-blue-600  absolute right-0">
-          <text className="font-bold color-white">Thêm tài nguyên</text>
-        </button>
-      )}
+        <>
+          <div className="h-auto w-auto border-2 mt-4 ml-10">
+            <div className="absolute end-10">
+              <Button label="Thêm tài nguyên" style={{ fontSize: 10 }} />
+            </div>
+            <div className="h-80 w-4/5 border-2 border-indigo-500/100">
+
+            </div>
+          </div>
+
+        </>
+      )
+      }
       {activeIndex === 1 && <Posts />}
-    </div>
+    </>
   );
 }
-
-export default NoiDung;
