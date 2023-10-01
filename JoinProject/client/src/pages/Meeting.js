@@ -3,8 +3,10 @@ import io from "socket.io-client";
 import Peer from "simple-peer";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import VideocamOffIcon from "@mui/icons-material/VideocamOff";
+import { Button } from "@mui/material";
 
 import Video from "../components/Video.js";
+import ChatSidebar from "../components/ChatSidebar1.js";
 
 export default function Meeting() {
   const roomID = "abc";
@@ -12,6 +14,7 @@ export default function Meeting() {
   const user = sessionStorage.getItem("user")
     ? JSON.parse(sessionStorage.getItem("user"))
     : null;
+  const [visibleChatSidebar, setVisibleChatSidebar] = useState(false);
   const dataFetch = useRef(false);
   const [isOnVideo, setIsOnVideo] = useState(false);
 
@@ -41,14 +44,14 @@ export default function Meeting() {
           const peers = [];
           users.forEach((userMeeting) => {
             const peer = createPeer(
-              userMeeting.socketId,
+              userMeeting.socketID,
               socketRef.current.id,
               stream,
               userMeeting.nameDisplay
             );
 
             peersRef.current.push({
-              peerID: userMeeting.socketId,
+              peerID: userMeeting.socketID,
               peer,
               nameDisplay: user.name,
             });
@@ -83,12 +86,12 @@ export default function Meeting() {
           item.peer.signal(payload.signal);
         });
 
-        socketRef.current.on("user left", (socketId) => {
-          const peerObj = peersRef.current.find((p) => p.peerID === socketId);
+        socketRef.current.on("user left", (socketID) => {
+          const peerObj = peersRef.current.find((p) => p.peerID === socketID);
           if (peerObj) {
             peerObj.peer.destroy();
-            const peers = peersRef.current.filter((p) => p.peerID !== socketId);
-            console.log(`user ${socketId} leaved meeting`);
+            const peers = peersRef.current.filter((p) => p.peerID !== socketID);
+            console.log(`user ${socketID} leaved meeting`);
             peersRef.current = peers;
             setPeers(peers);
             console.log(peersRef);
@@ -159,8 +162,8 @@ export default function Meeting() {
       {peers.map((peer, index) => (
         <Video key={index} peer={peer} />
       ))}
-      <div className="meeting-footer">
-      {isOnVideo ? (
+      <div className="meeting-footer flex gap-10">
+        {isOnVideo ? (
           <VideocamIcon
             fontSize="medium"
             onClick={handleCamera}
@@ -171,7 +174,7 @@ export default function Meeting() {
               width: "3rem",
               height: "3rem",
               borderRadius: "50%",
-              cursor: 'pointer'
+              cursor: "pointer",
             }}
           />
         ) : (
@@ -185,10 +188,18 @@ export default function Meeting() {
               width: "3rem",
               height: "3rem",
               borderRadius: "50%",
-              cursor: 'pointer',
+              cursor: "pointer",
             }}
           />
         )}
+        <div className="chat-sidebar">
+          <Button
+            icon="pi pi-arrow-left"
+            onClick={() => setVisibleChatSidebar(true)}
+            className="bg-black"
+          >Chat</Button>
+          <ChatSidebar nameDisplay={user.name} userID={user.username} roomID={roomID} socketRef={socketRef} visibleChatSidebar={visibleChatSidebar} setVisibleChatSidebar={setVisibleChatSidebar}/>
+        </div>
       </div>
     </div>
   );

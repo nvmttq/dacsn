@@ -44,6 +44,7 @@ const socketToRoom = {};
 const MeetingSchema = require("./models/meetingModel.js");
 
 io.on("connection", (socket) => {
+
   socket.on("join-room", async (data) => {
     const room = await MeetingSchema.findOne({ idMeeting: data.roomID });
 
@@ -51,35 +52,38 @@ io.on("connection", (socket) => {
       console.log("chua co");
       return;
     }
-  
-    console.log(socket.id);
-    const isUserInRoom = room.participants.toObject().find((user) => user.username === data.user.username);
 
-    if(!isUserInRoom) {
+    console.log(socket.id);
+    const isUserInRoom = room.participants
+      .toObject()
+      .find((user) => user.username === data.user.username);
+
+    if (!isUserInRoom) {
       room.participants.push({
-        socketId: socket.id,
+        socketID: socket.id,
         username: data.user.username,
         nameDisplay: data.user.name,
-        isOnline: true
-      })
+        isOnline: true,
+      });
     } else {
-      room.participants.forEach(user => {
-        if(user.username === data.user.username) {
-          user.socketId = socket.id;
-          user.isOnline = true
+      room.participants.forEach((user) => {
+        if (user.username === data.user.username) {
+          user.socketID = socket.id;
+          user.isOnline = true;
         }
-      })
+      });
     }
     await room.save();
     socket.join(data.roomID);
 
     const usersInThisRoom = room.participants
       .toObject()
-      .filter((user) => user.socketId !== socket.id);
+      .filter((user) => user.socketID !== socket.id);
     // users[roomID].filter((id) => id !== socket.id);
     console.log(usersInThisRoom);
     socket.emit("all users", usersInThisRoom);
   });
+
   socket.on("sending signal", async (payload) => {
     io.to(payload.userToSignal).emit("user joined", {
       signal: payload.signal,
@@ -95,16 +99,69 @@ io.on("connection", (socket) => {
       nameDisplay: payload.nameDisplay,
     });
   });
+
+  socket.on("get all message", async ({ roomID, userID }) => {
+    const room = await MeetingSchema.findOne({ idMeeting: roomID });
+
+    const conversation = room.conversation.toObject().map((m) => {
+      return {
+        conversation: m,
+        isOwn: m.userID,
+      };
+    });
+
+    socket.emit("get all message", conversation);
+    
+  });
+
+
+  socket.on("send message", async (message) => {
+    const room = await MeetingSchema.findOne({ idMeeting: message.roomID });
+
+    if (room) {
+      room.conversation.push({
+        userID: message.userID,
+        nameDisplay: message.nameDisplay,
+        content: {
+          file: message.file,
+          text: message.text,
+          emote: message.emote,
+        },
+      });
+
+      await room.save();
+      const sendMessage = {
+        conversation: {
+          userID: message.userID,
+          nameDisplay: message.nameDisplay,
+          content: {
+            file: message.file,
+            text: message.text,
+            emote: message.emote,
+          },
+        },
+        isOwn: message.userID,
+      };
+      // console.log(sendMessage)
+      io.emit("return message", sendMessage);
+    }
+  });
+
   socket.on("disconnect", async () => {
     console.log("USER LEFT1");
     socket.broadcast.emit("user left", socket.id);
-    const userLeft = await MeetingSchema.find({"participants.socketId" : socket.id});
-    if(!userLeft) return;
-    await MeetingSchema.updateOne({"participants.socketId" : socket.id}, {
-      $pull: {
-        "participants": {socketId: socket.id}
-      }
+    const userLeft = await MeetingSchema.find({
+      "participants.socketId": socket.id,
     });
+    if (!userLeft) return;
+    await MeetingSchema.updateOne(
+      { "participants.socketId": socket.id },
+      {
+        $pull: {
+          participants: { socketId: socket.id },
+        },
+      }
+    );
   });
 });
 

@@ -15,6 +15,7 @@
     "flowbite": "^1.8.1",
     "formik": "^2.4.5",
     "mdb-ui-kit": "^6.4.1",
+    "moment": "^2.29.4",
     "peer": "^1.0.1",
     "peerjs": "^1.5.1",
     "primeicons": "^6.0.1",
