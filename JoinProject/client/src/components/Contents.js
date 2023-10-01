@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "primereact/button";
+import TreeContent from "./TreeContent";
+
 
 function Contents() {
     const [turnButton, setTurnButton] = useState(false);
@@ -9,7 +11,7 @@ function Contents() {
                 <Button label="Thêm tài nguyên" style={{ fontSize: 10 }} />
             </div>
             <div className="h-[500px] w-[1000px] bg-white rounded-[15px]">
-                
+                <TreeContent />
             </div>
         </div>
     )
