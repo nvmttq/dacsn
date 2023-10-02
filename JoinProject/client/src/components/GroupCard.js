@@ -2,18 +2,18 @@ import React, { useEffect, useState } from "react";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 
-
+import * as constant from  "../constant.js"
 
 export default function GroupCard() {
 
   const [groups, setGroups] = useState([]);
-  const user = sessionStorage.getItem("user")
-    ? JSON.parse(sessionStorage.getItem("user"))
+  const user = localStorage.getItem("user")
+    ? JSON.parse(localStorage.getItem("user"))
     : null;
 
   useEffect(() => {
     if(user) {
-      fetch(`http://localhost:3002/groups/${user.username}`, {
+      fetch(`${constant.URL_API}/groups/${user.username}`, {
       method: "POST",
     })
       .then((res) => res.json())

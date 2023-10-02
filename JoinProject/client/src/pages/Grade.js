@@ -3,11 +3,11 @@ import { useParams } from "react-router-dom";
 import { AuthContext } from "../context/AuthProvider";
 
 import GradeCard from "../components/GradeCard.js";
-
+import * as constant from  "../constant.js"
 export default function Grade() {
   const { courseToken } = useParams();
-  const user = sessionStorage.getItem("user")
-    ? JSON.parse(sessionStorage.getItem("user"))
+  const user = localStorage.getItem("user")
+    ? JSON.parse(localStorage.getItem("user"))
     : null;
     
   const [grades, setGrades] = useState([]);
@@ -16,7 +16,7 @@ export default function Grade() {
   useEffect(() => {
     console.log(user);
     if (user) {
-      fetch(`http://localhost:3002/courses/${courseToken}/grade`, {
+      fetch(`${constant.URL_API}/courses/${courseToken}/grade`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -4,12 +4,14 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { Button } from "primereact/button";
 import axios from "axios";
 
+import * as constant from  "../constant.js"
+
 export default function Posts() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const AddPosts = () => {
     fetch
-      .post("http://localhost:3002/posts", {
+      .post(`${constant.URL_API}/posts`, {
         title: title,
         content: content,
       })

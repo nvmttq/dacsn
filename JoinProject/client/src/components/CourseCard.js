@@ -2,27 +2,26 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { Card } from "primereact/card";
-
-
+import * as constant from  "../constant.js"
 
 export default function CourseCard() {
   const [courses, setCourses] = useState([]);
 
-  const user = sessionStorage.getItem("user")
-    ? JSON.parse(sessionStorage.getItem("user"))
+  const user = localStorage.getItem("user")
+    ? JSON.parse(localStorage.getItem("user"))
     : null;
 
 
 
   useEffect(() => {
     if(user) {
-      fetch(`http://localhost:3002/courses/${user.username}`, {
+      fetch(`${constant.URL_API}/courses/${user.username}`, {
       method: "POST",
     })
       .then((res) => res.json())
       .then((result) => setCourses(result));
     }
-  }, []);
+  }, [user]);
 
 
 

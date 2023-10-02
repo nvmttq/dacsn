@@ -7,12 +7,13 @@ import { Button } from "@mui/material";
 
 import Video from "../components/Video.js";
 import ChatSidebar from "../components/ChatSidebar1.js";
+import * as constant from  "../constant.js"
 
 export default function Meeting() {
   const roomID = "abc";
   console.log("ROOM ID ", roomID);
-  const user = sessionStorage.getItem("user")
-    ? JSON.parse(sessionStorage.getItem("user"))
+  const user = localStorage.getItem("user")
+    ? JSON.parse(localStorage.getItem("user"))
     : null;
   const [visibleChatSidebar, setVisibleChatSidebar] = useState(false);
   const dataFetch = useRef(false);
@@ -35,7 +36,7 @@ export default function Meeting() {
         ownStream.current = stream;
         ownVideo.current.srcObject = stream;
 
-        socketRef.current = io.connect("http://localhost:3002");
+        socketRef.current = io.connect(`${constant.URL_API}`);
         socketRef.current.emit("join-room", { roomID, user });
 
         socketRef.current.on("all users", (users) => {

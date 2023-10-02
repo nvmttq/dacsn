@@ -3,9 +3,9 @@ import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Password } from "primereact/password";
 import { useNavigate } from "react-router-dom";
+import * as constant from  "../constant.js"
 
-
-export default function LoginDemo( {setVisible} ) {
+export default function Login( {setVisible} ) {
   const username = useRef("admin000");
   const password = useRef("admin000");
   const navigate = useNavigate();
@@ -16,7 +16,7 @@ export default function LoginDemo( {setVisible} ) {
 
   useEffect(() => {
     if (login && username && password) {
-      fetch(`http://localhost:3002/auth/login`, {
+      fetch(`${constant.URL_API}/auth/login`, {
         method: "POST",
         headers: {
           'Content-Type': 'application/json',
@@ -30,10 +30,13 @@ export default function LoginDemo( {setVisible} ) {
           return response.json();
         }).then((result) => {
           
-          sessionStorage.setItem("user", JSON.stringify(result));
+          localStorage.setItem("user", JSON.stringify(result));
           console.log(result)
+          
+        
           setVisible(false);
-          navigate("/");
+          setTimeout(() => {navigate("/")}, 2000)
+          
         })
         .catch(function (error) {
           console.log(error);

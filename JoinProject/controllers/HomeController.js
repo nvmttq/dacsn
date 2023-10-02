@@ -3,11 +3,58 @@ const groups = require("../models/groupModel.js");
 const usertest = require("../models/userTestModel.js");
 const GradesModel = require("../models/gradeModel.js");
 
-
 class HomeController {
   index(req, res) {
     //console.log("session user in homeController", req.session.user);
     res.json({ msg: "HELLO INDEX HGOME" });
+  }
+
+  async joinCourse(req, res) {
+    try {
+      const course = await courses.findOne({ token: req.body.courseToken });
+
+      if (course) {
+        let user = await usertest.findOne({
+          username: req.body.user.username,
+        });
+   
+        const isUserInCourse = course.participants
+          .toObject()
+          .find((u) => u.userID === user.username);
+        if (isUserInCourse) {
+          res.json({
+            severity: "info",
+            msg: `Bạn đã tham gia khóa học này trước đó`,
+          });
+        } else {
+          course.participants.push({
+            userID: user.username,
+            nameDisplay: user.toObject().name,
+            isTeachingAssitant: user.role === "TG",
+            isTeacher: user.role === "GV",
+          });
+          user.courses.push(req.body.courseToken)
+          await course.save();
+          await user.save();
+
+          res.json({
+            severity: "success",
+            msg: `Bạn đã được thêm vào khóa học ${course.title}`,
+          });
+        }
+      } else {
+        res.json({
+          severity: "warn",
+          msg: "Khóa học không tồn tại",
+        });
+      }
+    } catch (err) {
+      res.json({
+        severity: "error",
+        msg: "Có gì đó sai sai. Vui lòng kiểm tra lại !",
+        a: err.message,
+      });
+    }
   }
 
   async getCourseWithUserName(req, res) {
@@ -53,12 +100,11 @@ class HomeController {
     try {
       const grades = await GradesModel.find({
         courseToken: req.body.courseToken,
-        idUser: req.body.username
+        idUser: req.body.username,
       });
-      if(grades) {
+      if (grades) {
         res.json(grades);
-      }
-      else res.json({msg: "DONT MATCH ANY GRADES"});
+      } else res.json({ msg: "DONT MATCH ANY GRADES" });
     } catch (err) {
       res.json({ msg: "ERROR GRADES !!!" });
     }

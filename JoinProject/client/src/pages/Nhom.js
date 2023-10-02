@@ -9,11 +9,10 @@ import { InputText } from "primereact/inputtext";
 function Nhom() {
   const [visible, setVisible] = useState(false);
   const createNameGroup = useRef();
-
   const handleCreateGroup = (e) => {
     e.preventDefault();
   };
-
+  
   return (
     <div className="courses p-2 w-full flex flex-col">
       <div className="courses-header flex justify-between items-center">

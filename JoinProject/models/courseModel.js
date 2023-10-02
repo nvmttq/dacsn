@@ -18,7 +18,8 @@ const courseSchema = new mongoose.Schema({
   ],
   participants: [
     {
-      idUser: { type: String, default: "" },
+      userID: { type: String, default: "" },
+      nameDisplay: {type: String, default: ''},
       isTeacher: { type: Boolean, dafault: false },
       isTeachingAssitant: { type: Boolean, default: false },
     },
