@@ -27,25 +27,19 @@ export default function Posts() {
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [author, setAuthor] = useState("");
 
   const [listPosts, setListPosts] = useState([]);
-
-  useEffect(() => {
-    if (localStorage.getItem("user")) {
-      let user = JSON.parse(localStorage.getItem("user"));
-      setAuthor(user.name);
-    }
-  }, [author]);
+  const author = localStorage.getItem("user")
+    ? JSON.parse(localStorage.getItem("user"))
+    : null;
 
   useEffect(() => {
     axios
       .get("http://localhost:3002/posts", {})
       .then(function (response) {
         console.log(response);
-        let posts = response.data.dataPosts;
-        setListPosts(posts[0]);
-        //console.log(posts);
+
+        setListPosts(response.data.dataPosts);
       })
       .catch(function (error) {
         console.log(error);
@@ -103,14 +97,17 @@ export default function Posts() {
           </div>
         </div>
       </div>
-      {/* {listPosts.map((post, index) => { */}
-        <div class="flex flex-col bg-white px-8 py-6 mt-5 ml-10 mr-10 rounded-lg shadow-md">
+      {listPosts.map((post, index) => (
+        <div
+          key={index}
+          class="flex flex-col bg-white px-8 py-6 mt-5 ml-10 mr-10 rounded-lg shadow-md"
+        >
           <div>
             <a
-              class="text-lg text-gray-700 font-medium hover:underline cursor-pointer"
+              className="text-lg text-gray-700 font-medium hover:underline cursor-pointer"
               onClick={showModalPosts}
             >
-              {listPosts ? listPosts.title : "Không có tiêu đề"}
+              {post.title ? post.title : "Không có tiêu đề"}
             </a>
           </div>
           <div class="flex justify-between items-center mt-4">
@@ -120,14 +117,19 @@ export default function Posts() {
                 class="w-8 h-8 object-cover rounded-full"
                 alt="avatar"
               />
-              <a class="text-gray-700 text-sm mx-3 hover:underline" href="#">
-                {listPosts ? listPosts.author : ""}
+              <a
+                className="text-gray-700 text-sm mx-3 hover:underline"
+                href="#"
+              >
+                {post ? post.author : ""}
               </a>
             </div>
-            <span class="font-light text-sm text-gray-600">{listPosts ? listPosts.createdAt : ""}</span>
+            <span class="font-light text-sm text-gray-600">
+              {post ? post.createdAt : ""}
+            </span>
           </div>
         </div>
-      {/* })} */}
+      ))}
     </>
   );
 }

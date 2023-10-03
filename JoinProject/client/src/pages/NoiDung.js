@@ -41,20 +41,20 @@ export default function NoiDung() {
             marginLeft: 20,
           }}
         >
-          <text
+          <span
             style={{
               fontSize: 18,
             }}
           >
             Bài tập có sẵn
-          </text>
+          </span>
         </span>
       </div>
 
       <div className="w-full h-auto mt-5 ">
         <span className="ml-10 w-auto">
-          <text>môn học:</text>
-          <text className="ml-2">0</text>
+          <span>môn học:</span>
+          <span className="ml-2">0</span>
 
           <Dropdown
             value={selectedCity}
