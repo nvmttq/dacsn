@@ -16,10 +16,11 @@ exports.getAll = (req, res) => {
 };
 
 exports.create = async (req, res) => {
-  const { title, content } = req.body;
+  const { title, content, author } = req.body;
   const posts = new PostsModel({
     title: title,
     content: content,
+    author: author,
   });
   return posts
     .save()

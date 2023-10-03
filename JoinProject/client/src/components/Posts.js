@@ -1,35 +1,84 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Button } from "primereact/button";
+import { Toast } from "primereact/toast";
 import axios from "axios";
-
-import * as constant from  "../constant.js"
+import moment from "moment";
 
 export default function Posts() {
+  const toast = useRef(null);
+  const showSuccess = () => {
+    toast.current.show({
+      severity: "success",
+      summary: "Success",
+      detail: "Đăng bài thành công",
+      life: 3000,
+    });
+  };
+  const showError = () => {
+    toast.current.show({
+      severity: "error",
+      summary: "Error",
+      detail: "Đăng bài thất bại",
+      life: 3000,
+    });
+  };
+
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const AddPosts = () => {
-    fetch
-      .post(`${constant.URL_API}/posts`, {
-        title: title,
-        content: content,
-      })
+  const [author, setAuthor] = useState("");
+
+  const [listPosts, setListPosts] = useState([]);
+
+  useEffect(() => {
+    if (localStorage.getItem("user")) {
+      let user = JSON.parse(localStorage.getItem("user"));
+      setAuthor(user.name);
+    }
+  }, [author]);
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:3002/posts", {})
       .then(function (response) {
         console.log(response);
+        let posts = response.data.dataPosts;
+        setListPosts(posts[0]);
+        //console.log(posts);
       })
       .catch(function (error) {
         console.log(error);
       });
+  }, []);
+
+  const AddPosts = () => {
+    axios
+      .post("http://localhost:3002/posts", {
+        title: title,
+        content: content,
+        author: author,
+      })
+      .then(function (response) {
+        showSuccess();
+      })
+      .catch(function (error) {
+        console.log(error);
+        showError();
+      });
   };
+
+  const [postsModal, setPostModal] = useState(false);
+  const showModalPosts = () => {
+    setPostModal(true);
+  };
+
   return (
     <>
+      <Toast ref={toast} />
       <div className="rounded-lg h-auto mt-5 ml-10 mr-10 bg-white">
         <div className="w-full mb-4 border border-gray-200 rounded-lg bg-gray-50">
           <div className="px-4 py-2 bg-white rounded-t-lg">
-            <label for="comment" className="sr-only">
-              Your comment
-            </label>
             <InputText
               placeholder="Nhập tiêu đề"
               className="w-full"
@@ -54,6 +103,31 @@ export default function Posts() {
           </div>
         </div>
       </div>
+      {/* {listPosts.map((post, index) => { */}
+        <div class="flex flex-col bg-white px-8 py-6 mt-5 ml-10 mr-10 rounded-lg shadow-md">
+          <div>
+            <a
+              class="text-lg text-gray-700 font-medium hover:underline cursor-pointer"
+              onClick={showModalPosts}
+            >
+              {listPosts ? listPosts.title : "Không có tiêu đề"}
+            </a>
+          </div>
+          <div class="flex justify-between items-center mt-4">
+            <div class="flex items-center">
+              <img
+                src="https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=731&q=80"
+                class="w-8 h-8 object-cover rounded-full"
+                alt="avatar"
+              />
+              <a class="text-gray-700 text-sm mx-3 hover:underline" href="#">
+                {listPosts ? listPosts.author : ""}
+              </a>
+            </div>
+            <span class="font-light text-sm text-gray-600">{listPosts ? listPosts.createdAt : ""}</span>
+          </div>
+        </div>
+      {/* })} */}
     </>
   );
 }
