@@ -30,7 +30,7 @@ export default function Posts() {
 
   const [listPosts, setListPosts] = useState([]);
   const author = localStorage.getItem("user")
-    ? JSON.parse(localStorage.getItem("user"))
+    ? JSON.parse(localStorage.getItem("user")).name
     : null;
 
   useEffect(() => {
@@ -70,66 +70,64 @@ export default function Posts() {
   return (
     <>
       <Toast ref={toast} />
-      <div className="rounded-lg h-auto mt-5 ml-10 mr-10 bg-white">
-        <div className="w-full mb-4 border border-gray-200 rounded-lg bg-gray-50">
-          <div className="px-4 py-2 bg-white rounded-t-lg">
-            <InputText
-              placeholder="Nhập tiêu đề"
-              className="w-full"
-              onChange={(e) => setTitle(e.target.value)}
-            />
-            <InputTextarea
-              id="comment"
-              rows="4"
-              className="w-full text-sm text-gray-900 bg-white border-0 focus:ring-0"
-              placeholder="Viết nội dung..."
-              required
-              onChange={(e) => setContent(e.target.value)}
-            />
-          </div>
-          <div className="flex items-center justify-between px-3 py-2 border-t">
-            <Button
-              className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 hover:bg-blue-800"
-              onClick={AddPosts}
-            >
-              Đăng bài viết
-            </Button>
+      <div className="overflow-y-auto h-[500px] mt-5">
+        <div className="rounded-lg h-auto mt-5 ml-10 mr-10 bg-white">
+          <div className="w-full mb-4 border border-gray-200 rounded-lg bg-gray-50">
+            <div className="px-4 py-2 bg-white rounded-t-lg">
+              <InputText
+                placeholder="Nhập tiêu đề"
+                className="w-full"
+                onChange={(e) => setTitle(e.target.value)}
+              />
+              <InputTextarea
+                id="comment"
+                rows="4"
+                className="w-full text-sm text-gray-900 bg-white border-0 focus:ring-0"
+                placeholder="Viết nội dung..."
+                required
+                onChange={(e) => setContent(e.target.value)}
+              />
+            </div>
+            <div className="flex items-center justify-between px-3 py-2 border-t">
+              <Button
+                className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 hover:bg-blue-800"
+                onClick={AddPosts}
+              >
+                Đăng bài viết
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
-      {listPosts.map((post, index) => (
-        <div
-          key={index}
-          class="flex flex-col bg-white px-8 py-6 mt-5 ml-10 mr-10 rounded-lg shadow-md"
-        >
-          <div>
-            <a
-              className="text-lg text-gray-700 font-medium hover:underline cursor-pointer"
-              onClick={showModalPosts}
-            >
-              {post.title ? post.title : "Không có tiêu đề"}
-            </a>
-          </div>
-          <div class="flex justify-between items-center mt-4">
-            <div class="flex items-center">
-              <img
-                src="https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=731&q=80"
-                class="w-8 h-8 object-cover rounded-full"
-                alt="avatar"
-              />
+        {listPosts.map((post, index) => (
+          <div class="px-10 py-6 bg-white rounded-lg shadow-md h-auto mt-5 ml-10 mr-10">
+            <div class="flex justify-between items-center">
+              <span class="font-light text-gray-600">{post.createdAt}</span>
+            </div>
+            <div class="mt-2">
               <a
-                className="text-gray-700 text-sm mx-3 hover:underline"
+                class="text-2xl text-gray-700 font-bold hover:underline"
                 href="#"
               >
-                {post ? post.author : ""}
+                {post.title}
               </a>
+              <p class="mt-2 text-gray-600">{post.content}</p>
             </div>
-            <span class="font-light text-sm text-gray-600">
-              {post ? post.createdAt : ""}
-            </span>
+            <div class="flex justify-between items-center mt-4">
+              <div>
+                <a class="flex items-center" href="#">
+                  <img
+                    class="mx-4 w-10 h-10 object-cover rounded-full hidden sm:block"
+                    alt="avatar"
+                  />
+                  <h1 class="text-gray-700 font-bold hover:underline">
+                    {post.author}
+                  </h1>
+                </a>
+              </div>
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </>
   );
 }
