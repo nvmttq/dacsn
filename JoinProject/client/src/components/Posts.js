@@ -30,21 +30,26 @@ export default function Posts() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
+  const [contentCommentPost, setContentCommentPost] = useState("");
+
+  const [idDetailPost, setIdDetailPost] = useState("");
   const [titleDetailPost, setTitleDetailPost] = useState("");
   const [contentDetailPost, setContentDetailPost] = useState("");
   const [authorDetailPost, setAuthorDetailPost] = useState("");
   const [nameAuthorDetailPost, setNameAuthorDetailPost] = useState("");
   const [createdAtDetailPost, setCreatedAtDetailPost] = useState("");
-  const [checkLike, setCheckLike] = useState(false);
   const [checkBookmark, setCheckBookmark] = useState(false);
+  const [commentPost, setCommentPost] = useState([]);
+  const [listLikePost, setListLikePost] = useState([]);
+  const [checkLike, setCheckLike] = useState(false);
 
   const [listPosts, setListPosts] = useState([]);
   const author = localStorage.getItem("user")
     ? JSON.parse(localStorage.getItem("user"))._id
     : null;
   const nameUser = localStorage.getItem("user")
-  ? JSON.parse(localStorage.getItem("user")).name
-  : null;
+    ? JSON.parse(localStorage.getItem("user")).name
+    : null;
 
   useEffect(() => {
     axios
@@ -57,6 +62,54 @@ export default function Posts() {
       });
   }, []);
 
+  const fetchDataPosts = () => {
+    axios
+      .get("http://localhost:3002/posts", {})
+      .then(function (response) {
+        setListPosts(response.data.dataPosts.reverse());
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }
+
+  const fetchDataComment = ({id}) => {
+    axios
+      .get("http://localhost:3002/posts", {})
+      .then(function (response) {
+        let post = response.data.dataPosts.filter((x) => x._id === id);
+        setIdDetailPost(post[0]._id);
+        setTitleDetailPost(post[0].title);
+        setContentDetailPost(post[0].content);
+        setCreatedAtDetailPost(post[0].createDate);
+        setCheckBookmark(post[0].bookmark);
+        setAuthorDetailPost(post[0].author);
+        setNameAuthorDetailPost(post[0].nameAuthor);
+        setListLikePost(post[0].like);
+        let arr = post[0].like.filter((x) => x === author);
+        if (arr.length > 0) {
+          setCheckLike(true);
+        } else {
+          setCheckLike(false);
+        }
+        axios
+          .get("http://localhost:3002/comments", {})
+          .then(function (res) {
+            setCommentPost(
+              res.data.dataComments
+                .filter((x) => x.idPost === post[0]._id)
+                .reverse()
+            );
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
+
   const AddPosts = () => {
     axios
       .post("http://localhost:3002/posts", {
@@ -67,6 +120,7 @@ export default function Posts() {
         createDate: moment().format("DD-MM-YYYY HH:MM"),
       })
       .then(function (response) {
+        fetchDataPosts();
         showSuccess();
       })
       .catch(function (error) {
@@ -75,25 +129,107 @@ export default function Posts() {
       });
   };
 
-  const [postsModal, setPostModal] = useState(false);
-  const showModalPosts = ({ id }) => {
-    setPostModal(true);
+  const AddComment = () => {
     axios
-      .get("http://localhost:3002/posts", {})
+      .post("http://localhost:3002/comments", {
+        idPost: idDetailPost,
+        idUser: author,
+        nameUser: nameUser,
+        imagePath: "",
+        content: contentCommentPost,
+        createDate: moment().format("DD-MM-YYYY HH:MM"),
+        reply: [],
+      })
       .then(function (response) {
-        let post = response.data.dataPosts.filter((x) => x._id === id);
-        setTitleDetailPost(post[0].title);
-        setContentDetailPost(post[0].content);
-        setCreatedAtDetailPost(post[0].createDate);
-        setCheckLike(post[0].like);
-        setCheckBookmark(post[0].bookmark);
-        setAuthorDetailPost(post[0].author);
-        setNameAuthorDetailPost(post[0].nameAuthor);
+        fetchDataComment({id: idDetailPost});
       })
       .catch(function (error) {
         console.log(error);
       });
   };
+
+  const [contentReply, setContentReply] = useState("");
+  const AddReply = ({ id }) => {
+    axios
+      .get("http://localhost:3002/comments", {})
+      .then(function (response) {
+        let check = response.data.dataComments.filter((x) => x._id === id)[0]
+          .reply;
+        const reply = {
+          idUser: author,
+          nameUser: nameUser,
+          createDate: moment().format("DD-MM-YYYY HH:MM"),
+          content: contentReply,
+        };
+        check.push(reply);
+        axios
+          .put("http://localhost:3002/comments", {
+            id: id,
+            reply: check,
+          })
+          .then(function (res) {
+            fetchDataComment({id: idDetailPost});
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
+  const addLike = () => {
+    let arr = listLikePost;
+    arr.push(author);
+    setListLikePost(arr);
+    axios
+      .put("http://localhost:3002/posts", {
+        id: idDetailPost,
+        like: arr,
+      })
+      .then(function (response) {
+        fetchDataComment({id: idDetailPost});
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
+
+  const removeLike = () => {
+    axios
+      .get("http://localhost:3002/posts", {})
+      .then(function (response) {
+        let check = response.data.dataPosts.filter(
+          (x) => x._id === idDetailPost
+        );
+        let arr = check[0].like.filter((x) => x !== author);
+        axios
+          .put("http://localhost:3002/posts", {
+            id: idDetailPost,
+            like: arr,
+          })
+          .then(function (response) {
+            fetchDataComment({id: idDetailPost});
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }
+
+
+  const [postsModal, setPostModal] = useState(false);
+  const showModalPosts = ({ id }) => {
+    setPostModal(true);
+    fetchDataComment({id: id});
+  };
+  const cancelModal = () => {
+    setPostModal(false);
+    setCheckLike(false);
+  }
 
   return (
     <>
@@ -101,119 +237,152 @@ export default function Posts() {
         header={titleDetailPost}
         visible={postsModal}
         className="w-9/12"
-        onHide={() => setPostModal(false)}
+        onHide={() => cancelModal()}
       >
-        <div class="mx-auto my-10 w-full rounded-xl border px-4 py-6 text-gray-700">
-          <div class="mb-5">
-            <div class="flex items-center">
+        <div className="mx-auto my-10 w-full rounded-xl border px-4 py-6 text-gray-700">
+          <div className="mb-5">
+            <div className="flex items-center">
               <img
-                class="h-10 w-10 rounded-full object-cover"
+                className="h-10 w-10 rounded-full object-cover"
                 src="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
                 alt="Simon Lewis"
               />
-              <p class="ml-4 w-56">
-                <strong class="block font-medium text-gray-700">
+              <p className="ml-4 w-56">
+                <strong className="block font-medium text-gray-700">
                   {nameAuthorDetailPost}
                 </strong>
-                <span class="truncate text-sm text-gray-400">
+                <span className="truncate text-sm text-gray-400">
                   {createdAtDetailPost}
                 </span>
               </p>
             </div>
           </div>
-          <div class="mb-3">{contentDetailPost}</div>
-          <div class="mt-4 flex items-center space-x-2">
-            <button class="text-gray-500 hover:text-gray-800">
-              <i className="pi pi-heart"></i>
-              <div>Yêu thích</div>
-            </button>
-            <button class="text-gray-500 hover:text-gray-800">
-              <i className="pi pi-bookmark"></i>
-              <div>Đánh dấu</div>
-            </button>
-          </div>
-          <div class="flex first-letter:items-center justify-center shadow-lg mx-auto">
-            <div class="w-full bg-white rounded-lg px-4 pt-2">
-              <div class="flex flex-wrap -mx-3 mb-6">
-                <div class="w-full md:w-full px-3 mb-2 mt-2">
+          <div className="mb-3">{contentDetailPost}</div>
+          {checkLike ? (
+            <div className="mt-4 flex items-center space-x-2">
+              <button
+                className="text-gray-500 hover:text-gray-800 "
+                onClick={removeLike}
+              >
+                <i className="pi pi-heart-fill text-red-600"></i>
+                <div>Yêu thích ({listLikePost.length})</div>
+              </button>
+            </div>
+          ) : (
+            <div className="mt-4 flex items-center space-x-2">
+              <button
+                className="text-gray-500 hover:text-gray-800"
+                onClick={addLike}
+              >
+                <i className="pi pi-heart"></i>
+                <div>Yêu thích ({listLikePost.length})</div>
+              </button>
+            </div>
+          )}
+          <div className="flex first-letter:items-center justify-center border rounded mx-auto mt-5">
+            <div className="w-full bg-white rounded-lg px-4 pt-2">
+              <div className="flex flex-wrap -mx-3 mb-6">
+                <div className="w-full md:w-full px-3 mb-2 mt-2">
                   <textarea
-                    class="bg-gray-100 rounded border border-gray-400 leading-normal resize-none w-full h-20 py-2 px-3 placeholder-gray-700 focus:outline-none focus:bg-white"
-                    placeholder="Type Your Comment"
+                    className="bg-gray-100 rounded border border-gray-400 leading-normal resize-none w-full h-20 py-2 px-3 placeholder-gray-700 focus:outline-none focus:bg-white"
+                    placeholder="Nhập bình luận..."
                     required
+                    onChange={(e) => setContentCommentPost(e.target.value)}
                   ></textarea>
                 </div>
-                <div class="w-full flex items-start md:w-full px-3">
-                  <div class="cursor-pointer bg-white text-gray-700 font-medium py-1 px-4 border border-gray-400 rounded-lg tracking-wide mr-1 hover:bg-gray-100">
+                <div className="w-full flex items-start md:w-full px-3">
+                  <div
+                    className="cursor-pointer bg-white text-gray-700 font-medium py-1 px-4 border border-gray-400 rounded-lg tracking-wide mr-1 hover:bg-gray-100"
+                    onClick={AddComment}
+                  >
                     Gửi bình luận
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          <div class="mx-auto mt-10 w-full">
-            <div class="rounded-md border p-4 bg-white">
-              <div class="flex items-center space-x-4">
-                <img
-                  class="h-10 w-10 rounded-full"
-                  src="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
-                  alt="Avatar"
-                />
-                <div>
-                  <h2 class="text-lg font-semibold">John Doe</h2>
-                  <p class="text-sm text-gray-500">2 hours ago</p>
+          {commentPost.map((comment, index) => (
+            <div className="mx-auto mt-10 w-full">
+              <div className="rounded-md border p-4 bg-white">
+                <div className="flex items-center space-x-4">
+                  <img
+                    className="h-10 w-10 rounded-full"
+                    src="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
+                    alt="Avatar"
+                  />
+                  <div>
+                    <h2 className="text-lg font-semibold">
+                      {comment.nameUser}
+                    </h2>
+                    <p className="text-sm text-gray-500">
+                      {comment.createDate}
+                    </p>
+                  </div>
+                </div>
+                <p className="mt-4 text-gray-800">{comment.content}</p>
+                <div className="mt-4 flex items-center space-x-2">
+                  <button className="text-gray-500 hover:text-gray-800">
+                    <i className="pi pi-reply"></i>
+                    <div>Trả lời</div>
+                  </button>
+                  <button className="text-gray-500 hover:text-gray-800">
+                    <i className="pi pi-comments"></i>
+                    <div>
+                      Câu trả lời{" "}
+                      <strong className="text-">
+                        ({comment.reply.length})
+                      </strong>
+                    </div>
+                  </button>
                 </div>
               </div>
-              <p class="mt-4 text-gray-800">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-                auctor suscipit nisi, eu malesuada augue consectetur eget. Nam
-                molestie convallis nunc at hendrerit. Aliquam ut sapien sit amet
-                massa vehicula ultrices. In bibendum lacinia purus ut elementum.
-              </p>
-              <div class="mt-4 flex items-center space-x-2">
-                <button class="text-gray-500 hover:text-gray-800">
-                  <i className="pi pi-reply"></i>
-                  <div>Trả lời</div>
-                </button>
-              </div>
-            </div>
-            <div class="my-4 ml-10 rounded-md border p-4 bg-white">
-              <div class="flex items-center space-x-4">
-                <img
-                  class="h-8 w-8 rounded-full"
-                  src="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
-                  alt="Avatar"
-                />
-                <div>
-                  <h3 class="text-md font-medium">Jane Doe</h3>
-                  <p class="text-sm text-gray-500">30 minutes ago</p>
+              {comment.reply
+                .slice(0)
+                .reverse()
+                .map((reply, indexReply) => (
+                  <div className="my-4 ml-10 rounded-md border p-4 bg-white">
+                    <div className="flex items-center space-x-4">
+                      <img
+                        className="h-8 w-8 rounded-full"
+                        src="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
+                        alt="Avatar"
+                      />
+                      <div>
+                        <h3 className="text-md font-medium">
+                          {reply.nameUser}
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                          {reply.createDate}
+                        </p>
+                      </div>
+                    </div>
+                    <p className="mt-2 text-gray-800">{reply.content}</p>
+                  </div>
+                ))}
+              <div className="flex first-letter:items-center justify-center border rounded mt-5 my-4 ml-10">
+                <div className="w-full bg-white rounded-lg px-4 pt-2">
+                  <div className="flex flex-wrap -mx-3 mb-6">
+                    <div className="w-full md:w-full px-3 mb-2 mt-2">
+                      <textarea
+                        className="bg-gray-100 rounded border border-gray-400 leading-normal resize-none w-full h-20 py-2 px-3 placeholder-gray-700 focus:outline-none focus:bg-white"
+                        placeholder="Nhập câu trả lời..."
+                        required
+                        onChange={(e) => setContentReply(e.target.value)}
+                      ></textarea>
+                    </div>
+                    <div className="w-full flex items-start md:w-full px-3">
+                      <div
+                        className="cursor-pointer bg-white text-gray-700 font-medium py-1 px-4 border border-gray-400 rounded-lg tracking-wide mr-1 hover:bg-gray-100"
+                        onClick={() => AddReply({ id: comment._id })}
+                      >
+                        Gửi câu trả lời
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <p class="mt-2 text-gray-800">
-                Vivamus rutrum sem ut ipsum aliquam, eget posuere odio pulvinar.
-                Sed in eleifend odio, a congue nisl. Nam ac metus posuere,
-                maximus metus et, tincidunt risus.
-              </p>
             </div>
-
-            <div class="my-4 ml-10 rounded-md border p-4 bg-white">
-              <div class="flex items-center space-x-4">
-                <img
-                  class="h-8 w-8 rounded-full"
-                  src="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
-                  alt="Avatar"
-                />
-                <div>
-                  <h3 class="text-md font-medium">Jane Doe</h3>
-                  <p class="text-sm text-gray-500">30 minutes ago</p>
-                </div>
-              </div>
-              <p class="mt-2 text-gray-800">
-                Vivamus rutrum sem ut ipsum aliquam, eget posuere odio pulvinar.
-                Sed in eleifend odio, a congue nisl. Nam ac metus posuere,
-                maximus metus et, tincidunt risus.
-              </p>
-            </div>
-          </div>
+          ))}
         </div>
       </Dialog>
       <Toast ref={toast} />
@@ -246,24 +415,26 @@ export default function Posts() {
           </div>
         </div>
         {listPosts.map((post, index) => (
-          <div class="px-10 py-6 bg-white rounded-lg shadow-md h-auto mt-5 ml-10 mr-10">
-            <div class="flex justify-between items-center">
-              <span class="font-light text-gray-600">{post.createDate}</span>
+          <div className="px-10 py-6 bg-white rounded-lg shadow-md h-auto mt-5 ml-10 mr-10">
+            <div className="flex justify-between items-center">
+              <span className="font-light text-gray-600">
+                {post.createDate}
+              </span>
             </div>
-            <div class="mt-2">
+            <div className="mt-2">
               <div
-                class="text-2xl text-gray-700 font-bold hover:underline cursor-pointer"
+                className="text-2xl text-gray-700 font-bold hover:underline cursor-pointer"
                 onClick={() => showModalPosts({ id: post._id })}
               >
                 {post.title}
               </div>
-              <p class="mt-2 text-gray-600">{post.content}</p>
+              <p className="mt-2 text-gray-600">{post.content}</p>
             </div>
-            <div class="flex justify-between items-center mt-4">
+            <div className="flex justify-between items-center mt-4">
               <div>
-                <a class="flex items-center" href="#">
+                <a className="flex items-center" href="#">
                   <img
-                    class="mx-4 w-10 h-10 object-cover rounded-full hidden sm:block"
+                    className="mx-4 w-10 h-10 object-cover rounded-full hidden sm:block"
                     alt="avatar"
                     src="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
                   />

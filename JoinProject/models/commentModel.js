@@ -3,13 +3,12 @@ const mongoose = require("mongoose");
 
 
 const commentSchema = new mongoose.Schema({
-  idComment: { type: String },
   idPost: { type: String, required: false },
   idUser: { type: String },
-  title: { type: String, required: false },
+  nameUser: {type: String},
   imagePath: { type: String, default: "" },
   content: { type: String, default: "" },
-  createAt: { type: Date, default: Date.now() },
+  createDate: { type: String },
   updateAt: { type: Date, default: Date.now() },
 
   reply: { type: Array, default: [] },
