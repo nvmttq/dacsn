@@ -1,6 +1,5 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { AuthContext } from "../context/AuthProvider";
 
 import GradeCard from "../components/GradeCard.js";
 import * as constant from  "../constant.js"
@@ -11,10 +10,9 @@ export default function Grade() {
     : null;
     
   const [grades, setGrades] = useState([]);
-  console.log(grades);
+
 
   useEffect(() => {
-    console.log(user);
     if (user) {
       fetch(`${constant.URL_API}/courses/${courseToken}/grade`, {
         method: "POST",
@@ -31,6 +29,8 @@ export default function Grade() {
         .catch((err) => console.log(err));
     }
   }, []);
+
+  
   return (
     <div>
       DAY LA BANG DIEM CUA BAN TRONG KHOA HOC

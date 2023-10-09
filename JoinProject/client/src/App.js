@@ -19,7 +19,7 @@ function App() {
   return (
     <>
       <div className="w-screen h-screen flex">
-        <div className="w-1/6 bg-[#222222]">
+        <div className="w-1/6">
           <MenuSidebar />
         </div>
         <div className="w-5/6 bg-red-300">

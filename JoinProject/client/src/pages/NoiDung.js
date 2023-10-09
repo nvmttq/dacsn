@@ -2,8 +2,12 @@ import React, { useState } from "react";
 import { TabMenu } from "primereact/tabmenu";
 import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
+
+
 import Posts from "../components/Posts";
 import Contents from "../components/Contents";
+import Meeting from "../pages/Meeting.js";
+
 
 export default function NoiDung() {
 
@@ -28,28 +32,6 @@ export default function NoiDung() {
 
   return (
     <>
-      <div
-        style={{
-          // border: '1px solid red',
-          marginTop: 20,
-        }}
-      >
-        <span
-          className="font-bold"
-          style={{
-            // border: '1px solid red',
-            marginLeft: 20,
-          }}
-        >
-          <text
-            style={{
-              fontSize: 18,
-            }}
-          >
-            Bài tập có sẵn
-          </text>
-        </span>
-      </div>
 
       <div className="w-full h-auto mt-5 ">
         <span className="ml-10 w-auto">
@@ -74,9 +56,9 @@ export default function NoiDung() {
           />
         </div>
       </div>
-      {activeIndex === 0 && <Contents />
-      }
+      {activeIndex === 0 && <Contents />}
       {activeIndex === 1 && <Posts />}
+      {activeIndex === 2 && <Meeting />}
     </>
   );
 }

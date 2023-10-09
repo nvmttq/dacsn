@@ -1,26 +1,22 @@
 import React, { useState, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Dialog } from "primereact/dialog";
 import { Menu } from "primereact/menu";
 import { Avatar } from "primereact/avatar";
-import { classNames } from "primereact/utils";
 import { Button } from "primereact/button";
 import { TieredMenu } from "primereact/tieredmenu";
 
 // PAGES
 import Login from "../pages/Login.js";
-
+import MenuItemSidebar from "./MenuItemSidebar.js";
 
 export default function MenuSidebar() {
 
   const navigate = useNavigate();
   const [activeMenuItem, setActiveMenuItem] = useState(1);
-  const menuUser = useRef(null);
   const [visible, setVisible] = useState(false);
-  let user;
-  if (localStorage.getItem("user")) {
-    user = JSON.parse(localStorage.getItem("user"));
-  }
+  const menuUser = useRef(null);
+  let user = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null;
   console.log(activeMenuItem);
 
   let items = [
@@ -30,24 +26,7 @@ export default function MenuSidebar() {
       icon: "pi pi-fw pi-book",
       template: (item, options) => {
         return (
-          /* custom element */
-          <Link
-            to="/"
-            className={
-              options.className +
-              " " +
-              (activeMenuItem === item.id ? "active" : "")
-            }
-            onClick={(e) => setActiveMenuItem(item.id)}
-          >
-            <span
-              className={classNames(options.iconClassName, item.icon)}
-              style={{ color: "#76C044" }}
-            ></span>
-            <span className={options.labelClassName} style={{ color: "white" }}>
-              {item.label}
-            </span>
-          </Link>
+          <MenuItemSidebar linkTo={"/"} item={item} options={options} isActiveMenu={activeMenuItem} setActiveMenuItem={setActiveMenuItem}/>
         );
       },
     },
@@ -58,24 +37,7 @@ export default function MenuSidebar() {
 
       template: (item, options) => {
         return (
-          /* custom element */
-          <Link
-            to="/groups"
-            className={
-              options.className +
-              " " +
-              (activeMenuItem === item.id ? "active" : "")
-            }
-            onClick={(e) => setActiveMenuItem(item.id)}
-          >
-            <span
-              className={classNames(options.iconClassName, item.icon)}
-              style={{ color: "#76C044" }}
-            ></span>
-            <span className={options.labelClassName} style={{ color: "white" }}>
-              {item.label}
-            </span>
-          </Link>
+          <MenuItemSidebar linkTo={"/groups"} item={item} options={options} isActiveMenu={activeMenuItem} setActiveMenuItem={setActiveMenuItem}/>
         );
       },
     },
@@ -85,24 +47,7 @@ export default function MenuSidebar() {
       icon: "pi pi-fw pi-calendar",
       template: (item, options) => {
         return (
-          /* custom element */
-          <Link
-            to="/lich"
-            className={
-              options.className +
-              " " +
-              (activeMenuItem === item.id ? "active" : "")
-            }
-            onClick={(e) => setActiveMenuItem(item.id)}
-          >
-            <span
-              className={classNames(options.iconClassName, item.icon)}
-              style={{ color: "#76C044" }}
-            ></span>
-            <span className={options.labelClassName} style={{ color: "white" }}>
-              {item.label}
-            </span>
-          </Link>
+          <MenuItemSidebar linkTo={"/lich"} item={item} options={options} isActiveMenu={activeMenuItem} setActiveMenuItem={setActiveMenuItem}/>
         );
       },
     },
@@ -112,24 +57,7 @@ export default function MenuSidebar() {
       icon: "pi pi-fw pi-comment",
       template: (item, options) => {
         return (
-          /* custom element */
-          <Link
-            to="/messages"
-            className={
-              options.className +
-              " " +
-              (activeMenuItem === item.id ? "active" : "")
-            }
-            onClick={(e) => setActiveMenuItem(item.id)}
-          >
-            <span
-              className={classNames(options.iconClassName, item.icon)}
-              style={{ color: "#76C044" }}
-            ></span>
-            <span className={options.labelClassName} style={{ color: "white" }}>
-              {item.label}
-            </span>
-          </Link>
+          <MenuItemSidebar linkTo={"/messages"} item={item} options={options} isActiveMenu={activeMenuItem} setActiveMenuItem={setActiveMenuItem}/>
         );
       },
     },
@@ -139,24 +67,7 @@ export default function MenuSidebar() {
       icon: "pi pi-fw pi-cog",
       template: (item, options) => {
         return (
-          /* custom element */
-          <Link
-            to="/content"
-            className={
-              options.className +
-              " " +
-              (activeMenuItem === item.id ? "active" : "")
-            }
-            onClick={(e) => setActiveMenuItem(item.id)}
-          >
-            <span
-              className={classNames(options.iconClassName, item.icon)}
-              style={{ color: "#76C044" }}
-            ></span>
-            <span className={options.labelClassName} style={{ color: "white" }}>
-              {item.label}
-            </span>
-          </Link>
+          <MenuItemSidebar linkTo={"/content"} item={item} options={options} isActiveMenu={activeMenuItem} setActiveMenuItem={setActiveMenuItem}/>
         );
       },
     },
@@ -166,41 +77,7 @@ export default function MenuSidebar() {
       icon: "pi pi-fw pi-cog",
       template: (item, options) => {
         return (
-          /* custom element */
-          <Link
-            to="/setting"
-            className={
-              options.className +
-              " " +
-              (activeMenuItem === item.id ? "active" : "")
-            }
-            onClick={(e) => setActiveMenuItem(item.id)}
-          >
-            <span
-              className={classNames(options.iconClassName, item.icon)}
-              style={{ color: "#76C044" }}
-            ></span>
-            <span className={options.labelClassName} style={{ color: "white" }}>
-              {item.label}
-            </span>
-          </Link>
-        );
-      },
-    },
-    {
-      label: "AAA",
-      template: (item, options) => {
-        return (
-          /* custom element */
-          <Link to="/meeting" className={options.className}>
-            <span
-              className={classNames(options.iconClassName, "pi pi-home")}
-              style={{ color: "#76C044" }}
-            ></span>
-            <span className={options.labelClassName} style={{ color: "white" }}>
-              {item.label}
-            </span>
-          </Link>
+          <MenuItemSidebar linkTo={"/setting"} item={item} options={options} isActiveMenu={activeMenuItem} setActiveMenuItem={setActiveMenuItem}/>
         );
       },
     },
@@ -225,16 +102,16 @@ export default function MenuSidebar() {
   return (
     <div className="card h-full">
       <div className="w-full h-[40px] flex items-center justify-center gap-2">
-        <span className="text-white font-bold">TDMU COLLECT</span>
+        <span className="text-black font-bold">TDMU COLLECT</span>
       </div>
       <Menu
         model={items}
-        className="w-full h-[calc(100%-110px)] rounded-none bg-[#222222] border-0 border-b-[1px] border-t-[1px]"
+        className="w-full h-[calc(100%-110px)] rounded-none border-0 border-b-[1px] border-t-[1px] border-r-[2px]"
       />
 
       {user ? (
         <div className="card flex justify-content-center">
-          <TieredMenu model={ITEMS_MENU_USER} popup ref={menuUser} breakpoint="767px"/>
+          <TieredMenu model={ITEMS_MENU_USER} popup ref={menuUser} popupAlignment={"right"} breakpoint="767px"/>
           <button
             className="w-full h-[70px] p-link flex items-center p-1"
             onClick={(e) => {
@@ -246,7 +123,7 @@ export default function MenuSidebar() {
               className="mr-2"
               shape="circle"
             />
-            <div className="flex flex-col align text-white">
+            <div className="flex flex-col align text-black">
               <span className="font-bold">{user.name}</span>
               <span className="text-sm">{user.role}</span>
             </div>
@@ -258,7 +135,7 @@ export default function MenuSidebar() {
             label="Đăng nhập"
             icon="pi pi-external-link"
             onClick={() => setVisible(true)}
-            className="bg-[#222] border-1"
+            className="border-1"
           />
           <Dialog
             header="Header"

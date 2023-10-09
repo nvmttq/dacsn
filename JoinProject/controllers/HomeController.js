@@ -2,6 +2,7 @@ const courses = require("../models/courseModel.js");
 const groups = require("../models/groupModel.js");
 const usertest = require("../models/userTestModel.js");
 const GradesModel = require("../models/gradeModel.js");
+const ExamModel = require("../models/examModel.js");
 
 class HomeController {
   index(req, res) {
@@ -109,13 +110,18 @@ class HomeController {
       res.json({ msg: "ERROR GRADES !!!" });
     }
   }
-  // auth
+  
+  async getExamForUserInCourse(req, res) {
+    const { examToken } = req.params;
 
-  // async getUser(req, res) {
-  //   if(req.session.user) {
-  //     res.json(req.session.user);
-  //   } else res.json({});
-  // }
+    try {
+      const exam = await ExamModel.findOne({id: examToken});
+
+      res.json(exam);
+    } catch (err) {
+      res.json({msg : "DONT MATCH ANY EXAM !!!"})
+    }
+  }
 }
 
 module.exports = new HomeController();

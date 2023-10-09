@@ -11,7 +11,7 @@ export default function CourseCard() {
     <div>
         <Link to="/">GO BACK</Link>
         <div>DETAILS COURSE {courseToken}</div>
-        <Link to={`/courses/${courseToken}/grade`}>
+        <Link to={`./grade`}>
           XEM BANG DIEM
         </Link>
 
