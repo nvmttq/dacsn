@@ -1,11 +1,11 @@
-const PostsModel = require("../models/postModel");
+const CommentModel = require("../models/commentModel");
 
 exports.getAll = (req, res) => {
-  PostsModel.find()
+  CommentModel.find()
     .then((data) => {
       res.status(200).json({
         success: true,
-        dataPosts: data,
+        dataComments: data,
       });
     })
     .catch((err) =>
@@ -16,20 +16,22 @@ exports.getAll = (req, res) => {
 };
 
 exports.create = async (req, res) => {
-  const { title, content, author, nameAuthor, createDate} = req.body;
-  const posts = new PostsModel({
-    title: title,
+  const { idPost, idUser, nameUser, imagePath, content, createDate, reply} = req.body;
+  const comments = new CommentModel({
+    idPost: idPost,
+    idUser: idUser,
+    nameUser: nameUser,
+    imagePath: imagePath,
     content: content,
-    author: author,
-    nameAuthor: nameAuthor,
     createDate: createDate,
+    reply: reply,
   });
-  return posts
+  return comments
     .save()
     .then((data) => {
       return res.status(201).json({
         success: true,
-        message: "Created posts successfully",
+        message: "Created comment successfully",
         data: data,
       });
     })
@@ -42,15 +44,15 @@ exports.create = async (req, res) => {
       });
     });
 };
-exports.updatePosts = (req, res) => {
-  const { like } = req.body;
-  PostsModel.findByIdAndUpdate(req.body.id, {
-    like: like,
+exports.updateComment = (req, res) => {
+  const { reply } = req.body;
+  CommentModel.findByIdAndUpdate(req.body.id, {
+    reply: reply,
   })
     .then(() => {
       return res.status(204).json({
         success: true,
-        message: "Update like successfully",
+        message: "Update comment successfully",
       });
     })
     .catch((error) => {

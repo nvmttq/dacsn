@@ -1,6 +1,6 @@
 const courses = require("../models/courseModel.js");
 const groups = require("../models/groupModel.js");
-const usertest = require("../models/userTestModel.js");
+const usertest = require("../models/userModel.js");
 const GradesModel = require("../models/gradeModel.js");
 const ExamModel = require("../models/examModel.js");
 

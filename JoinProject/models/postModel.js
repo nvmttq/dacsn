@@ -1,24 +1,20 @@
 const mongoose = require("mongoose");
 
-const postSchema = new mongoose.Schema({
-  title: { type: String, required: false },
-  tags: [String],
-  imagePath: { type: String, default: "" },
-  content: { type: String, default: "" },
-  author: { type: String, required: true },
-  idCourse: { type: String, required: false },
-  comments: [
-    {
-      idComment: { type: String },
-      idUser: { type: String },
-      imagePath: { type: String, default: "" },
-      content: { type: String, default: "" },
-
-      reply: { type: Array, default: [] },
-    }
-  ],
-}, {
-  timestamps: true
-});
+const postSchema = new mongoose.Schema(
+  {
+    title: { type: String, required: false },
+    tags: [String],
+    imagePath: { type: String, default: "" },
+    content: { type: String, default: "" },
+    author: { type: String, required: true },
+    nameAuthor: { type: String },
+    like: { type: Array },
+    createDate: { type: String },
+    idCourse: { type: String, required: false },
+  },
+  {
+    timestamps: true,
+  }
+);
 
 module.exports = mongoose.model("post", postSchema);

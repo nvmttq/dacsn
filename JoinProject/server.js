@@ -6,6 +6,7 @@ const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const bodyParser = require("body-parser");
 const posts = require("./routes/posts");
+const comments = require("./routes/comment");
 
 const http = require("http");
 const app = express();
@@ -28,11 +29,12 @@ app.use(
     cookie: { maxAge: 5 * 60 * 1000 },
   })
 );
-app.use(posts);
 
 // ROUTES
 const route = require("./routes/index.js");
 route(app);
+app.use(posts);
+app.use(comments);
 
 // CONNECT DATABASE
 const connectDb = require("./db.js");

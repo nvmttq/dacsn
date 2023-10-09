@@ -32,11 +32,33 @@ export default function NoiDung() {
 
   return (
     <>
+      <div
+        style={{
+          // border: '1px solid red',
+          marginTop: 20,
+        }}
+      >
+        <span
+          className="font-bold"
+          style={{
+            // border: '1px solid red',
+            marginLeft: 20,
+          }}
+        >
+          <span
+            style={{
+              fontSize: 18,
+            }}
+          >
+            Bài tập có sẵn
+          </span>
+        </span>
+      </div>
 
       <div className="w-full h-auto mt-5 ">
         <span className="ml-10 w-auto">
-          <text>môn học:</text>
-          <text className="ml-2">0</text>
+          <span>môn học:</span>
+          <span className="ml-2">0</span>
 
           <Dropdown
             value={selectedCity}
