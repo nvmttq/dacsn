@@ -1,44 +1,21 @@
 const mongoose = require("mongoose");
 
 const examSchema = new mongoose.Schema({
-  id: { type: String, required: false },
-  userID: String,
-  courseID: { type: String, default: "" },
-  courseName: { type: String, default: "" },
-  isGrade: { type: Boolean, default: false },
-  type: [
-    [
-      {
-        id: Number,
-        question: String,
-        choice: [
-          {
-            name: String,
-            text: String,
-          },
-        ],
-        isCorrect: Boolean,
-        answer: String,
-        maxGrade: Number,
-        grade: Number,
-      },
-    ],
-    [
-      {
-        id: Number,
-        question: {
-          text: {type: String, default: ""},
-          support: [],
-        },
-        file: [],
-        maxGrade: {type: Number, default: 10},
-        grade: Number,
-      },
-    ]
+  id: { type: String, default: "" },
+  name: String,
+  questions: [
+    {
+      id: String,
+      textQues: String,
+      choice: [{ name: String, textChoice: String, userChoose: [String] }],
+      answer: String,
+      gradeQues: { type: Number, default: 0 },
+    },
   ],
-  startAt: {type: Date, default: Date.now()},
-  endAt: {type: Date, default: Date.now()},
-  
+  isReview: { type: Boolean, default: true },
+  startAt: { type: Date, default: Date.now },
+  endAt: { type: Date, default: Date.now },
+  timlitmit: { type: Number, default: 5 },
 });
 
 module.exports = mongoose.model("exam", examSchema);

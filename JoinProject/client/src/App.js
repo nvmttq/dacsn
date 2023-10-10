@@ -11,11 +11,8 @@ import Grade from "./pages/Grade.js";
 
 import Meeting from "./pages/Meeting.js";
 import NoiDung from "./pages/NoiDung.js";
-
-
+import ReviewExam from "./pages/ReviewExam.js";
 function App() {
-
-
   return (
     <>
       <div className="w-screen h-screen flex">
@@ -29,6 +26,11 @@ function App() {
             <Route
               path="/courses/:courseToken/grade"
               element={<Grade />}
+            ></Route>
+
+            <Route
+              path="/exam/review/:examToken"
+              element={<ReviewExam />}
             ></Route>
 
             <Route path="/groups" element={<Nhom />} />

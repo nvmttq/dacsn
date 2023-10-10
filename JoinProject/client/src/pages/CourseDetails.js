@@ -6,7 +6,7 @@ import { Link, useParams } from "react-router-dom";
 export default function CourseCard() {
   const {courseToken} = useParams();
   console.log(courseToken)
-
+  const examToken = "examToken1";
   return (
     <div>
         <Link to="/">GO BACK</Link>
@@ -14,7 +14,7 @@ export default function CourseCard() {
         <Link to={`./grade`}>
           XEM BANG DIEM
         </Link>
-
+      <Link to={`/exam/:${examToken}`}/>
         
     </div>
   );

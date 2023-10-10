@@ -29,6 +29,7 @@ export default function Exam() {
       })
         .then((response) => response.json())
         .then((result) => {
+          console.log(result)
           totalCorrect.current = result.totalCorrect;
           setExam(result.exam);
         })

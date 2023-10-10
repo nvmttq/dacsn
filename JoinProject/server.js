@@ -40,8 +40,6 @@ app.use(comments);
 const connectDb = require("./db.js");
 connectDb();
 
-const users = {};
-const socketToRoom = {};
 
 const MeetingSchema = require("./models/meetingModel.js");
 

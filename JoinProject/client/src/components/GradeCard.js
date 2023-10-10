@@ -43,7 +43,7 @@ export default function Grade({ grade }) {
         <span className="percent">{grade.percent}</span>
       </div>
 
-      <Link to={`/exam/${grade.examToken}`}>
+      <Link to={`/exam/review/${grade.examToken}`}>
         <ChevronRightIcon
           className="view-details cursor-pointer"
           color="#76C044"

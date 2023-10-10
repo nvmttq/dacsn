@@ -111,16 +111,31 @@ class HomeController {
     }
   }
   
-  async getExamForUserInCourse(req, res) {
+  async getReviewExamForUserInCourse(req, res) {
     const { examToken } = req.params;
 
     try {
       const exam = await ExamModel.findOne({id: examToken});
+      let totalCorrect = 0;
+      exam.questions.forEach(e => {
+        e.choice.forEach(c => {
+          c.userChoose.forEach(username => {
 
-      res.json(exam);
+            if(c.name === e.answer && req.body.username === username) totalCorrect++;
+          })
+        });
+      });
+      res.json({
+        exam, totalCorrect
+      });
     } catch (err) {
-      res.json({msg : "DONT MATCH ANY EXAM !!!"})
+      console.log(err)
+      res.json({msg :err})
     }
+  }
+
+  async getExamForUserInCourse(req, res) {
+    
   }
 }
 

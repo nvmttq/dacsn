@@ -5,8 +5,10 @@ const homeController = require('../controllers/HomeController.js')
 router.post('/courses/joinCourse', homeController.joinCourse)
 router.post('/courses/:courseToken/grade', homeController.getGradeOfUserFromCourse);
 
-//exam
+//exam and review
+router.post('/exam/review/:examToken', homeController.getReviewExamForUserInCourse);
 router.post('/exam/:examToken', homeController.getExamForUserInCourse);
+
 
 //user
 router.post('/groups/:username', homeController.getGroupWithUserName);
