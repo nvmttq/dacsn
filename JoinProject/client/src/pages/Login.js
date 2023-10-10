@@ -35,7 +35,7 @@ export default function Login( {setVisible} ) {
           
         
           setVisible(false);
-          setTimeout(() => {navigate("/")}, 2000)
+          setTimeout(() => {navigate("/")}, 100)
           
         })
         .catch(function (error) {

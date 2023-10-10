@@ -96,6 +96,7 @@ export default function MenuSidebar() {
       command : () => {
         if(localStorage.getItem("user")) localStorage.removeItem("user");
         navigate("/")
+        window.location.reload()
       }
     },
   ];

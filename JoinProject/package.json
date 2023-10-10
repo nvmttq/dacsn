@@ -12,6 +12,7 @@
     "http": "^0.0.1-security",
     "mongodb": "^6.1.0",
     "mongoose": "^7.5.2",
+    "shortid": "^2.2.16",
     "socket.io": "^4.7.2"
   },
   "name": "joinproject",

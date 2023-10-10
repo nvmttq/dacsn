@@ -53,7 +53,6 @@ class HomeController {
       res.json({
         severity: "error",
         msg: "Có gì đó sai sai. Vui lòng kiểm tra lại !",
-        a: err.message,
       });
     }
   }

@@ -11,9 +11,9 @@ router.post('/exam/:examToken', homeController.getExamForUserInCourse);
 
 
 //user
-router.post('/groups/:username', homeController.getGroupWithUserName);
+router.get('/groups/:username', homeController.getGroupWithUserName);
 
-router.post('/courses/:username', homeController.getCourseWithUserName)
+router.get('/courses/:username', homeController.getCourseWithUserName)
 router.get('/', homeController.index)
 
 module.exports = router

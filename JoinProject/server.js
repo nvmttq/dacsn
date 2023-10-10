@@ -32,10 +32,11 @@ app.use(
 
 // ROUTES
 const route = require("./routes/index.js");
+const course = require("./routes/course.js");
 route(app);
 app.use(posts);
 app.use(comments);
-
+app.use(course)
 // CONNECT DATABASE
 const connectDb = require("./db.js");
 connectDb();

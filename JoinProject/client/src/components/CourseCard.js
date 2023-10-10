@@ -16,7 +16,7 @@ export default function CourseCard() {
   useEffect(() => {
     if(user) {
       fetch(`${constant.URL_API}/courses/${user.username}`, {
-      method: "POST",
+      method: "GET",
     })
       .then((res) => res.json())
       .then((result) => setCourses(result));

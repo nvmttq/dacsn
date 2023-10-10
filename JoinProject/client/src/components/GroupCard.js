@@ -14,7 +14,7 @@ export default function GroupCard() {
   useEffect(() => {
     if(user) {
       fetch(`${constant.URL_API}/groups/${user.username}`, {
-      method: "POST",
+      method: "GET",
     })
       .then((res) => res.json())
       .then((result) => setGroups(result));
