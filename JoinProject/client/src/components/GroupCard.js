@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 
-import * as constant from  "../constant.js"
+import * as constant from "../constant.js"
 
 export default function GroupCard() {
 
@@ -12,12 +12,12 @@ export default function GroupCard() {
     : null;
 
   useEffect(() => {
-    if(user) {
+    if (user) {
       fetch(`${constant.URL_API}/groups/${user.username}`, {
-      method: "GET",
-    })
-      .then((res) => res.json())
-      .then((result) => setGroups(result));
+        method: "GET",
+      })
+        .then((res) => res.json())
+        .then((result) => setGroups(result));
     }
 
   }, []);
@@ -51,7 +51,7 @@ export default function GroupCard() {
             >
               <div className="m-0">
                 <div className="course-info flex justify-between">
-                  
+
                   <div className="course-assigment flex items-center gap-2">
                     <i className="pi pi-book text-green-600 text-xl" />
                     <div className="flex flex-col">
