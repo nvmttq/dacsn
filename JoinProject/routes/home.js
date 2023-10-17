@@ -7,9 +7,9 @@ router.post('/courses/:courseToken/grade', homeController.getGradeOfUserFromCour
 
 //exam and review
 router.post('/exam/review/:examToken', homeController.getReviewExamForUserInCourse);
-router.post('/exam/:examToken', homeController.getExamForUserInCourse);
-
-
+router.get('/exam/:examToken', homeController.getExamForUserInCourse);
+router.put('/exam/set-choice', homeController.setChoice);
+router.post('/exam/submit-exam', homeController.submitExam);
 //user
 router.get('/groups/:username', homeController.getGroupWithUserName);
 

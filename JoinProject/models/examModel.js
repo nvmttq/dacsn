@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const examSchema = new mongoose.Schema({
   id: { type: String, default: "" },
+  courseToken: {type: String, default: ""},
   name: String,
   questions: [
     {
@@ -14,8 +15,11 @@ const examSchema = new mongoose.Schema({
   ],
   isReview: { type: Boolean, default: true },
   startAt: { type: Date, default: Date.now },
-  endAt: { type: Date, default: Date.now },
-  timlitmit: { type: Number, default: 5 },
+  endAt: { type: Date, default: Date.now},
+  timelimit: { type: Number, default: 5 },
+  userStatus: [
+    {userID: String, status: {type: Boolean, default: false}}
+  ],
 });
 
 module.exports = mongoose.model("exam", examSchema);

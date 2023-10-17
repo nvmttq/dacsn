@@ -139,6 +139,83 @@ class HomeController {
 
   async getExamForUserInCourse(req, res) {
     
+
+    try {
+      const examToken = req.params.examToken;
+
+      const exam = await ExamModel.findOne({id: examToken});
+
+      return res.json(exam);
+    } catch(err) {
+      return res.json(err);
+    }
+  }
+
+  async setChoice(req, res) {
+    const {user, quesID, choiceName,examToken} = req.body;
+  
+    const exam = await ExamModel.findOne({id: examToken});
+    exam.questions.forEach(ques => {
+      if(ques.id === quesID) {
+        ques.choice.forEach(c => {
+          const isUserChoose = c.userChoose.find(username => username === user.username);
+          if(isUserChoose) {
+            c.userChoose = c.userChoose.filter(username => username !== user.username);
+          }
+          if(c.name === choiceName) {
+            c.userChoose.push(user.username);
+          }
+          
+        });
+      }
+    });
+    await exam.save();
+
+    return res.json({
+      msg: "change chocie",
+      data: exam,
+    })
+  }
+
+  async submitExam(req, res) {
+    const {user, examToken} = req.body;
+    try {
+      const exam = await ExamModel.findOne({id: examToken});
+      exam.userStatus.forEach(u => {
+        if(u.userID === user.username) {
+          u.status = true;
+        }
+      });
+      await exam.save();
+
+      var correct = 0, wrong = 0;
+      exam.questions.forEach(ques => {
+        ques.choice.forEach(c => {
+          c.userChoose.forEach(u => {
+            if(c.name.toUpperCase() === ques.answer.toUpperCase() && u === user.username) {
+              correct++;
+            } else wrong++;
+          });
+        });
+      });
+      console.log(correct, wrong)
+      const grade = new GradesModel({
+        id: "gradetest",
+        name: exam.name,
+        courseToken: exam.courseToken,
+        examToken: exam.id,
+        status: "Đã hoàn thành",
+        grade: correct,
+        percent: 20,
+        userID: user.username
+
+      });
+      await grade.save();
+      return res.json({severity: 'success', msg: "Nộp bài thành công !",grade, exam})
+    } catch(err) {
+      console.log(err);
+      return res.json({severity: 'error', msg: "Nộp bài không thành công công !",err})
+    }
   }
 
   async getContentCourse(req, res) {

@@ -14,7 +14,7 @@ export default function CourseCard() {
         <Link to={`./grade`}>
           XEM BANG DIEM
         </Link>
-      <Link to={`/exam/:${examToken}`}/>
+      <Link to={`/exam/${examToken}`}>GO TO EXAM</Link>
         
     </div>
   );
