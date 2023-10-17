@@ -16,4 +16,8 @@ router.get('/groups/:username', homeController.getGroupWithUserName);
 router.get('/courses/:username', homeController.getCourseWithUserName)
 router.get('/', homeController.index)
 
+router.post('/course/content', homeController.getContentCourse);
+
+router.get('/load-dkmh', homeController.loadDkmh);
+
 module.exports = router

@@ -9,6 +9,7 @@ import { TieredMenu } from "primereact/tieredmenu";
 // PAGES
 import Login from "../pages/Login.js";
 import MenuItemSidebar from "./MenuItemSidebar.js";
+import * as constant from "../constant.js";
 
 export default function MenuSidebar() {
 
@@ -81,6 +82,7 @@ export default function MenuSidebar() {
         );
       },
     },
+    
   ];
   const ITEMS_MENU_USER = [
     {
@@ -100,6 +102,22 @@ export default function MenuSidebar() {
       }
     },
   ];
+
+  const loadDkmh = async (e) => {
+    await fetch(`${constant.URL_API}/load-dkmh`, {
+      method: "GET",
+    })
+      .then(function (response) {
+        return response.json();
+      }).then((result) => {
+        console.log(result)
+        
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }
+
   return (
     <div className="card h-full">
       <div className="w-full h-[40px] flex items-center justify-center gap-2">
@@ -109,7 +127,7 @@ export default function MenuSidebar() {
         model={items}
         className="w-full h-[calc(100%-110px)] rounded-none border-0 border-b-[1px] border-t-[1px] border-r-[2px]"
       />
-
+      <Button onClick={loadDkmh}>LOAD DANH SÁCH DKMH</Button>
       {user ? (
         <div className="card flex justify-content-center">
           <TieredMenu model={ITEMS_MENU_USER} popup ref={menuUser} popupAlignment={"right"} breakpoint="767px"/>

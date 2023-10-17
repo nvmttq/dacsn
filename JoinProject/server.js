@@ -166,28 +166,8 @@ io.on("connection", (socket) => {
   });
 });
 
-// const ExamSchme = require("./models/examModel.js");
-// const ExamCollection = new ExamSchme({
-//   id: "examToken1",
-//   userID: "admin000",
-//   courseID: "token4",
-//   type: [[], []]
-//  });
-//  ExamCollection.type[0].push({
-//   id: 1,
-//   question: "Kiểu dữ liệu số nguyên trong C++ là gì ? ",
-//   choice: [
-//     {name: "A", text: "int"},
-//     {name: "B", text: "bool"},
-//     {name: "C", text: "Không biết"},
-//     {name: "D", text: "float"}
-//   ],
-//   isCorrect: false,
-//   answer: "int",
-//   maxGrade: 1,
-//   grade: 0
-//  });
-//  ExamCollection.save();
+
+
 const port = process.env.PORT || 3002;
 server.listen(port, () => {
   console.log("SEVER RUNNING ON PORT", port);

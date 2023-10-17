@@ -1,8 +1,12 @@
 const courses = require("../models/courseModel.js");
+const CourseModel = require("../models/courseModel.js");
 const groups = require("../models/groupModel.js");
 const usertest = require("../models/userModel.js");
 const GradesModel = require("../models/gradeModel.js");
 const ExamModel = require("../models/examModel.js");
+const ContentSubjectModel = require("../models/contentSubjectModel.js");
+const DkmhModel = require("../models/dkmhModel.js");
+
 
 class HomeController {
   index(req, res) {
@@ -135,6 +139,56 @@ class HomeController {
 
   async getExamForUserInCourse(req, res) {
     
+  }
+
+  async getContentCourse(req, res) {
+    const {user, courseID} = req.body;
+
+    // try {
+    //   const contentSubject = await ContentSubjectModel.findOne({courseID: courseToken})
+    // }
+  }
+
+  async loadDkmh(req, res) {
+
+
+    try {
+      await DkmhModel.find({}).then(documents => {
+        documents.forEach( async docs => {
+          console.log(docs)
+          const contentSubject = await ContentSubjectModel.find({id: docs.contentSubjectID});
+
+          const course = new CourseModel({
+            id: "test",
+            title: docs.courseFullName,
+            token: docs.courseID,
+            assignment: 0,
+            participants: docs.participants,
+            contentCourse: contentSubject.contentCourse,
+          });
+          
+          docs.participants.forEach(async user => {
+            await usertest.findOneAndUpdate({username: user.userID}, {
+              $push: {
+                courses: docs.courseID
+              }
+            });
+          });
+
+          const saveCourse = await course.save().catch(err => console.log(err));
+        })
+      });
+
+      return res.json({
+        msg: "Đã load danh sách thành công",
+        code: 200,
+      })
+    } catch(err) {
+      return res.json({
+        msg: "Có gì đó sai sai khi load danh sách đăng ký môn học" + "\n" + err,
+        code: 500,
+      })
+    }
   }
 }
 
