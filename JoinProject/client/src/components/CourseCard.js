@@ -31,9 +31,12 @@ export default function CourseCard() {
       src="https://primefaces.org/cdn/primereact/images/usercard.png"
     />
   );
+  const getToken = ({ token }) => {
+    localStorage.setItem("currentCourses", JSON.stringify(token));
+  }
   const footer = (courseToken) => {
     return (
-      <Link to={`/courses/${courseToken}`} label="Vào lớp" icon="pi pi-book">Vào lớp</Link>
+      <Link to={`/content`} label="Vào lớp" icon="pi pi-book" onClick={() => getToken({token: courseToken})}>Vào lớp</Link>
   )};
 
   return (

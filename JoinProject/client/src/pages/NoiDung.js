@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TabMenu } from "primereact/tabmenu";
 import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
@@ -7,9 +7,25 @@ import { Dropdown } from "primereact/dropdown";
 import Posts from "../components/Posts";
 import Contents from "../components/Contents";
 import Meeting from "../pages/Meeting.js";
+import axios from "axios";
 
 
 export default function NoiDung() {
+  const currentCourses = localStorage.getItem("currentCourses")
+    ? JSON.parse(localStorage.getItem("currentCourses"))
+    : null;
+
+  const [courseInformation, setCourseInformation] = useState({});
+  useEffect(() => {
+    axios
+      .get("http://localhost:3002/get-course", {})
+      .then(function (response) {
+        setCourseInformation(response.data.dataCourse.filter((x => x.token == currentCourses))[0]);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }, [currentCourses]);
 
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -50,7 +66,7 @@ export default function NoiDung() {
               fontSize: 18,
             }}
           >
-            Bài tập có sẵn
+            {courseInformation ? courseInformation.title : "Chưa vào lớp học nào!!"}
           </span>
         </span>
       </div>
