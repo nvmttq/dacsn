@@ -8,6 +8,7 @@ import { InputText } from "primereact/inputtext";
 import * as constant from "../constant.js"
 import { useNavigate } from "react-router-dom";
 import { Toast } from "primereact/toast";
+
 function Nhom() {
   const user = localStorage.getItem("user")
     ? JSON.parse(localStorage.getItem("user"))
@@ -18,7 +19,6 @@ function Nhom() {
   const navigate = useNavigate();
 
   const showCreateGroup = (data) => {
-    console.log(data)
     toastCreateGroup.current.show({
       severity: data.severity,
       summary: "Thông báo",
@@ -30,7 +30,7 @@ function Nhom() {
     e.preventDefault();
     console.log(createNameGroup.current.value)
     await fetch(`${constant.URL_API}/groups/create-group`, {
-      method: "GROUP",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
@@ -41,8 +41,8 @@ function Nhom() {
     })
       .then((response) => response.json())
       .then((result) => {
+        console.log(result)
         showCreateGroup(result);
-        console.log(result);
         setTimeout(() => { navigate("/") }, 2000)
       })
       .catch((err) => {
@@ -65,7 +65,7 @@ function Nhom() {
             text={"Nhập mã nhóm"}
             textButton={"Tham gia nhóm"}
           />
-          <Toast ref={toastCreateGroup} position="bottom-right"/>
+          <Toast ref={toastCreateGroup} position="bottom-right" />
           <Button
             label="Tạo mới"
             icon="pi pi-plus"
