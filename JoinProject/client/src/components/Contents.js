@@ -1,14 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Dropdown } from "primereact/dropdown";
 import { Dialog } from "primereact/dialog";
 import { Tree } from "primereact/tree";
 import { InputText } from "primereact/inputtext";
+import { Button } from "primereact/button";
+import { Toast } from 'primereact/toast';
 import axios from "axios";
 
 export default function Contents() {
+  const toast = useRef(null);
+
+  const showSuccess = () => {
+      toast.current.show({severity:'success', summary: 'Success', detail:'Cập nhật nội dung thành công!!', life: 3000});
+  }
+
+  const [loadingSaveChanges, setLoadingSaveChanges] = useState(false);
   const [checkUpdateContent, setCheckUpdateContent] = useState(false);
   const editContent = ({ tree, index, key, newValue }) => {
-    if (!checkUpdateContent) {
+    if (!checkUpdateContent && index < tree.length) {
       if (tree[index].key === key) {
         setCheckUpdateContent(true);
         tree[index].label = newValue;
@@ -34,24 +43,22 @@ export default function Contents() {
   };
 
   const solveContent = ({ newValue, key }) => {
-    setCheckUpdateContent(false);
-    let treeContentEditCopy = treeContentEdit;
     editContent({
-      tree: treeContentEditCopy,
+      tree: treeContentEdit,
       index: 0,
       key: key,
       newValue: newValue,
     });
-    setTreeContentEdit(treeContentEditCopy);
   };
 
   const nodeTemplate = (node, options) => {
     let label = (
       <InputText
-        value={node.label}
-        onChange={(e) =>
-          solveContent({ newValue: e.target.value, key: node.key })
-        }
+        defaultValue={node.label}
+        onChange={(e) => {
+          setCheckUpdateContent(false);
+          solveContent({ newValue: e.target.value, key: node.key });
+        }}
       />
     );
 
@@ -70,8 +77,10 @@ export default function Contents() {
         let course = response.data.dataCourse.filter(
           (x) => x.token === currentCourses
         )[0];
-        setCourseInformation(course);
-        setTreeContentEdit(course.contentCourse);
+        if (course) {
+          setCourseInformation(course);
+          setTreeContentEdit(course.contentCourse);
+        }
       })
       .catch(function (error) {
         console.log(error);
@@ -92,21 +101,62 @@ export default function Contents() {
     setEditContentModal(false);
   };
 
+  const fetchContentCourse = () => {
+    axios
+      .get("http://localhost:3002/get-course", {})
+      .then(function (response) {
+        let course = response.data.dataCourse.filter(
+          (x) => x.token === currentCourses
+        )[0];
+        if (course) {
+          setCourseInformation(course);
+          setTreeContentEdit(course.contentCourse);
+          setLoadingSaveChanges(false);
+          showSuccess();
+        }
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }
+  const SaveChangeButton = () => {
+    setLoadingSaveChanges(true);
+    axios
+      .put("http://localhost:3002/update-course", {
+        token: currentCourses,
+        contentCourse: treeContentEdit,
+      })
+      .then(function (response) {
+        fetchContentCourse();
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
+
   return (
     <>
+      <Toast ref={toast} />
       <Dialog
         header="CHỈNH SỬA NỘI DUNG"
         visible={editContentModal}
         className="w-4/5"
         onHide={cancelModalEditContent}
       >
-        <div className="card flex justify-content-center">
-          <Tree
-            value={treeContentEdit}
-            nodeTemplate={nodeTemplate}
-            className="w-full md:w-30rem"
-          />
-        </div>
+          <div>
+            <Button
+              label="Lưu thay đổi"
+              icon="pi pi-check"
+              loading={loadingSaveChanges}
+              onClick={SaveChangeButton}
+              className="mb-5 bg-green-400"
+            />
+            <Tree
+              value={treeContentEdit}
+              nodeTemplate={nodeTemplate}
+              className="w-full md:w-30rem"
+            />
+          </div>
       </Dialog>
       <div className="w-auto mt-4 ml-10">
         <div className="absolute end-5">
