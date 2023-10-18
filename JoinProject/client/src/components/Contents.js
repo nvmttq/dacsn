@@ -4,22 +4,25 @@ import { Dialog } from "primereact/dialog";
 import { Tree } from "primereact/tree";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
-import { Toast } from 'primereact/toast';
+import { Toast } from "primereact/toast";
 import axios from "axios";
 
 export default function Contents() {
   const toast = useRef(null);
 
   const showSuccess = () => {
-      toast.current.show({severity:'success', summary: 'Success', detail:'Cập nhật nội dung thành công!!', life: 3000});
-  }
+    toast.current.show({
+      severity: "success",
+      summary: "Success",
+      detail: "Cập nhật nội dung thành công!!",
+      life: 3000,
+    });
+  };
 
   const [loadingSaveChanges, setLoadingSaveChanges] = useState(false);
-  const [checkUpdateContent, setCheckUpdateContent] = useState(false);
   const editContent = ({ tree, index, key, newValue }) => {
-    if (!checkUpdateContent && index < tree.length) {
+    if (index < tree.length) {
       if (tree[index].key === key) {
-        setCheckUpdateContent(true);
         tree[index].label = newValue;
       } else {
         if (tree[index].children) {
@@ -30,14 +33,13 @@ export default function Contents() {
             newValue: newValue,
           });
         }
-        if (!checkUpdateContent) {
-          editContent({
-            tree: tree,
-            index: index + 1,
-            key: key,
-            newValue: newValue,
-          });
-        }
+
+        editContent({
+          tree: tree,
+          index: index + 1,
+          key: key,
+          newValue: newValue,
+        });
       }
     }
   };
@@ -56,7 +58,6 @@ export default function Contents() {
       <InputText
         defaultValue={node.label}
         onChange={(e) => {
-          setCheckUpdateContent(false);
           solveContent({ newValue: e.target.value, key: node.key });
         }}
       />
@@ -118,7 +119,7 @@ export default function Contents() {
       .catch(function (error) {
         console.log(error);
       });
-  }
+  };
   const SaveChangeButton = () => {
     setLoadingSaveChanges(true);
     axios
@@ -143,20 +144,20 @@ export default function Contents() {
         className="w-4/5"
         onHide={cancelModalEditContent}
       >
-          <div>
-            <Button
-              label="Lưu thay đổi"
-              icon="pi pi-check"
-              loading={loadingSaveChanges}
-              onClick={SaveChangeButton}
-              className="mb-5 bg-green-400"
-            />
-            <Tree
-              value={treeContentEdit}
-              nodeTemplate={nodeTemplate}
-              className="w-full md:w-30rem"
-            />
-          </div>
+        <div>
+          <Button
+            label="Lưu thay đổi"
+            icon="pi pi-check"
+            loading={loadingSaveChanges}
+            onClick={SaveChangeButton}
+            className="mb-5 bg-green-400"
+          />
+          <Tree
+            value={treeContentEdit}
+            nodeTemplate={nodeTemplate}
+            className="w-full md:w-30rem"
+          />
+        </div>
       </Dialog>
       <div className="w-auto mt-4 ml-10">
         <div className="absolute end-5">
