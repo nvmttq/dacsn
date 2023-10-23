@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Dropdown } from "primereact/dropdown";
 import { Dialog } from "primereact/dialog";
 import { Tree } from "primereact/tree";
-import { InputText } from "primereact/inputtext";
+import { InputTextarea } from "primereact/inputtextarea";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import axios from "axios";
@@ -33,7 +33,6 @@ export default function Contents() {
             newValue: newValue,
           });
         }
-
         editContent({
           tree: tree,
           index: index + 1,
@@ -53,14 +52,59 @@ export default function Contents() {
     });
   };
 
+  const deleteContentByKey = ({tree, index, key}) => {
+    if (index < tree.length && tree[index].children) {
+      if (tree[index].children.filter(x => x.key === key).length > 0) {
+        tree[index].children = tree[index].children.filter(x => x.key !== key);
+      } else {
+        if (tree[index].children) {
+          deleteContentByKey({
+            tree: tree[index].children,
+            index: 0,
+            key: key,
+          });
+        }
+        deleteContentByKey({
+          tree: tree,
+          index: index + 1,
+          key: key,
+        });
+      }
+    }
+  }
+
   const nodeTemplate = (node, options) => {
     let label = (
-      <InputText
-        defaultValue={node.label}
-        onChange={(e) => {
-          solveContent({ newValue: e.target.value, key: node.key });
-        }}
-      />
+      <div className="flex">
+        <InputTextarea
+          autoResize
+          cols={100}
+          rows={1}
+          defaultValue={node.label}
+          onChange={(e) => {
+            solveContent({ newValue: e.target.value, key: node.key });
+          }}
+        />
+        <Button
+          icon="pi pi-arrow-down-right"
+          className="ml-3"
+          title="Thêm nội dung con"
+          severity="info"
+        />
+        <Button
+          icon="pi pi-trash"
+          className="ml-3"
+          title="Xóa nội dung này"
+          severity="danger"
+          onClick={() => {
+            if (treeContentEdit.filter(x => x.key === node.key).length > 0) {
+              setTreeContentEdit(treeContentEdit.filter(x => x.key !== node.key))
+            } else {
+              deleteContentByKey({tree: treeContentEdit, index: 0, key: node.key})
+            }
+          }}
+        />
+      </div>
     );
 
     return <span className={options.className}>{label}</span>;
@@ -99,6 +143,7 @@ export default function Contents() {
     setEditContentModal(true);
   };
   const cancelModalEditContent = () => {
+    fetchContentCourse();
     setEditContentModal(false);
   };
 
@@ -112,8 +157,6 @@ export default function Contents() {
         if (course) {
           setCourseInformation(course);
           setTreeContentEdit(course.contentCourse);
-          setLoadingSaveChanges(false);
-          showSuccess();
         }
       })
       .catch(function (error) {
@@ -125,14 +168,28 @@ export default function Contents() {
     axios
       .put("http://localhost:3002/update-course", {
         token: currentCourses,
-        contentCourse: treeContentEdit,
+        contentCourse: treeContentEdit.filter((x) => x.label !== ""),
       })
       .then(function (response) {
         fetchContentCourse();
+        setLoadingSaveChanges(false);
+        showSuccess();
       })
       .catch(function (error) {
         console.log(error);
       });
+  };
+  const AddToTreeContent = () => {
+    const arr = [];
+    for (var i = 0; i < treeContentEdit.length; i++) {
+      arr.push(treeContentEdit[i]);
+    }
+    arr.push({
+      key: treeContentEdit.length.toString(),
+      label: "",
+      children: [],
+    });
+    setTreeContentEdit(arr);
   };
 
   return (
@@ -145,18 +202,29 @@ export default function Contents() {
         onHide={cancelModalEditContent}
       >
         <div>
-          <Button
-            label="Lưu thay đổi"
-            icon="pi pi-check"
-            loading={loadingSaveChanges}
-            onClick={SaveChangeButton}
-            className="mb-5 bg-green-400"
-          />
+          <div className="flex">
+            <Button
+              label="Lưu thay đổi"
+              icon="pi pi-check"
+              loading={loadingSaveChanges}
+              onClick={SaveChangeButton}
+              className="mb-5"
+              severity="success"
+            />
+          </div>
           <Tree
             value={treeContentEdit}
             nodeTemplate={nodeTemplate}
             className="w-full md:w-30rem"
           />
+          <div className="flex">
+            <Button
+              label="Thêm tài nguyên"
+              onClick={AddToTreeContent}
+              className="mt-5"
+              severity="info"
+            />
+          </div>
         </div>
       </Dialog>
       <div className="w-auto mt-4 ml-10">
