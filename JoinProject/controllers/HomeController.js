@@ -202,14 +202,10 @@ class HomeController {
         wrong = 0;
       exam.questions.forEach((ques) => {
         ques.choice.forEach((c) => {
-          c.userChoose.forEach((u) => {
-            if (
-              c.name.toUpperCase() === ques.answer.toUpperCase() &&
-              u === user.username
-            ) {
-              correct++;
-            } else wrong++;
-          });
+          if(c.name.toUpperCase() === ques.answer.toUpperCase()) {
+            if(c.userChoose.find(u => u === user.username)) correct++;
+            else wrong++;
+          } 
         });
       });
       console.log(correct, wrong);

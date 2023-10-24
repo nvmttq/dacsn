@@ -105,16 +105,19 @@ export default function Exam() {
     const [correct, setCorrect] = useState(0);
     const [wrong, setWrong] = useState(0);
     useEffect( () => {
+      let correct = 0, wrong = 0;
       exam.questions.forEach(ques => {
         ques.choice.forEach(c => {
-          c.userChoose.forEach(u => {
-            if(c.name.toUpperCase() === ques.answer.toUpperCase() && u === user.username) {
-              setCorrect( prev => prev+1);
-            } else setWrong(prev => prev+1)
-          });
+          if(c.name.toUpperCase() === ques.answer.toUpperCase()) {
+              
+              if(c.userChoose.find(u => u === user.username)) correct++;
+              else wrong++;
+          } 
         });
       });
       console.log(correct, wrong)
+      setCorrect(correct);
+      setWrong(wrong);
     }, []);
 
     return (
