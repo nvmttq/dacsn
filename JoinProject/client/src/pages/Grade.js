@@ -33,10 +33,8 @@ export default function Grade() {
   
   return (
     <div>
-      DAY LA BANG DIEM CUA BAN TRONG KHOA HOC
-      <span>TAT CA DIEM CUA CAC BAI TAP</span>
       {grades.length === 0 ? (
-        <div className="grades flex flex-col gap-y-2 overflow-y-scroll h-full px-3"></div>
+        <div className="grades flex flex-col gap-y-2 overflow-y-scroll h-full px-3">Chưa có bảng điểm nào</div>
       ) : (
         <div className="grades flex flex-col gap-y-2 overflow-y-scroll h-full px-3">
           {grades.map((grade, index) => (

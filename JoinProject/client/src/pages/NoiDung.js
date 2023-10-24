@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import { TabMenu } from "primereact/tabmenu";
-import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
 
 
 import Posts from "../components/Posts";
 import Contents from "../components/Contents";
+import Participants from "../components/Participants.js";
+import CourseDetails from "../pages/CourseDetails.js";
 import Meeting from "../pages/Meeting.js";
-import axios from "axios";
+import Grade from "../pages/Grade.js";
 
 
 export default function NoiDung() {
@@ -33,17 +35,9 @@ export default function NoiDung() {
     { label: "Nội dung", icon: "pi pi-fw pi-book" },
     { label: "Diễn đàn", icon: "pi pi-fw pi-comments" },
     { label: "Cuộc họp", icon: "pi pi-fw pi-phone" },
-    { label: "bảng điểm", icon: "pi pi-fw pi-file" },
+    { label: "Thành viên", icon: "pi pi-fw pi-file" },
+    { label: "Bảng điểm", icon: "pi pi-fw pi-file" },
     { label: "Điểm danh", icon: "pi pi-fw pi-check" },
-  ];
-
-  const [selectedCity, setSelectedCity] = useState(null);
-  const cities = [
-    { name: "New York", code: "NY" },
-    { name: "Rome", code: "RM" },
-    { name: "London", code: "LDN" },
-    { name: "Istanbul", code: "IST" },
-    { name: "Paris", code: "PRS" },
   ];
 
   return (
@@ -72,20 +66,8 @@ export default function NoiDung() {
       </div>
 
       <div className="w-full h-auto mt-5 ">
-        <span className="ml-10 w-auto">
-          <span>môn học:</span>
-          <span className="ml-2">0</span>
-
-          <Dropdown
-            value={selectedCity}
-            onChange={(e) => setSelectedCity(e.value)}
-            options={cities}
-            optionLabel="name"
-            placeholder="Lọc theo"
-            className="ml-10 text-xs/[0.2] w-auto md:w-14rem"
-          />
-        </span>
-        <div className="rounded-lg w-1/2 h-auto mt-5 ml-10 bg-white flex justify-center ">
+        <CourseDetails />
+        <div className="rounded-lg w-4/5 my-3 bg-white flex justify-start ">
           <TabMenu
             className="text-xs"
             model={items}
@@ -97,6 +79,8 @@ export default function NoiDung() {
       {activeIndex === 0 && <Contents />}
       {activeIndex === 1 && <Posts />}
       {activeIndex === 2 && <Meeting />}
+      {activeIndex === 3 && <Participants/>}
+      {activeIndex === 4 && <Grade/>}
     </>
   );
 }

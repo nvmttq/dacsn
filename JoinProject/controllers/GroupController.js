@@ -31,4 +31,12 @@ module.exports = {
       });
     }
   },
+  getGroupsInCourse: async (req, res) => {
+    const {courseToken} = req.body;
+
+    const groups = await GroupModel.find({courseToken});
+    
+    groups.sort(g => g.title);
+    return res.json(groups);
+  }
 };

@@ -36,7 +36,7 @@ export default function CourseCard() {
   }
   const footer = (courseToken) => {
     return (
-      <Link to={`/content`} label="Vào lớp" icon="pi pi-book" onClick={() => getToken({token: courseToken})}>Vào lớp</Link>
+      <Link to={`/courses/${courseToken}`} label="Vào lớp" icon="pi pi-book" onClick={() => getToken({token: courseToken})}>Vào lớp</Link>
   )};
 
   return (
