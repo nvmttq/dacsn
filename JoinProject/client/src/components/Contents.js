@@ -101,6 +101,7 @@ export default function Contents() {
               setTreeContentEdit(treeContentEdit.filter(x => x.key !== node.key))
             } else {
               deleteContentByKey({tree: treeContentEdit, index: 0, key: node.key})
+              setTreeContentEdit(treeContentEdit.filter(x => x.key !== "???"));
             }
           }}
         />
