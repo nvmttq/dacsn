@@ -7,6 +7,8 @@ import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import axios from "axios";
 
+const shortid = require("shortid");
+
 export default function Contents() {
   const toast = useRef(null);
 
@@ -52,10 +54,12 @@ export default function Contents() {
     });
   };
 
-  const deleteContentByKey = ({tree, index, key}) => {
+  const deleteContentByKey = ({ tree, index, key }) => {
     if (index < tree.length && tree[index].children) {
-      if (tree[index].children.filter(x => x.key === key).length > 0) {
-        tree[index].children = tree[index].children.filter(x => x.key !== key);
+      if (tree[index].children.filter((x) => x.key === key).length > 0) {
+        tree[index].children = tree[index].children.filter(
+          (x) => x.key !== key
+        );
       } else {
         if (tree[index].children) {
           deleteContentByKey({
@@ -71,7 +75,20 @@ export default function Contents() {
         });
       }
     }
-  }
+  };
+  const addChildrenContentFromKey = ({ tree, key }) => {
+    for (var i = 0; i < tree.length; i++) {
+      if (tree[i].key === key) {
+        tree[i].children.push({
+          key: shortid.generate(),
+          label: "",
+          children: [],
+        });
+      } else {
+        addChildrenContentFromKey({ tree: tree[i].children, key: key });
+      }
+    }
+  };
 
   const nodeTemplate = (node, options) => {
     let label = (
@@ -83,6 +100,7 @@ export default function Contents() {
           defaultValue={node.label}
           onChange={(e) => {
             solveContent({ newValue: e.target.value, key: node.key });
+            setTreeContentEdit(treeContentEdit.filter(x => x.key !== "?????"));
           }}
         />
         <Button
@@ -90,6 +108,12 @@ export default function Contents() {
           className="ml-3"
           title="Thêm nội dung con"
           severity="info"
+          onClick={() => {
+            addChildrenContentFromKey({ tree: treeContentEdit, key: node.key });
+            setTreeContentEdit(
+              treeContentEdit.filter((x) => x.key !== "?????")
+            );
+          }}
         />
         <Button
           icon="pi pi-trash"
@@ -97,11 +121,19 @@ export default function Contents() {
           title="Xóa nội dung này"
           severity="danger"
           onClick={() => {
-            if (treeContentEdit.filter(x => x.key === node.key).length > 0) {
-              setTreeContentEdit(treeContentEdit.filter(x => x.key !== node.key))
+            if (treeContentEdit.filter((x) => x.key === node.key).length > 0) {
+              setTreeContentEdit(
+                treeContentEdit.filter((x) => x.key !== node.key)
+              );
             } else {
-              deleteContentByKey({tree: treeContentEdit, index: 0, key: node.key})
-              setTreeContentEdit(treeContentEdit.filter(x => x.key !== "???"));
+              deleteContentByKey({
+                tree: treeContentEdit,
+                index: 0,
+                key: node.key,
+              });
+              setTreeContentEdit(
+                treeContentEdit.filter((x) => x.key !== "???")
+              );
             }
           }}
         />
@@ -164,12 +196,27 @@ export default function Contents() {
         console.log(error);
       });
   };
+
+  const fixTreeContent = ({ tree }) => {
+    var i = 0;
+    while (i < tree.length) {
+      if (tree[i].label === "") {
+        tree.splice(i, 1);
+      } else {
+        i++;
+      }
+    }
+    for (var j = 0; j < tree.length; j++) {
+      fixTreeContent({tree: tree[j].children});
+    }
+  };
+
   const SaveChangeButton = () => {
     setLoadingSaveChanges(true);
     axios
       .put("http://localhost:3002/update-course", {
         token: currentCourses,
-        contentCourse: treeContentEdit.filter((x) => x.label !== ""),
+        contentCourse: treeContentEdit,
       })
       .then(function (response) {
         fetchContentCourse();
@@ -208,7 +255,13 @@ export default function Contents() {
               label="Lưu thay đổi"
               icon="pi pi-check"
               loading={loadingSaveChanges}
-              onClick={SaveChangeButton}
+              onClick={() => {
+                fixTreeContent({ tree: treeContentEdit });
+                setTreeContentEdit(
+                  treeContentEdit.filter((x) => x.key !== "?????")
+                );
+                SaveChangeButton();
+              }}
               className="mb-5"
               severity="success"
             />
