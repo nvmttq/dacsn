@@ -5,12 +5,15 @@ import { Tree } from "primereact/tree";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
+import { Fieldset } from "primereact/fieldset";
 import axios from "axios";
 
 const shortid = require("shortid");
 
 export default function Contents() {
   const toast = useRef(null);
+
+  const [currentKeySelect, setCurrentKeySelect] = useState("");
 
   const showSuccess = () => {
     toast.current.show({
@@ -82,6 +85,7 @@ export default function Contents() {
         tree[i].children.push({
           key: shortid.generate(),
           label: "",
+          type: "VB",
           children: [],
         });
       } else {
@@ -90,9 +94,25 @@ export default function Contents() {
     }
   };
 
+  const addChildrenExamFromKey = ({ tree, key }) => {
+    for (var i = 0; i < tree.length; i++) {
+      if (tree[i].key === key) {
+        tree[i].children.push({
+          key: shortid.generate(),
+          label: "",
+          type: "TN",
+          children: [],
+        });
+      } else {
+        addChildrenExamFromKey({ tree: tree[i].children, key: key });
+      }
+    }
+  };
+
   const nodeTemplate = (node, options) => {
-    let label = (
-      <div className="flex">
+    let typeLabel;
+    if (node.type === "VB") {
+      typeLabel = (
         <InputTextarea
           autoResize
           cols={100}
@@ -100,19 +120,45 @@ export default function Contents() {
           defaultValue={node.label}
           onChange={(e) => {
             solveContent({ newValue: e.target.value, key: node.key });
-            setTreeContentEdit(treeContentEdit.filter(x => x.key !== "?????"));
-          }}
-        />
-        <Button
-          icon="pi pi-arrow-down-right"
-          className="ml-3"
-          title="Thêm nội dung con"
-          severity="info"
-          onClick={() => {
-            addChildrenContentFromKey({ tree: treeContentEdit, key: node.key });
             setTreeContentEdit(
               treeContentEdit.filter((x) => x.key !== "?????")
             );
+          }}
+        />
+      );
+    } else if (node.type === "TN") {
+      typeLabel = (
+        <div className="flex items-center">
+          <i
+            className="pi pi-book mr-5"
+            style={{ fontSize: "2rem", color: "#4338CA" }}
+          ></i>
+          <InputTextarea
+            autoResize
+            cols={100}
+            rows={1}
+            defaultValue={node.label}
+            onChange={(e) => {
+              solveContent({ newValue: e.target.value, key: node.key });
+              setTreeContentEdit(
+                treeContentEdit.filter((x) => x.key !== "?????")
+              );
+            }}
+          />
+        </div>
+      );
+    }
+    let label = (
+      <div className="flex">
+        {typeLabel}
+        <Button
+          icon="pi pi-arrow-down-right"
+          className="ml-3"
+          title="Thêm tài nguyên"
+          severity="info"
+          onClick={() => {
+            setCurrentKeySelect(node.key);
+            showModalAddChildrenContent();
           }}
         />
         <Button
@@ -140,6 +186,16 @@ export default function Contents() {
       </div>
     );
 
+    return <span className={options.className}>{label}</span>;
+  };
+
+  const nodeTemplateCourseInformation = (node, options) => {
+    let label;
+    if (node.type === "VB") {
+      label = node.label;
+    } else if (node.type === "TN") {
+      label = <Button icon="pi pi-book" label={node.label} link />;
+    }
     return <span className={options.className}>{label}</span>;
   };
 
@@ -180,6 +236,14 @@ export default function Contents() {
     setEditContentModal(false);
   };
 
+  const [addChildrenContentModal, setAddChildrenContentModal] = useState(false);
+  const showModalAddChildrenContent = () => {
+    setAddChildrenContentModal(true);
+  };
+  const cancelModalAddChildrenContent = () => {
+    setAddChildrenContentModal(false);
+  };
+
   const fetchContentCourse = () => {
     axios
       .get("http://localhost:3002/get-course", {})
@@ -207,7 +271,7 @@ export default function Contents() {
       }
     }
     for (var j = 0; j < tree.length; j++) {
-      fixTreeContent({tree: tree[j].children});
+      fixTreeContent({ tree: tree[j].children });
     }
   };
 
@@ -236,6 +300,7 @@ export default function Contents() {
       key: treeContentEdit.length.toString(),
       label: "",
       children: [],
+      type: "VB",
     });
     setTreeContentEdit(arr);
   };
@@ -243,6 +308,46 @@ export default function Contents() {
   return (
     <>
       <Toast ref={toast} />
+      <Dialog
+        visible={addChildrenContentModal}
+        className="w-2/3"
+        onHide={cancelModalAddChildrenContent}
+      >
+        <Fieldset legend="Thêm tài nguyên">
+          <div className="flex">
+            <Button
+              label="Văn bản"
+              icon="pi pi-clone"
+              text
+              onClick={() => {
+                addChildrenContentFromKey({
+                  tree: treeContentEdit,
+                  key: currentKeySelect,
+                });
+                setTreeContentEdit(
+                  treeContentEdit.filter((x) => x.key !== "?????")
+                );
+                cancelModalAddChildrenContent();
+              }}
+            />
+            <Button
+              label="Trắc nghiệm"
+              icon="pi pi-book"
+              text
+              onClick={() => {
+                addChildrenExamFromKey({
+                  tree: treeContentEdit,
+                  key: currentKeySelect,
+                });
+                setTreeContentEdit(
+                  treeContentEdit.filter((x) => x.key !== "?????")
+                );
+                cancelModalAddChildrenContent();
+              }}
+            />
+          </div>
+        </Fieldset>
+      </Dialog>
       <Dialog
         header="CHỈNH SỬA NỘI DUNG"
         visible={editContentModal}
@@ -273,7 +378,7 @@ export default function Contents() {
           />
           <div className="flex">
             <Button
-              label="Thêm tài nguyên"
+              label="Thêm văn bản"
               onClick={AddToTreeContent}
               className="mt-5"
               severity="info"
@@ -295,6 +400,7 @@ export default function Contents() {
           <Tree
             value={courseInformation.contentCourse}
             className="w-full md:w-30rem"
+            nodeTemplate={nodeTemplateCourseInformation}
           />
         </div>
       </div>
