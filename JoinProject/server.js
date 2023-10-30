@@ -34,11 +34,13 @@ app.use(
 const route = require("./routes/index.js");
 const course = require("./routes/course.js");
 const group = require("./routes/group.js");
+const calendar = require("./routes/calendar")
 route(app);
 app.use(posts);
-app.use(group)
+app.use(group);
 app.use(comments);
-app.use(course)
+app.use(course);
+app.use(calendar);
 // CONNECT DATABASE
 const connectDb = require("./db.js");
 connectDb();
@@ -114,7 +116,7 @@ io.on("connection", (socket) => {
     });
 
     socket.emit("get all message", conversation);
-    
+
   });
 
 
@@ -297,7 +299,7 @@ const ExamModel = require("./models/examModel.js");
 //       $push: {
 //         questions: ques
 //       }
-      
+
 //     }) 
 //   })
 // }
