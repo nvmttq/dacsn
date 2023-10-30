@@ -9,6 +9,8 @@ import Nhom from "./pages/Nhom.js";
 import NoiDung from "./pages/NoiDung.js";
 import ReviewExam from "./pages/ReviewExam.js";
 import Exam from "./pages/Exam.js";
+import ViewGroup from "./components/ViewGroup.js"
+
 function App() {
   return (
     <>
@@ -24,7 +26,8 @@ function App() {
             <Route
               path="/exam/:examToken"
               element={<Exam />}
-            ></Route>
+            ></Route>s
+            <Route path="/groups/:tokenGroup" element={<ViewGroup />} />
             <Route
               path="/exam/review/:examToken"
               element={<ReviewExam />}

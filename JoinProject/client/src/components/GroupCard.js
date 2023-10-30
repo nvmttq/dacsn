@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
-
+import { Link } from "react-router-dom";
 import * as constant from "../constant.js"
 
 export default function GroupCard() {
@@ -28,12 +28,18 @@ export default function GroupCard() {
       src="https://primefaces.org/cdn/primereact/images/usercard.png"
     />
   );
-  const footer = (
+  const getToken = ({ token }) => {
+    localStorage.setItem("currentGroups", JSON.stringify(token));
+  }
+  const footer1 = (
     <div className="">
       <Button label="Xem nhóm" icon="pi pi-book" />
     </div>
   );
-
+  const footer = (tokenGroup) => {
+    return (
+      <Link to={`/groups/${tokenGroup}`} label="Xem nhóm" icon="pi pi-book" onClick={() => getToken({token: tokenGroup})}>Vào nhóm</Link>
+  )};
   return (
     <>
       {groups.length !== 0 ? (
@@ -45,7 +51,7 @@ export default function GroupCard() {
             <Card
               key={index}
               title={group.title}
-              footer={footer}
+              footer={footer(group.token)}
               header={header}
               className="w-[calc(33.333333%-16px)] h-max"
             >
