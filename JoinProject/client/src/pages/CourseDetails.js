@@ -9,7 +9,6 @@ export default function CourseCard() {
   const examToken = "examToken1";
   return (
     <div>
-        <Link to="/">GO BACK</Link>
         <div>DETAILS COURSE {courseToken}</div>
         {/* <Link to={`./grade`}>
           XEM BANG DIEM

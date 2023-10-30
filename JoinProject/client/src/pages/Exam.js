@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Countdown from 'react-countdown';
-import { useNavigate, useParams } from "react-router-dom";
-
+import { Link, useNavigate, useParams } from "react-router-dom";
+import moment from "moment"
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 
@@ -21,6 +21,7 @@ export default function Exam() {
   const toastSubmitExam = useRef(null);
   const [isDone, setIsDone] = useState(false);
   const [startExam, setStartExam] = useState(false);
+  const [startAgain, setStartAgain] = useState(false);
   const [exam, setExam] = useState({});
   const navigate = useNavigate();
   
@@ -33,14 +34,19 @@ export default function Exam() {
       .then((response) => response.json())
       .then((result) => {
         console.log(result)
+        setExam(result)
         result.userStatus.forEach(data => {
+
           if(data.userID === user.username) {
-            if(data.status) {
+            if(data.status === 2) {
               setIsDone(true);
+            } else if(data.status === 1) {
+              setStartExam(true);
             }
           }
-        })
-        setExam(result);
+
+        });
+
       })
       .catch((err) => console.log(err));
   }, []);
@@ -75,7 +81,7 @@ export default function Exam() {
       }
     }
     await fetch(`${constant.URL_API}/exam/submit-exam`, {
-      method: "POST",
+      method: "PUT",
       headers: {
         'Content-Type': 'application/json',
       },
@@ -85,14 +91,16 @@ export default function Exam() {
     })
       .then((response) => response.json())
       .then((result) => {
-        console.log(result)
+        console.log("SUBMIT", skip, result)
+        window.scrollTo({
+          top: 10,
+          behavior: "smooth",
+        });
         showSubmitExam(result);
         setIsDone(true);
         setStartExam(false);
-        window.scrollTo({
-          top: 0,
-          behavior: "smooth",
-        });
+        setExam(result.exam)
+        setStartAgain(false);
       })
       .catch((err) => {
         console.log(err);
@@ -145,10 +153,63 @@ export default function Exam() {
     }
   };
 
+  const handleStartExam = async () => {
+    await fetch(`${constant.URL_API}/exam/start-exam`, {
+      method: "PUT",
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        user, examToken
+      }),
+    })
+      .then((response) => response.json())
+      .then(async (result) => {
+        console.log("START ", result)
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+        setExam(result.exam);
+        setStartExam(true)
+        setIsDone(false);
+        setStartAgain(true)
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+   
+  }
+
+
   const calcTimer = () => {
-    console.log(exam.timelimit * 60 * 1000)
-    if(exam.timelimit) return (exam.timelimit * 60 * 1000);
-    return 0;
+
+    let timeStart = null;
+    let checkUserPending = null;
+    exam.userStatus.find(u => {
+     
+      if(u.status === 1 && u.userID === user.username) {
+        timeStart = new Date(u.timeStart);
+        checkUserPending = u;
+      }
+    });
+
+    if(checkUserPending) {
+      if(exam.timelimit) {
+        const timelimit = exam.timelimit * 60 * 1000;
+        const dateNow = new Date();
+        const dateDiff = dateNow  - timeStart;
+        console.log(dateDiff, timeStart, dateNow)
+        const minutes = dateDiff;
+        if(minutes > timelimit) {
+          submitExam(true);
+          return;
+        }
+        return (timelimit - minutes);
+      }
+    }
+    
+    return exam.timelimit * 60 * 1000;
     
   }
 
@@ -157,7 +218,14 @@ export default function Exam() {
     <div className="px-6 py-3">
       <Toast ref={toastSubmitExam} position="bottom-right"/>
       
-      <button onClick={() => navigate(-1)}>BACK</button>
+      <button
+          id="back-to-course"
+          className="flex items-center text-primary font-bold mb-4"
+          onClick={() => navigate(-1)}
+        >
+          <i className="pi pi-angle-left"></i>
+          <span>GO BACK</span>
+        </button>
       <div className="bg-white flex justify-between gap-5 rounded-lg shadow p-4 md:px-6" style={{position: 'relative'}}>
         <div className="space-y-1" >
           <div className="font-bold text-sushi-400 uppercase text-sm text-primary">
@@ -187,15 +255,16 @@ export default function Exam() {
 
           {
             exam.questions.map((ques, index) => (
-              <ExamCard key={index} examToken={examToken} ques={ques} />
+              <ExamCard key={index} examToken={examToken} ques={ques} isDone={isDone} startAgain={startAgain}/>
             ))
           }
-          <div className="submit-exam">
-            <Button onClick={submitExam}>NỘP BÀI</Button>
+          <div className="submit-exam mt-3 gap-3">
+            <Button onClick={() => submitExam(false)} disabled={isDone}> {isDone ? "Đã nộp bài" : "NỘP BÀI"}</Button>
+            <Button onClick={handleStartExam} visible={exam.numberOfTimes > 0 && isDone}>Làm lại</Button>
           </div>
         </div>
       ) : (
-          <Button onClick={() => setStartExam(true)}>Bắt đầu thi</Button>
+          <Button onClick={handleStartExam}>Bắt đầu thi</Button>
       )}
 
 

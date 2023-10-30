@@ -187,19 +187,53 @@ class HomeController {
     });
   }
 
+  async startExam(req, res) {
+    const { user, examToken } = req.body;
+    try {
+
+      // 0 chua bat dau, 1 pending, 2 ok
+      const exam = await ExamModel.findOne({ id: examToken });
+      exam.questions.forEach(ques => {
+        ques.choice.forEach(c => {
+          c.userChoose = [];
+        })
+      });
+      exam.userStatus.forEach(u => {
+        if(u.userID === user.username) {
+          u.status = 1;
+          u.timeStart = new Date();
+        }
+      });
+      exam.numberOfTimes -= 1;
+      await exam.save();
+
+      return res.json({
+        severity: "success",
+        msg: "Cập nhật thành công!",
+        exam,
+      });
+    } catch (err) {
+      console.log(err);
+      return res.json({
+        severity: "error",
+        msg: "Cập nhật không thành công!",
+        err,
+      });
+    }
+  }
+
   async submitExam(req, res) {
     const { user, examToken } = req.body;
     try {
       const exam = await ExamModel.findOne({ id: examToken });
       exam.userStatus.forEach((u) => {
         if (u.userID === user.username) {
-          u.status = true;
+          u.status = 2;
         }
       });
       await exam.save();
 
-      var correct = 0,
-        wrong = 0;
+      var correct = 0, wrong = 0;
       exam.questions.forEach((ques) => {
         ques.choice.forEach((c) => {
           if(c.name.toUpperCase() === ques.answer.toUpperCase()) {

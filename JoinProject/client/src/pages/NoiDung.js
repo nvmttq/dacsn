@@ -3,14 +3,13 @@ import axios from "axios";
 import { TabMenu } from "primereact/tabmenu";
 import { Dropdown } from "primereact/dropdown";
 
-
 import Posts from "../components/Posts";
 import Contents from "../components/Contents";
 import Participants from "../components/Participants.js";
 import CourseDetails from "../pages/CourseDetails.js";
 import Meeting from "../pages/Meeting.js";
 import Grade from "../pages/Grade.js";
-
+import { Link } from "react-router-dom";
 
 export default function NoiDung() {
   const currentCourses = localStorage.getItem("currentCourses")
@@ -22,7 +21,9 @@ export default function NoiDung() {
     axios
       .get("http://localhost:3002/get-course", {})
       .then(function (response) {
-        setCourseInformation(response.data.dataCourse.filter((x => x.token == currentCourses))[0]);
+        setCourseInformation(
+          response.data.dataCourse.filter((x) => x.token == currentCourses)[0]
+        );
       })
       .catch(function (error) {
         console.log(error);
@@ -42,25 +43,24 @@ export default function NoiDung() {
 
   return (
     <>
-      <div
-        style={{
-          // border: '1px solid red',
-          marginTop: 20,
-        }}
-      >
-        <span
-          className="font-bold"
-          style={{
-            // border: '1px solid red',
-            marginLeft: 20,
-          }}
+      <div className="mt-[15px] flex flex-col">
+        <Link
+          to="/"
+          id="back-to-course"
+          className="flex items-center text-primary font-bold mb-4"
         >
+          <i className="pi pi-angle-left"></i>
+          <span>GO BACK</span>
+        </Link>
+        <span className="font-bold">
           <span
             style={{
               fontSize: 18,
             }}
           >
-            {courseInformation ? courseInformation.title : "Chưa vào lớp học nào!!"}
+            {courseInformation
+              ? courseInformation.title
+              : "Chưa vào lớp học nào!!"}
           </span>
         </span>
       </div>
@@ -79,8 +79,8 @@ export default function NoiDung() {
       {activeIndex === 0 && <Contents />}
       {activeIndex === 1 && <Posts />}
       {activeIndex === 2 && <Meeting />}
-      {activeIndex === 3 && <Participants/>}
-      {activeIndex === 4 && <Grade/>}
+      {activeIndex === 3 && <Participants />}
+      {activeIndex === 4 && <Grade />}
     </>
   );
 }

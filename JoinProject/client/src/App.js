@@ -6,8 +6,6 @@ import MenuSidebar from "./components/MenuSidebar.js";
 import KhoaHoc from "./pages/KhoaHoc.js";
 import Lich from "./pages/Lich.js";
 import Nhom from "./pages/Nhom.js";
-import Grade from "./pages/Grade.js";
-import Meeting from "./pages/Meeting.js";
 import NoiDung from "./pages/NoiDung.js";
 import ReviewExam from "./pages/ReviewExam.js";
 import Exam from "./pages/Exam.js";
@@ -18,7 +16,7 @@ function App() {
         <div className="w-1/6 fixed left-0 h-screen bg-white">
           <MenuSidebar />
         </div>
-        <div className="pl-[234px] pr-4 w-full bg-[#F5F5F6] h-full">
+        <div className="pl-[234px] pr-4 w-full bg-[#F5F5F6] h-max">
           <Routes>
             <Route path="/" element={<KhoaHoc />}></Route>
             <Route path="/courses/:courseToken" element={<NoiDung />} />
