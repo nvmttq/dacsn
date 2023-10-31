@@ -8,6 +8,7 @@ import Lich from "./pages/Lich.js";
 import Nhom from "./pages/Nhom.js";
 import NoiDung from "./pages/NoiDung.js";
 import ReviewExam from "./pages/ReviewExam.js";
+import IndexExam from "./pages/IndexExam.js";
 import Exam from "./pages/Exam.js";
 import ViewGroup from "./components/ViewGroup.js"
 
@@ -25,12 +26,20 @@ function App() {
 
             <Route
               path="/exam/:examToken"
-              element={<Exam />}
-            ></Route>s
+              element={<IndexExam />}
+            ></Route>
             <Route path="/groups/:tokenGroup" element={<ViewGroup />} />
             <Route
               path="/exam/review/:examToken"
               element={<ReviewExam />}
+            ></Route>
+            <Route
+              path="/exam/redo/:examToken"
+              element={<Exam />}
+            ></Route>
+            <Route
+              path="/exam/start/:examToken"
+              element={<Exam />}
             ></Route>
 
             <Route path="/groups" element={<Nhom />} />

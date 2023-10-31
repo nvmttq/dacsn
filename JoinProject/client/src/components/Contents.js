@@ -6,6 +6,8 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { Fieldset } from "primereact/fieldset";
+import { Link } from "react-router-dom";
+import "primeicons/primeicons.css";
 import axios from "axios";
 
 const shortid = require("shortid");
@@ -14,6 +16,8 @@ export default function Contents() {
   const toast = useRef(null);
 
   const [currentKeySelect, setCurrentKeySelect] = useState("");
+
+  const examToken = "examToken1";
 
   const showSuccess = () => {
     toast.current.show({
@@ -194,7 +198,22 @@ export default function Contents() {
     if (node.type === "VB") {
       label = node.label;
     } else if (node.type === "TN") {
-      label = <Button icon="pi pi-book" label={node.label} link />;
+      label = (
+        <div className="flex items-center">
+          <i className="pi pi-book mr-3" style={{ color: "#4338CA" }}></i>
+          <Link
+            to={"/exam/" + examToken}
+            style={{ color: "#4338CA" }}
+            className="hover:underline hover:decoration-4"
+          >
+            {node.label}
+          </Link>
+        </div>
+
+        // <form action={}>
+        //   <Button icon="pi pi-book" label={node.label} type="submit" link/>;
+        // </form>
+      );
     }
     return <span className={options.className}>{label}</span>;
   };

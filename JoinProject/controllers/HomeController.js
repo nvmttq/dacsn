@@ -93,15 +93,12 @@ class HomeController {
       await GroupModel.find({}).then((groups) => {
         let username = req.params.username;
         groups.forEach((group) => {
-          if (
-            group.participants.find((user) => user.userID === username)
-          ) {
+          if (group.participants.find((user) => user.userID === username)) {
             groupsOfUser.push(group);
           }
         });
       });
       res.json(groupsOfUser);
-
     } catch (err) {
       res.json({ msg: "err group" });
     }
@@ -190,18 +187,18 @@ class HomeController {
   async startExam(req, res) {
     const { user, examToken } = req.body;
     try {
-
       // 0 chua bat dau, 1 pending, 2 ok
       const exam = await ExamModel.findOne({ id: examToken });
-      exam.questions.forEach(ques => {
-        ques.choice.forEach(c => {
+      exam.questions.forEach((ques) => {
+        ques.choice.forEach((c) => {
           c.userChoose = [];
-        })
+        });
       });
-      exam.userStatus.forEach(u => {
-        if(u.userID === user.username) {
+      exam.userStatus.forEach((u) => {
+        if (u.userID === user.username) {
           u.status = 1;
           u.timeStart = new Date();
+          u.timeEnd = new Date();
         }
       });
       exam.numberOfTimes -= 1;
@@ -229,17 +226,19 @@ class HomeController {
       exam.userStatus.forEach((u) => {
         if (u.userID === user.username) {
           u.status = 2;
+          u.timeEnd = new Date();
         }
       });
       await exam.save();
 
-      var correct = 0, wrong = 0;
+      var correct = 0,
+        wrong = 0;
       exam.questions.forEach((ques) => {
         ques.choice.forEach((c) => {
-          if(c.name.toUpperCase() === ques.answer.toUpperCase()) {
-            if(c.userChoose.find(u => u === user.username)) correct++;
+          if (c.name.toUpperCase() === ques.answer.toUpperCase()) {
+            if (c.userChoose.find((u) => u === user.username)) correct++;
             else wrong++;
-          } 
+          }
         });
       });
       console.log(correct, wrong);

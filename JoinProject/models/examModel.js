@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const examSchema = new mongoose.Schema({
   id: { type: String, default: "" },
-  courseToken: {type: String, default: ""},
+  courseToken: { type: String, default: "" },
   name: String,
   questions: [
     {
@@ -15,11 +15,16 @@ const examSchema = new mongoose.Schema({
   ],
   isReview: { type: Boolean, default: true },
   startAt: { type: Date, default: Date.now },
-  endAt: { type: Date, default: Date.now},
+  endAt: { type: Date, default: Date.now },
   timelimit: { type: Number, default: 5 },
-  numberOfTimes: {type: Number, default: 0},
+  numberOfTimes: { type: Number, default: 0 },
   userStatus: [
-    {userID: String, status: {type: Number, default: 0}, timeStart: {type:Date, default: Date.now}}
+    {
+      userID: String,
+      status: { type: Number, default: 0 },
+      timeStart: { type: Date, default: Date.now },
+      timeEnd: { type: Date, default: Date.now },
+    },
   ],
 });
 
