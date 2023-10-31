@@ -10,6 +10,18 @@ const groupSchema = new mongoose.Schema({
     nameDisplay: {type: String, default: ""},
     isCreator: {type: Boolean, default: false}
   }],
+  conversations: [
+    {
+      userID: String,
+      nameDisplay: String,
+      time_send: { type: Date, default: Date.now() },
+      content: {
+        file: [String],
+        text: { type: String, default: "" },
+        emote: { type: String, default: "" },
+      },
+    },
+  ],
 });
 
 module.exports = mongoose.model('group',groupSchema)

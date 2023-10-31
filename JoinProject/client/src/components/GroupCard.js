@@ -13,8 +13,14 @@ export default function GroupCard() {
 
   useEffect(() => {
     if (user) {
-      fetch(`${constant.URL_API}/groups/${user.username}`, {
-        method: "GET",
+      fetch(`${constant.URL_API}/groups`, {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user
+        }),
       })
         .then((res) => res.json())
         .then((result) => setGroups(result));

@@ -90,8 +90,9 @@ class HomeController {
       //     groupsOfUser.push(data);
       //   }
       // });
+      const {user} = req.body;
       await GroupModel.find({}).then((groups) => {
-        let username = req.params.username;
+        let username = user.username;
         groups.forEach((group) => {
           if (group.participants.find((user) => user.userID === username)) {
             groupsOfUser.push(group);

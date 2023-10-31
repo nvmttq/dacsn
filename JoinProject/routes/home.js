@@ -12,7 +12,7 @@ router.put('/exam/set-choice', homeController.setChoice);
 router.put('/exam/submit-exam', homeController.submitExam);
 router.put('/exam/start-exam', homeController.startExam);
 //user
-router.get('/groups/:username', homeController.getGroupWithUserName);
+router.post('/groups', homeController.getGroupWithUserName);
 
 router.get('/courses/:username', homeController.getCourseWithUserName)
 router.get('/', homeController.index)

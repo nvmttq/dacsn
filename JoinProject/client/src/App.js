@@ -28,7 +28,8 @@ function App() {
               path="/exam/:examToken"
               element={<IndexExam />}
             ></Route>
-            <Route path="/groups/:tokenGroup" element={<ViewGroup />} />
+            <Route path="/groups/:groupToken" element={<ViewGroup />}> </Route>
+            
             <Route
               path="/exam/review/:examToken"
               element={<ReviewExam />}

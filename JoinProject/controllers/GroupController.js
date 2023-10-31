@@ -38,5 +38,16 @@ module.exports = {
     
     groups.sort(g => g.title);
     return res.json(groups);
+  },
+
+  getGroup: async (req, res) => {
+    const {groupToken} = req.params;
+    try {
+      const group = await GroupModel.findOne({token: groupToken});
+      return res.json(group);
+    } catch(err) {
+      return res.json(err);
+    }
+
   }
 };

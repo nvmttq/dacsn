@@ -1,6 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { Sidebar } from "primereact/sidebar";
-import { InputText } from "primereact/inputtext";
 import { FileUpload } from "primereact/fileupload";
 
 import MoodIcon from "@mui/icons-material/Mood";
@@ -70,7 +69,7 @@ export default function ChatSidebar({
     });
 
     socketRef.current.on("return message", (dataMessage) => {
-
+      
       socketRef.current.emit("get all message", { roomID, userID: userID });
 
       socketRef.current.on("get all message", (dataMessage) => {
@@ -123,7 +122,7 @@ export default function ChatSidebar({
           <input
             type="text"
             id="exampleFormControlInput2"
-            placeholder="Type message"
+            placeholder="Soạn tin"
             className="text-md outline-none"
             ref={textSendRef}
             autoComplete="false"
