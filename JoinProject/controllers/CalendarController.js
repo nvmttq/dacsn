@@ -17,6 +17,7 @@ exports.getAll = (req, res) => {
 
 exports.create = async (req, res) => {
     const { id, title, start, end } = req.body;
+    // console.log(req.body)
     const calendar = new CalendarModel({
         id: id,
         title: title,

@@ -4,8 +4,8 @@ const mongoose = require("mongoose");
 const CalendarSchema = new mongoose.Schema({
     id: { type: String, default: "" },
     title: { type: String, default: "" },
-    start: { type: Date },
-    end: { type: Date },
+    start: { type: String },
+    end: { type: String },
 });
 // {
 //     "_id": {
