@@ -12,6 +12,8 @@ import IndexExam from "./pages/IndexExam.js";
 import Exam from "./pages/Exam.js";
 import EditExam from "./components/EditExam.js";
 import ViewGroup from "./components/ViewGroup.js";
+import AssignmentDetails from "./pages/AssignmentDetails.js";
+
 
 function App() {
   const [idReview, setIdReview] = useState("");
@@ -35,8 +37,22 @@ function App() {
             </Route>
 
             <Route
+              path="/assignments/:assignmentToken"
+              element={<AssignmentDetails />}
+            ></Route>
+
+            <Route
               path="/exam/review/:examToken"
               element={<ReviewExam idReview={idReview} />}
+            ></Route>
+
+            <Route
+              path="/exam/redo/:examToken"
+              element={<Exam />}
+            ></Route>
+            <Route
+              path="/exam/start/:examToken"
+              element={<Exam />}
             ></Route>
             <Route path="/exam/redo/:examToken" element={<Exam />}></Route>
             <Route path="/exam/start/:examToken" element={<Exam />}></Route>

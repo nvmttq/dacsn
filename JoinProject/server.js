@@ -35,8 +35,11 @@ app.use(
 const route = require("./routes/index.js");
 const course = require("./routes/course.js");
 const group = require("./routes/group.js");
-const calendar = require("./routes/calendar")
+const calendar = require("./routes/calendar");
+const assignment = require("./routes/assignment.js");
+
 route(app);
+app.use(assignment);
 app.use(posts);
 app.use(group);
 app.use(comments);
@@ -47,13 +50,26 @@ app.use(submitHistory);
 const connectDb = require("./db.js");
 connectDb();
 
-
 const MeetingSchema = require("./models/meetingModel.js");
 const GroupModel = require("./models/groupModel.js");
+const AssignmentModel = require("./models/assignmentModel.js");
+// const newCollect = new AssignmentModel({
+//   title: "Bài tập chương 2 - Tìm hiểu về ngôn ngữ C++",
+//   assignmentToken: "assToken2",
+//   courseToken: "AqmQk1",
+//   content: {
+//       text: "1. Ngôn ngữ C++ ra đời vào năm nào ? \n 2. Ngôn ngữ C++ do ai ?",
+//       file: ["file1", "file2"]
+//   },
+//   timeStart: new Date(),
+//   timeEnd: (new Date()).setDate((new Date()).getDate() + 10),
+//   userStatus: [
+//     {participants: ["gv002", "admin000"]},
 
-
+//   ]
+// });
+// newCollect.save();
 io.on("connection", (socket) => {
-
   socket.on("join-room", async (data) => {
     const room = await MeetingSchema.findOne({ idMeeting: data.roomID });
 
@@ -120,9 +136,7 @@ io.on("connection", (socket) => {
     });
 
     socket.emit("get all message", conversation);
-
   });
-
 
   socket.on("send message", async (message) => {
     const room = await MeetingSchema.findOne({ idMeeting: message.roomID });
@@ -174,10 +188,9 @@ io.on("connection", (socket) => {
   });
 });
 
-io.of('/group').on("connection", (socket) => {
-  
-  socket.on("abc", () => console.log(123))
-  socket.on("send message", async ({message, user, socketID, groupToken}) => {
+io.of("/group").on("connection", (socket) => {
+  socket.on("abc", () => console.log(123));
+  socket.on("send message", async ({ message, user, socketID, groupToken }) => {
     const group = await GroupModel.findOne({ token: groupToken });
 
     if (group) {
@@ -197,14 +210,11 @@ io.of('/group').on("connection", (socket) => {
         },
         isOwn: user.username,
       };
-      
-      
-      io.of("/group").emit("abc",group.conversations);
+
+      io.of("/group").emit("abc", group.conversations);
     }
   });
-})
-
-
+});
 
 const port = process.env.PORT || 3002;
 server.listen(port, () => {

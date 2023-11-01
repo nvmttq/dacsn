@@ -1,7 +1,6 @@
 import React, { useEffect, useState} from "react";
 import { useParams } from "react-router-dom";
 import { Button } from "primereact/button";
-import io from "socket.io-client";
 
 import * as constant from "../constant.js";
 import Chat from "./Chat.js";
@@ -16,14 +15,19 @@ export default function GroupCard() {
 
   const [conversations, setConversations] = useState(null);
   const [group, setGroup] = useState(null);
-
+  const [assignments, setAssignments] = useState(null);
+  
   useEffect(() => {
     fetch(`${constant.URL_API}/groups/${groupToken}`, {
       method: "GET",
     })
       .then((res) => res.json())
-      .then((group) => {
-        console.log(group)
+      .then(({
+        group,
+        assignments
+      }) => {
+        
+        console.log(group, assignments)
         setGroup(group);
         const conversations = group.conversations.map(m => {
           return {
@@ -31,18 +35,21 @@ export default function GroupCard() {
             isOwn: m.userID,
           };
         });
+
         setConversations(conversations);
 
         setParticipants(group.participants);
         
+        setAssignments(assignments);
+
         console.log(conversations);
       });
   }, []);
 
   return (
     <>
-      <div className="ml-[25px] mt-[10px]">
-        <span className="">
+      <div className="mt-5 h-[calc(100vh-20px)] px-3">
+        <span className="mb-5 block">
           <Button
             label="Chat nhóm"
             onClick={() => setType(0)}
@@ -57,7 +64,7 @@ export default function GroupCard() {
         <div>
           {type === 0 && <Chat participants={participants} conversations={conversations} groupToken={groupToken} user={user} setConversations={setConversations} />}
           
-          {type === 1 && <Assignments />}
+          {type === 1 && <Assignments assignments={assignments} group={group}/>}
         </div>
       </div>
     </>
