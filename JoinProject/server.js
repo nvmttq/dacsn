@@ -7,6 +7,7 @@ const session = require("express-session");
 const bodyParser = require("body-parser");
 const posts = require("./routes/posts");
 const comments = require("./routes/comment");
+const submitHistory = require("./routes/submitHistory");
 
 const http = require("http");
 const app = express();
@@ -41,6 +42,7 @@ app.use(group);
 app.use(comments);
 app.use(course);
 app.use(calendar);
+app.use(submitHistory);
 // CONNECT DATABASE
 const connectDb = require("./db.js");
 connectDb();

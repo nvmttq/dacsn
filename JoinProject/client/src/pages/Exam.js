@@ -12,12 +12,15 @@ import CheckIcon from "@mui/icons-material/Check";
 import * as constant from "../constant.js";
 import ExamCard from "../components/ExamCard.js";
 
+import axios from "axios";
+
 export default function Exam() {
   const { examToken } = useParams();
   const user = localStorage.getItem("user")
     ? JSON.parse(localStorage.getItem("user"))
     : null;
   const toastSubmitExam = useRef(null);
+  const [nameCourse, setNameCourse] = useState("");
   const [isDone, setIsDone] = useState(false);
   const [startExam, setStartExam] = useState(false);
   const [startAgain, setStartAgain] = useState(false);
@@ -41,6 +44,19 @@ export default function Exam() {
             }
           }
         });
+        axios
+          .get(constant.URL_API + "/get-course", {})
+          .then(function (response) {
+            let course = response.data.dataCourse.filter(
+              (x) => x.token === result.courseToken
+            )[0];
+            if (course) {
+              setNameCourse(course.title);
+            }
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
       })
       .catch((err) => console.log(err));
   }, []);
@@ -93,11 +109,38 @@ export default function Exam() {
           top: 10,
           behavior: "smooth",
         });
-        showSubmitExam(result);
         setIsDone(true);
         setStartExam(false);
         setExam(result.exam);
         setStartAgain(false);
+        let correct = 0,
+          wrong = 0;
+        result.exam.questions.forEach((ques) => {
+          ques.choice.forEach((c) => {
+            if (c.name.toUpperCase() === ques.answer.toUpperCase()) {
+              if (c.userChoose.find((u) => u === user.username)) correct++;
+              else wrong++;
+            }
+          });
+        });
+        let score = (10 / (correct + wrong)) * correct;
+        let numQuestion = correct + wrong;
+        axios
+          .post(constant.URL_API + "/post-submitHistory", {
+            idUser: user.username,
+            idExam: examToken,
+            lastSubmit: moment().format("DD-MM-YYYY HH:mm:ss"),
+            point: score.toString() + "/10",
+            correctAnswer: correct.toString() + "/" + numQuestion.toString(),
+            numberOfCorrect: correct,
+            exam: result.exam,
+          })
+          .then(function (res) {
+            showSubmitExam(result);
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
       })
       .catch((err) => {
         console.log(err);
@@ -229,7 +272,7 @@ export default function Exam() {
       >
         <div className="space-y-1">
           <div className="font-bold text-sushi-400 uppercase text-sm text-primary">
-            Bài tập trắc nghiệm
+            Bài tập trắc nghiệm - {nameCourse}
           </div>
           <div className="text-xl text-zinc-600 font-bold leading-6 pb-2">
             {exam.name}
