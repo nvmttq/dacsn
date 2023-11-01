@@ -11,6 +11,8 @@ import ReviewExam from "./pages/ReviewExam.js";
 import IndexExam from "./pages/IndexExam.js";
 import Exam from "./pages/Exam.js";
 import ViewGroup from "./components/ViewGroup.js"
+import AssignmentDetails from "./pages/AssignmentDetails.js"
+
 
 function App() {
   return (
@@ -31,9 +33,15 @@ function App() {
             <Route path="/groups/:groupToken" element={<ViewGroup />}> </Route>
             
             <Route
+              path="/assignments/:assignmentToken"
+              element={<AssignmentDetails />}
+            ></Route>
+
+            <Route
               path="/exam/review/:examToken"
               element={<ReviewExam />}
             ></Route>
+
             <Route
               path="/exam/redo/:examToken"
               element={<Exam />}

@@ -50,8 +50,7 @@ export default function GroupCard() {
     <>
       {groups.length !== 0 ? (
         <div
-          className="courses-content flex flex-wrap justify-center gap-2 mt-2 h-[calc(100vh-34px-25px)] bg-lime-200"
-          style={{ overflowY: "scroll" }}
+          className="courses-content flex flex-wrap justify-center gap-2 gap-y-10 mt-5"
         >
           {groups.map((group, index) => (
             <Card

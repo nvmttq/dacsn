@@ -1,5 +1,6 @@
 const GroupModel = require("../models/groupModel.js");
 const UserModel = require("../models/userModel.js");
+const AssignmentModel = require("../models/assignmentModel.js");
 const shortid = require('shortid');
 
 module.exports = {
@@ -44,9 +45,14 @@ module.exports = {
     const {groupToken} = req.params;
     try {
       const group = await GroupModel.findOne({token: groupToken});
-      return res.json(group);
+      const assignments = await AssignmentModel.find({courseToken: group.courseToken});
+
+      return res.json({
+        group,
+        assignments
+      });
     } catch(err) {
-      return res.json(err);
+      return res.json({err});
     }
 
   }

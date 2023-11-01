@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState, useParams } from "react";
-import io from "socket.io-client";
-import moment from "moment";
+import React, { useEffect, useRef, useState } from "react";
 import MoodIcon from "@mui/icons-material/Mood";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import SendIcon from "@mui/icons-material/Send";
+import { Divider } from "primereact/divider";
+import io from "socket.io-client";
 import { FileUpload } from "primereact/fileupload";
 import { ListBox } from "primereact/listbox";
 import { Splitter, SplitterPanel } from "primereact/splitter";
@@ -11,7 +11,7 @@ import { Splitter, SplitterPanel } from "primereact/splitter";
 import * as constant from "../constant.js";
 import ChatMessage from "./ChatMessage.js";
 
-export default function Chat({
+export default function ChatComponent({
   user,
   groupToken,
   participants,
@@ -24,14 +24,13 @@ export default function Chat({
   const emoteSendRef = useRef(null);
   const scrollToBottom = useRef();
 
-  console.log(socketRef)
-  const [selectedCity, setSelectedCity] = useState(null);
+  const [selectedParticipant, setSelectedParticipant] = useState(null);
 
   useEffect(() => {
     socketRef.current = io.connect(`${constant.URL_API}/group`);
-    
+
     socketRef.current.on("abc", (dataMessage) => {
-      socketRef.current.emit("ok chua")
+      socketRef.current.emit("ok chua");
       const conversations = dataMessage.map((m) => {
         return {
           conversation: m,
@@ -47,7 +46,7 @@ export default function Chat({
 
   const handleSendChat = (e) => {
     e.preventDefault();
-    if(!textSendRef.current.value) return;
+    if (!textSendRef.current.value) return;
     console.log({
       text: textSendRef.current.value,
       file: fileSendRef.current
@@ -55,8 +54,6 @@ export default function Chat({
         : "NOT FOUND SRC FILE",
       emote: emoteSendRef.current ? emoteSendRef.current : "NOT FOUNT EMOTE",
     });
-    
-    
 
     socketRef.current.emit("send message", {
       message: {
@@ -70,25 +67,30 @@ export default function Chat({
       socketID: socketRef.current.id,
       groupToken,
     });
-    
+
     textSendRef.current.value = "";
     textSendRef.current.focus();
     fileSendRef.current = null;
     emoteSendRef.current = null;
   };
-
   return (
-    <Splitter className="w-full">
-      <SplitterPanel size={55} minSize={10}>
+    <Splitter className="w-full h-[80%]">
+      <SplitterPanel size={55} minSize={10} className="px-3">
+        <div className="card-header flex justify-between items-center p-3">
+          <h5 className="mb-0">Chat</h5>
+          <button className="btn btn-primary btn-sm ripple-dark">
+            Let's Chat App
+          </button>
+        </div>
         <div
-          className="chat-container bg-blue-500 ml-[20px] h-[500px] mt-2 flex-grow overflow-y-scroll"
+          className="card-body chat-container h-[400px] mt-2 flex-grow overflow-y-scroll"
           ref={scrollToBottom}
-          onLoad={(e) =>
+          onLoad={() =>
             (document.querySelector(".chat-container").scrollTop =
               document.querySelector(".chat-container").scrollHeight)
           }
         >
-          {conversations && conversations.length >0 ? (
+          {conversations && conversations.length > 0 ? (
             conversations.map((m, index) => (
               <ChatMessage key={index} dataMessage={m} />
             ))
@@ -96,43 +98,38 @@ export default function Chat({
             <div>Hãy nhắn gì đó gửi tới mọi người</div>
           )}
         </div>
-
+        <Divider className="mb-0" style={{margin: '0'}}/>
         <form
-          className="send-chat ml-[20px] w-full flex justify-between items-center py-3 gap-x-2"
+          className="card-footer text-gray-500 flex justify-start items-center w-full p-3"
           onSubmit={handleSendChat}
         >
-          <div className="flex items-center w-4/5">
-            <img
-              src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp"
-              alt="avatar 3"
-              style={{ width: "30px", height: "30px" }}
-              className="w-10 h-full"
-            />
-            <input
-              type="text"
-              placeholder="Soạn tin"
-              className="text-md outline-none h-[40px] w-full border-solid border-2 border-blue-500 pl-2"
-              autoComplete="false"
-              ref={textSendRef}
-            />
-          </div>
-          <div className="w-1/5 text-gray-500 flex items-center gap-x-2">
-            <FileUpload
-              mode="basic"
-              name="demo[]"
-              url="/api/upload"
-              accept="image/*"
-              maxFileSize={1000000}
-              chooseOptions={{
-                icon: <AttachFileIcon />,
-                className: "p-0",
-              }}
-              chooseLabel=" "
-              ref={fileSendRef}
-            />
-            <MoodIcon style={{ fontSize: "20px" }} />
-            <SendIcon style={{ color: "#1976D2", fontSize: "20px" }} />
-          </div>
+          <img
+            src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp"
+            alt="avatar 3"
+            style={{ width: "40px", height: "100%" }}
+          />
+          <input
+            type="text"
+            placeholder="Soạn tin"
+            className=" block w-full outline-none pl-3"
+            autoComplete="false"
+            ref={textSendRef}
+          />
+          <MoodIcon className="ms-1 text-gray-500 block" />
+          <FileUpload
+            mode="basic"
+            name="demo[]"
+            url="/api/upload"
+            accept="image/*"
+            maxFileSize={1000000}
+            chooseOptions={{
+              icon: <AttachFileIcon />,
+              className: "p-0",
+            }}
+            chooseLabel=" "
+            ref={fileSendRef}
+          />
+          <SendIcon className="ms-3 text-gray-500 block" />
         </form>
       </SplitterPanel>
       <SplitterPanel
@@ -143,8 +140,8 @@ export default function Chat({
         <p className="text-[20px] flex justify-center">Thành viên trong nhóm</p>
         <ListBox
           filter
-          value={selectedCity}
-          onChange={(e) => setSelectedCity(e.value)}
+          value={selectedParticipant}
+          onChange={(e) => setSelectedParticipant(e.value)}
           options={participants}
           optionLabel="nameDisplay"
           className="md:w-14rem"
