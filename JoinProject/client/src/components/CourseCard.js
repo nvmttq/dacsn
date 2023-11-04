@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { Card } from "primereact/card";
-import * as constant from  "../constant.js"
+import * as constant from "../constant.js"
 
 export default function CourseCard() {
   const [courses, setCourses] = useState([]);
@@ -14,12 +14,12 @@ export default function CourseCard() {
 
 
   useEffect(() => {
-    if(user) {
+    if (user) {
       fetch(`${constant.URL_API}/courses/${user.username}`, {
-      method: "GET",
-    })
-      .then((res) => res.json())
-      .then((result) => setCourses(result));
+        method: "GET",
+      })
+        .then((res) => res.json())
+        .then((result) => setCourses(result));
     }
   }, [user]);
 
@@ -36,18 +36,19 @@ export default function CourseCard() {
   }
   const footer = (courseToken) => {
     return (
-      <Link to={`/courses/${courseToken}`} label="Vào lớp" icon="pi pi-book" onClick={() => getToken({token: courseToken})}>Vào lớp</Link>
-  )};
+      <Link to={`/courses/${courseToken}`} label="Vào lớp" icon="pi pi-book" onClick={() => getToken({ token: courseToken })}>Vào lớp</Link>
+    )
+  };
 
   return (
     <>
-   
+
       {courses.length !== 0 ? (
         <div
           className="courses-content flex flex-wrap justify-center gap-2 mt-2 h-[calc(100vh-34px-25px)]"
-        
+
         >
-          
+
           {courses.map((course, index) => (
             <Card
               key={index}

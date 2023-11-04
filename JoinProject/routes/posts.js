@@ -6,5 +6,6 @@ const router = express.Router();
 router.get("/posts", PostsController.getAll);
 router.post("/posts", PostsController.create);
 router.put("/posts", PostsController.updatePosts);
-
+router.put("/posts-edit",PostsController.editPost);
+router.put("/posts/delete-post",PostsController.deletePost);
 module.exports = router;

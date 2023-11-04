@@ -7,8 +7,11 @@ import { Dialog } from "primereact/dialog";
 import "primeicons/primeicons.css";
 import axios from "axios";
 import moment from "moment";
+import { useParams } from "react-router-dom";
+
 
 export default function Posts() {
+  const { courseToken } = useParams();
   const toast = useRef(null);
   const showSuccess = () => {
     toast.current.show({
@@ -44,6 +47,8 @@ export default function Posts() {
   const [checkLike, setCheckLike] = useState(false);
 
   const [listPosts, setListPosts] = useState([]);
+  const [tempPost,setTempPost] = useState([]);
+
   const author = localStorage.getItem("user")
     ? JSON.parse(localStorage.getItem("user"))._id
     : null;
@@ -55,13 +60,23 @@ export default function Posts() {
     axios
       .get("http://localhost:3002/posts", {})
       .then(function (response) {
-        setListPosts(response.data.dataPosts.reverse());
+        let tmp = response.data.dataPosts.reverse();
+        // setListPosts(response.data.dataPosts.reverse());
+        let tmp1 = [];
+        tmp.map(item=>{
+          if(item.idCourse === courseToken)
+          {
+            tmp1.push(item);
+          }
+        })
+        setListPosts(tmp1);
+        tmp1=[];
+        console.log(listPosts)
       })
       .catch(function (error) {
         console.log(error);
       });
   }, []);
-
   const fetchDataPosts = () => {
     axios
       .get("http://localhost:3002/posts", {})
@@ -73,7 +88,7 @@ export default function Posts() {
       });
   }
 
-  const fetchDataComment = ({id}) => {
+  const fetchDataComment = ({ id }) => {
     axios
       .get("http://localhost:3002/posts", {})
       .then(function (response) {
@@ -118,6 +133,7 @@ export default function Posts() {
         author: author,
         nameAuthor: nameUser,
         createDate: moment().format("DD-MM-YYYY HH:MM"),
+        idCourse: courseToken
       })
       .then(function (response) {
         fetchDataPosts();
@@ -141,7 +157,8 @@ export default function Posts() {
         reply: [],
       })
       .then(function (response) {
-        fetchDataComment({id: idDetailPost});
+        fetchDataComment({ id: idDetailPost });
+        console.log(commentPost);
       })
       .catch(function (error) {
         console.log(error);
@@ -168,7 +185,7 @@ export default function Posts() {
             reply: check,
           })
           .then(function (res) {
-            fetchDataComment({id: idDetailPost});
+            fetchDataComment({ id: idDetailPost });
           })
           .catch(function (error) {
             console.log(error);
@@ -188,7 +205,7 @@ export default function Posts() {
         like: arr,
       })
       .then(function (response) {
-        fetchDataComment({id: idDetailPost});
+        fetchDataComment({ id: idDetailPost });
       })
       .catch(function (error) {
         console.log(error);
@@ -209,7 +226,7 @@ export default function Posts() {
             like: arr,
           })
           .then(function (response) {
-            fetchDataComment({id: idDetailPost});
+            fetchDataComment({ id: idDetailPost });
           })
           .catch(function (error) {
             console.log(error);
@@ -224,11 +241,60 @@ export default function Posts() {
   const [postsModal, setPostModal] = useState(false);
   const showModalPosts = ({ id }) => {
     setPostModal(true);
-    fetchDataComment({id: id});
+    fetchDataComment({ id: id });
   };
   const cancelModal = () => {
     setPostModal(false);
     setCheckLike(false);
+  }
+
+  const [visible, setVisible] = useState(false);
+
+  const [editPost, setEditPost] = useState('');
+  const [editContent, setEditContent] = useState('');
+  const [editId, setEditId] = useState(null);
+
+  const DeletePost = () => {
+    axios
+      .put("http://localhost:3002/posts/delete-post", {
+        _id: editId,
+      })
+      .then(function () {
+        fetchDataPosts();
+      })
+      .catch(function (e) {
+        console.log(e);
+      })
+  }
+
+  const EditPost = () => {
+
+    axios
+      .put("http://localhost:3002/posts-edit", {
+        _id: editId,
+        title: editPost,
+        content: editContent,
+      })
+      .then(function (response) {
+        fetchDataPosts();
+        setEditContent('');
+        setEditId(null);
+        setEditPost('');
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }
+  const LoadContentPost = () => {
+    if (editId !== null) {
+      listPosts.map(item => {
+        if (item._id === editId) {
+          setEditPost(item.title);
+          setEditContent(item.content);
+        }
+      })
+      // console.log(editId, editContent, editPost);
+    }
   }
 
   return (
@@ -415,34 +481,64 @@ export default function Posts() {
           </div>
         </div>
         {listPosts.map((post, index) => (
-          <div className="px-10 py-6 bg-white rounded-lg shadow-md h-auto mt-5 ml-10 mr-10">
-            <div className="flex justify-between items-center">
-              <span className="font-light text-gray-600">
-                {post.createDate}
-              </span>
-            </div>
-            <div className="mt-2">
-              <div
-                className="text-2xl text-gray-700 font-bold hover:underline cursor-pointer"
-                onClick={() => showModalPosts({ id: post._id })}
-              >
-                {post.title}
+          <div className="px-10 py-6 bg-white rounded-lg shadow-md h-auto mt-5 ml-10 mr-10 flex flex-row">
+            <div>
+              <div className="flex justify-between items-center">
+                <span className="font-light text-gray-600">
+                  {post.createDate}
+                </span>
               </div>
-              <p className="mt-2 text-gray-600">{post.content}</p>
-            </div>
-            <div className="flex justify-between items-center mt-4">
-              <div>
-                <a className="flex items-center" href="#">
-                  <img
-                    className="mx-4 w-10 h-10 object-cover rounded-full hidden sm:block"
-                    alt="avatar"
-                    src="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
-                  />
+              <div className="mt-2">
+                <div
+                  className="text-2xl text-gray-700 font-bold hover:underline cursor-pointer border-[1px] "
+                  onClick={() => showModalPosts({ id: post._id })}
+                >
+                  {post.title}
+                </div>
+                <p className="mt-2 text-gray-600">{post.content}</p>
+              </div>
+              <div className="flex justify-between items-center mt-4">
+                <div>
+                  <a className="flex items-center" href="#">
+                    <img
+                      className="mx-4 w-10 h-10 object-cover rounded-full hidden sm:block"
+                      alt="avatar"
+                      src="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
+                    />
 
-                  {post.nameAuthor}
-                </a>
+                    {post.nameAuthor}
+                  </a>
+                </div>
               </div>
             </div>
+            {
+              post.author === author &&
+              <>
+                <div className="grid justify-items-end w-full h-[30px]">
+
+                  <Button className="" onClick={() => { setEditId(post._id); setVisible(true); LoadContentPost(); }}>
+                    <i className="pi pi-ellipsis-v" ></i>
+                  </Button>
+                  <Dialog header="Chỉnh sửa bài viết" visible={visible} className="w-[900px] h-auto" onHide={() => { setVisible(false); }}>
+                    <div className="border-[2px]">
+                      <span>
+                        <p className="ml-[350px] text-xl">Chỉnh sửa bài viết </p>
+                        <p>Tiêu đề: </p>
+                        <InputTextarea className="mt-[10px]" value={editPost} onChange={(e) => setEditPost(e.target.value)} />
+                      </span>
+                      <span>
+                        <p>Nội dung: </p>
+                        <InputTextarea className="mt-[10px]" value={editContent} onChange={(e) => setEditContent(e.target.value)} />
+                      </span>
+                      <Button label="Xác nhận" className="ml-[10px]" onClick={() => { EditPost() }} />
+                      <Button label="Xóa bài viết" className="ml-[10px]" onClick={() => { DeletePost() }} />
+
+                    </div>
+
+                  </Dialog>
+                </div>
+              </>
+            }
           </div>
         ))}
       </div>
