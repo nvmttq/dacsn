@@ -90,7 +90,7 @@ class HomeController {
       //     groupsOfUser.push(data);
       //   }
       // });
-      const {user} = req.body;
+      const { user } = req.body;
       await GroupModel.find({}).then((groups) => {
         let username = user.username;
         groups.forEach((group) => {
@@ -268,6 +268,32 @@ class HomeController {
         err,
       });
     }
+  }
+
+  async editExam(req, res) {
+    const {
+      textQuesCurrent,
+      choiceCurrent,
+      answerCurrent,
+      examToken,
+      minutes,
+      title,
+    } = req.body;
+
+    const exam = await ExamModel.findOne({ id: examToken });
+    exam.timelimit = minutes;
+    exam.name = title;
+    exam.questions.forEach((item, index) => {
+      item.textQues = textQuesCurrent[index];
+      item.choice = choiceCurrent[index];
+      item.answer = answerCurrent[index];
+    });
+    await exam.save();
+    return res.json({
+      severity: "success",
+      msg: "Cập nhật thành công",
+      exam,
+    });
   }
 
   async getContentCourse(req, res) {

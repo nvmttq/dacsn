@@ -29,7 +29,7 @@ export default function IndexExam({ setIdReview }) {
   const navigate = useNavigate();
 
   const settingOptions = [
-    { name: "Chỉnh sửa câu hỏi", code: "CSCH" },
+    { name: "Chỉnh sửa", code: "CS" },
     { name: "Xem trước", code: "XT" },
   ];
 
@@ -102,7 +102,7 @@ export default function IndexExam({ setIdReview }) {
   }, []);
 
   const solveOptions = (e) => {
-    if (e.value.code === "CSCH") {
+    if (e.value.code === "CS") {
       navigate("/exam/edit/" + examToken);
     }
   };

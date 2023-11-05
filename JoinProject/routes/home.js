@@ -11,6 +11,7 @@ router.get('/exam/:examToken', homeController.getExamForUserInCourse);
 router.put('/exam/set-choice', homeController.setChoice);
 router.put('/exam/submit-exam', homeController.submitExam);
 router.put('/exam/start-exam', homeController.startExam);
+router.put('/exam/edit', homeController.editExam);
 //user
 router.post('/groups', homeController.getGroupWithUserName);
 
