@@ -1,6 +1,7 @@
 const GroupModel = require("../models/groupModel.js");
 const UserModel = require("../models/userModel.js");
 const AssignmentModel = require("../models/assignmentModel.js");
+const CourseModel = require("../models/courseModel.js");
 const shortid = require("shortid");
 
 module.exports = {
@@ -37,6 +38,7 @@ module.exports = {
         participants: convertParticipants,
         assignmented: files,
         status: true,
+        dateSubmit: Date.now()
       });
       await ass.save();
     }
@@ -46,5 +48,44 @@ module.exports = {
       assignment: ass
     });
   },
+  getAssignment: async (req, res) => {
+    const {assignToken} = req.body;
+    console.log(req.body)
+    const assign = await AssignmentModel.findOne({assignmentToken: assignToken});
+    const course = await CourseModel.findOne({token: assign.courseToken})
+    return res.json(
+      {
+        assignment: assign,
+        course
+      }
+    )
+  },
 
+  setGrade: async (req, res) => {
+    const {grade, username, assignToken} = req.body;
+
+    const parseFloatGrade = parseFloat(grade);
+
+    if(!parseFloatGrade || isNaN(parseFloatGrade) || !grade) {
+      return res.json({
+        code: 500,
+        msg: "loi "
+      })
+    }
+
+    const assign = await AssignmentModel.findOne({assignmentToken: assignToken});
+
+    assign.userStatus.forEach(data => {
+      if(data.participants.find(u => u === username)) {
+        data.grade = (parseFloat(grade));
+      }
+    });
+
+    await assign.save();
+
+    return res.json({
+      code: 200,
+      assignment: assign
+    })
+  }
 };

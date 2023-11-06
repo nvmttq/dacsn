@@ -223,6 +223,7 @@ export default function Contents() {
     : null;
   const [courseInformation, setCourseInformation] = useState({});
   const [treeContentEdit, setTreeContentEdit] = useState([]);
+  
   useEffect(() => {
     axios
       .get("http://localhost:3002/get-course", {})

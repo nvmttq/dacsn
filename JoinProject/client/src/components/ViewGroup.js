@@ -17,6 +17,7 @@ export default function GroupCard() {
   const [group, setGroup] = useState(null);
   const [assignments, setAssignments] = useState(null);
   
+
   useEffect(() => {
     fetch(`${constant.URL_API}/groups/${groupToken}`, {
       method: "GET",
@@ -28,6 +29,7 @@ export default function GroupCard() {
       }) => {
         
         console.log(group, assignments)
+        console.log(group)
         setGroup(group);
         const conversations = group.conversations.map(m => {
           return {
@@ -43,8 +45,8 @@ export default function GroupCard() {
         setAssignments(assignments);
 
         console.log(conversations);
-      });
-  }, []);
+      
+  })}, []);
 
   return (
     <>
@@ -69,4 +71,4 @@ export default function GroupCard() {
       </div>
     </>
   );
-}
+  }

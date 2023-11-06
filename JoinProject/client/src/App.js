@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Routes, Route } from "react-router-dom";
 
 // PAGES
@@ -12,8 +12,7 @@ import IndexExam from "./pages/IndexExam.js";
 import Exam from "./pages/Exam.js";
 import EditExam from "./components/EditExam.js";
 import ViewGroup from "./components/ViewGroup.js";
-import AssignmentDetails from "./pages/AssignmentDetails.js";
-
+import AssignmentForTeacher from "./components/AssignmentForTeacher.js"
 
 function App() {
   const [idReview, setIdReview] = useState("");
@@ -23,7 +22,7 @@ function App() {
         <div className="w-1/6 fixed left-0 h-screen bg-white">
           <MenuSidebar />
         </div>
-        <div className="pl-[234px] pr-4 w-full bg-[#F5F5F6] h-max">
+        <div className="pl-[calc(16.6667%+20px)] pr-4 w-full bg-[#F5F5F6] h-max">
           <Routes>
             <Route path="/" element={<KhoaHoc />}></Route>
             <Route path="/courses/:courseToken" element={<NoiDung />} />
@@ -37,8 +36,8 @@ function App() {
             </Route>
 
             <Route
-              path="/assignments/:assignmentToken"
-              element={<AssignmentDetails />}
+              path="/assignments/:assignToken"
+              element={<AssignmentForTeacher />}
             ></Route>
 
             <Route

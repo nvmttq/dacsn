@@ -66,6 +66,7 @@ const AssignmentModel = require("./models/assignmentModel.js");
 //   userStatus: [
 //     {participants: ["gv002", "admin000"]},
 
+
 //   ]
 // });
 // newCollect.save();
@@ -188,9 +189,10 @@ io.on("connection", (socket) => {
   });
 });
 
-io.of("/group").on("connection", (socket) => {
-  socket.on("abc", () => console.log(123));
-  socket.on("send message", async ({ message, user, socketID, groupToken }) => {
+
+io.of('/group').on("connection", (socket) => {
+
+  socket.on("send message", async ({message, user, socketID, groupToken}) => {
     const group = await GroupModel.findOne({ token: groupToken });
 
     if (group) {
@@ -210,11 +212,14 @@ io.of("/group").on("connection", (socket) => {
         },
         isOwn: user.username,
       };
-
-      io.of("/group").emit("abc", group.conversations);
+      
+      
+      io.of("/group").emit("abc",group.conversations);
     }
   });
-});
+})
+
+
 
 const port = process.env.PORT || 3002;
 server.listen(port, () => {

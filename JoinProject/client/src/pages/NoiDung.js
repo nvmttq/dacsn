@@ -52,6 +52,11 @@ export default function NoiDung() {
           <i className="pi pi-angle-left"></i>
           <span>GO BACK</span>
         </Link>
+        <Link
+          to={`/assignments/assToken2`}
+        >
+          <span>Bài tập chương 1</span>
+        </Link>
         <span className="font-bold">
           <span
             style={{

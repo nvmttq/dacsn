@@ -6,6 +6,7 @@ const GradesModel = require("../models/gradeModel.js");
 const ExamModel = require("../models/examModel.js");
 const ContentSubjectModel = require("../models/contentSubjectModel.js");
 const DkmhModel = require("../models/dkmhModel.js");
+const userModel = require("../models/userModel.js");
 
 class HomeController {
   index(req, res) {
@@ -356,6 +357,21 @@ class HomeController {
         code: 500,
       });
     }
+  }
+
+  async getUser(req, res) {
+    const { participants } = req.body;
+
+    
+    const users = await userModel.find({});
+    const ret = (users.filter( u => participants.find(userID => userID === u.username))).map(data => {
+      return {
+        username: data.username,
+        nameDisplay: data.name,
+        role: data.role
+      }
+    });
+    return res.json(ret);
   }
 }
 

@@ -20,6 +20,8 @@ const AssignmentSchema = new mongoose.Schema({
                 size: Number, // kb
                 uploadDate: {type: Date, default: Date.now}
             }],
+            grade: {type: Number, default: 0},
+            dateSubmit: Date,
             status: {type: Boolean, default: false}
         }
     ]

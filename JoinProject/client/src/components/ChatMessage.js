@@ -12,6 +12,7 @@ function ChatMessage({ dataMessage }) {
     ? JSON.parse(localStorage.getItem("user"))
     : null;
 
+
   return (
     <div className="chat-message mb-4">
       {dataMessage.isOwn === user.username ? (

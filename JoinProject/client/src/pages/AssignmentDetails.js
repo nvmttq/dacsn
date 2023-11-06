@@ -1,11 +1,7 @@
-import React, { useEffect, useState, useRef } from "react";
-import { ToggleButton } from "primereact/togglebutton";
-import { ListBox } from "primereact/listbox";
-import { FileUpload } from "primereact/fileupload";
-import { Toast } from "primereact/toast";
+import React, { useEffect, useState } from "react";
+
 import moment from "moment";
 
-import * as constant from "../constant.js";
 import UploadAssignment from "../components/UploadAssignment.js";
 export default function AssignmentDetails(props) {
   const [assignment, setAssignment] = useState(props.assignment);
@@ -54,7 +50,7 @@ export default function AssignmentDetails(props) {
         <div id="ass-work">
           <span className="font-[500] mb-4 block">Các tài liệu đã nộp</span>
           <div className="grid grid-cols-4 gap-4 mb-4">
-            {assignmented.map((ass, i) => {
+            {assignmented && assignmented.map((ass, i) => {
               return (<span key={i}>{ass.name}</span>);
             })}
           </div>
