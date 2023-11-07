@@ -51,6 +51,7 @@ export default function GroupCard() {
   return (
     <>
       <div className="mt-5 h-[calc(100vh-20px)] px-3">
+        <div className="mb-5 font-bold text-xl">{group ? group.title : ''}</div>
         <span className="mb-5 block">
           <Button
             label="Chat nhóm"

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import AccessAlarmsIcon from "@mui/icons-material/AccessAlarms";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { Link } from "react-router-dom";
@@ -16,14 +16,17 @@ export default function AssignmentCard({
   const user = localStorage.getItem("user")
     ? JSON.parse(localStorage.getItem("user"))
     : null;
-  const handleCalcDateDiff = (start, end) => {
-    const s = new Date(start);
-    const e = new Date(end); // Replace with your desired exam date
-    const timeDifference = Math.abs(e - s);
-    const daysRemaining = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
-    return daysRemaining;
-  };
-
+  const [isSubmit, setIsSubmit] = useState(false);
+  useEffect( () => {
+    if(assignment && assignment.userStatus) {
+      assignment.userStatus.forEach(g => {
+        console.log(g)
+        if(g.participants.find(username => user.username === username)) {
+          setIsSubmit(true);
+        }
+      })
+    }
+  }, [assignment])
   const convertDateMongodb = (date) => {
     return moment(date).format("DD-MM-YYYY HH:mm:ss");
   };
@@ -73,7 +76,7 @@ export default function AssignmentCard({
 
           <div className="grade-status flex flex-col items-center">
             <span className="title text-secondary">Trạng thái</span>
-            {assignment.status ? (
+            {isSubmit ? (
               <div className="status flex items-center gap-x-2">
                 <i className="pi pi-check"></i>
                 <span>Đã nộp bài</span>

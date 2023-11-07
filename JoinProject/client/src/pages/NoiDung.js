@@ -42,7 +42,7 @@ export default function NoiDung() {
   ];
 
   return (
-    <>
+    <div className=" h-screen">
       <div className="mt-[15px] flex flex-col">
         <Link
           to="/"
@@ -86,6 +86,6 @@ export default function NoiDung() {
       {activeIndex === 2 && <Meeting />}
       {activeIndex === 3 && <Participants />}
       {activeIndex === 4 && <Grade />}
-    </>
+    </div>
   );
 }

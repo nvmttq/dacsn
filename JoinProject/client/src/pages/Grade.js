@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
+import GradeForTeacher from "../components/GradeForTeacher.js";
 import GradeCard from "../components/GradeCard.js";
 import * as constant from  "../constant.js"
 export default function Grade() {
@@ -34,12 +35,13 @@ export default function Grade() {
   return (
     <div>
       {grades.length === 0 ? (
-        <div className="grades flex flex-col gap-y-2 overflow-y-scroll h-full px-3">Chưa có bảng điểm nào</div>
+        <div className="grades flex flex-col gap-y-2 px-3">Chưa có bảng điểm nào</div>
       ) : (
-        <div className="grades flex flex-col gap-y-2 overflow-y-scroll h-full px-3">
-          {grades.map((grade, index) => (
+        <div className="grades flex flex-col gap-y-2 px-3">
+          {/* {grades.map((grade, index) => (
             <GradeCard key={index} grade={grade} />
-          ))}
+          ))} */}
+          <GradeForTeacher courseToken={courseToken}/>
         </div>
       )}
     </div>

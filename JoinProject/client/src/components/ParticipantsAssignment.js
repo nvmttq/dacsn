@@ -217,9 +217,10 @@ export default function ParticipantsAssignmentForTeacher({ assignment }) {
   const filesBodyTemplate = (rowData) => {
     return (
       <div>
-        {rowData.assignmented.map((f, i) => (
+        {rowData.assignmented && rowData.assignmented.length > 0 ? 
+          rowData.assignmented.map((f, i) => (
           <div key={i}>{f.name}</div>
-        ))}
+        )) : <div>Chưa nộp</div>}
       </div>
     );
   };

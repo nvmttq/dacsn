@@ -37,8 +37,10 @@ const course = require("./routes/course.js");
 const group = require("./routes/group.js");
 const calendar = require("./routes/calendar");
 const assignment = require("./routes/assignment.js");
+const grade = require("./routes/grade.js");
 
 route(app);
+app.use(grade);
 app.use(assignment);
 app.use(posts);
 app.use(group);

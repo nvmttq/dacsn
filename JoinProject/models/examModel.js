@@ -24,6 +24,7 @@ const examSchema = new mongoose.Schema({
       status: { type: Number, default: 0 },
       timeStart: { type: Date, default: Date.now },
       timeEnd: { type: Date, default: Date.now },
+      grade: { type: Number, default: 0 },
     },
   ],
 });

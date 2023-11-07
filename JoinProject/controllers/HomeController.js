@@ -225,13 +225,6 @@ class HomeController {
     const { user, examToken } = req.body;
     try {
       const exam = await ExamModel.findOne({ id: examToken });
-      exam.userStatus.forEach((u) => {
-        if (u.userID === user.username) {
-          u.status = 2;
-          u.timeEnd = new Date();
-        }
-      });
-      await exam.save();
 
       var correct = 0,
         wrong = 0;
@@ -243,6 +236,17 @@ class HomeController {
           }
         });
       });
+
+      exam.userStatus.forEach((u) => {
+        if (u.userID === user.username) {
+          u.status = 2;
+          u.timeEnd = new Date();
+          u.grade = correct;
+        }
+      });
+      await exam.save();
+
+      
       console.log(correct, wrong);
       const grade = new GradesModel({
         id: "gradetest",
