@@ -58,10 +58,11 @@ connectDb();
 const MeetingSchema = require("./models/meetingModel.js");
 const GroupModel = require("./models/groupModel.js");
 const AssignmentModel = require("./models/assignmentModel.js");
+
 // const newCollect = new AssignmentModel({
-//   title: "Bài tập chương 2 - Tìm hiểu về ngôn ngữ C++",
+//   title: "Bài tập chương 1 - Tìm hiểu về ngôn ngữ C++",
 //   assignmentToken: "assToken2",
-//   courseToken: "AqmQk1",
+//   courseToken: "AmQEk1",
 //   content: {
 //       text: "1. Ngôn ngữ C++ ra đời vào năm nào ? \n 2. Ngôn ngữ C++ do ai ?",
 //       file: ["file1", "file2"]
@@ -69,7 +70,7 @@ const AssignmentModel = require("./models/assignmentModel.js");
 //   timeStart: new Date(),
 //   timeEnd: (new Date()).setDate((new Date()).getDate() + 10),
 //   userStatus: [
-//     {participants: ["gv002", "admin000"]},
+//     {participants: ["gv001", "admin000"]},
 
 //   ]
 // });

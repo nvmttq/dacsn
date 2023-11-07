@@ -46,10 +46,12 @@ module.exports = {
     try {
       const group = await GroupModel.findOne({token: groupToken});
       const assignments = await AssignmentModel.find({courseToken: group.courseToken});
-
+      console.log(assignments)
+      const assignment = await AssignmentModel.find({assignmentToken: "assToken2"});
       return res.json({
         group,
-        assignments
+        assignments,
+        assignment
       });
     } catch(err) {
       return res.json({err});

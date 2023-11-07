@@ -50,8 +50,11 @@ export default function AssignmentDetails(props) {
         <div id="ass-work">
           <span className="font-[500] mb-4 block">Các tài liệu đã nộp</span>
           <div className="grid grid-cols-4 gap-4 mb-4">
-            {assignmented && assignmented.map((ass, i) => {
-              return (<span key={i}>{ass.name}</span>);
+            {assignmented && assignmented.map((f, i) => {
+              return (<a key={i} href={f.base64} download={f.name} style={{
+                color: 'rgb(67, 56, 202)',
+                textUnderlineOffset: 'under'
+              }} className="hover:underline">{f.name}</a>);
             })}
           </div>
           <UploadAssignment group={group} assignment={assignment} setAssignment={setAssignment}/>

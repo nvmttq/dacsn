@@ -214,13 +214,17 @@ const exportExcel = () => {
 const saveAsExcelFile = (buffer, fileName) => {
   import('file-saver').then((module) => {
       if (module && module.default) {
-          let EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
-          let EXCEL_EXTENSION = '.xlsx';
-          const data = new Blob([buffer], {
-              type: EXCEL_TYPE
-          });
+        const blob = new Blob(['Hello, World!'], { type: 'text/plain' });
 
-          module.default.saveAs(data, fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION);
+        // Save the Blob as a file
+        module.default.saveAs(blob, 'example.txt');
+          // let EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+          // let EXCEL_EXTENSION = '.xlsx';
+          // const data = new Blob([buffer], {
+          //     type: EXCEL_TYPE
+          // });
+
+          // module.default.saveAs(data, fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION);
       }
   });
 };
@@ -250,11 +254,11 @@ const header = (
   const assignBodyTemplate = (e, assign) => {
 
     const fileAssign= (e.fileAssignments.find(f => f.fileToken === assign.assignmentToken));
-    console.log(fileAssign);
+ 
     return (
       <div className="fullname-student flex flex-col items-center">
         {/* {rowData.username} */}
-        {fileAssign.status ? fileAssign.grade : "Chưa nộp bài"}
+        {fileAssign && fileAssign.status ? fileAssign.grade : "Chưa nộp bài"}
       </div>
     );
   };

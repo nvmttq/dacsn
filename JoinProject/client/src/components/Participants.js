@@ -138,8 +138,9 @@ export default function LazyLoadDemo() {
   const groupBodyTemplate = (rowData) => {
     let idGroup = -1;
     const username = rowData.userID;
+    const groupsSort = groups.sort((r1, r2) => (r1.title > r2.title) ? 1 : (r1.title < r2.title) ? -1 : 0);
 
-    groups.forEach( (g, i) => {
+    groupsSort.forEach( (g, i) => {
       if(idGroup !== -1) return;
       g.participants.forEach(p => {
         if(p.userID === username) {

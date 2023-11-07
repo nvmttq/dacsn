@@ -105,19 +105,6 @@ exports.divGroup = async (req, res) => {
     });
     newGroup.save().then(res => console.log("DONE DIV GROUP")).catch(err => console.log(err));  
   }
-  // const groupSchema = new mongoose.Schema({
-  //   id: { type: String, required: false },
-  //   title: { type: String, required: false },
-  //   courseToken: {type: String, default: ""},
-  //   token: { type: String, default: "" },
-  //   participants: [{
-  //     userID: { type: String, default: ""},
-  //     nameDisplay: {type: String, default: ""},
-  //     isCreator: {type: Boolean, default: false}
-  //   }];
-
-
-    
 
 
   return res.json({

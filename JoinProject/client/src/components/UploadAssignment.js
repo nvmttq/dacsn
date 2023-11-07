@@ -5,8 +5,6 @@ import { ProgressBar } from "primereact/progressbar";
 import { Button } from "primereact/button";
 import { Tooltip } from "primereact/tooltip";
 import { Tag } from "primereact/tag";
-import { ProgressSpinner } from "primereact/progressspinner";
-import { Dialog } from 'primereact/dialog';
 import * as constant from "../constant.js";
 
 export default function UploadAssignment({ group, assignment, setAssignment }) {
@@ -137,35 +135,58 @@ export default function UploadAssignment({ group, assignment, setAssignment }) {
       "custom-cancel-btn p-button-danger p-button-rounded p-button-outlined",
   };
 
-  const myUploader = (e) => {
-    console.log(e);
-    fetch(`${constant.URL_API}/assignments/submit-ass`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        files: e.files.map((f) => {
-          return {
-            name: f.name,
-            size: f.size,
-            uploadDate: Date.now(),
-          };
-        }),
-        group,
-        assignment,
-      }),
-    })
-      .then((respone) => respone.json())
-      .then((data) => {
-        setAssignment(data.assignment);
-        toast.current.show({
-          severity: "success",
-          summary: "Thông báo",
-          detail: "Nộp file thành công",
-        });
-        e.options.clear();
+  const myUploader = async (e) => {
+    const convertBase64 = (file) => {
+      return new Promise((resolve, reject) => {
+        const fileReader = new FileReader();
+        fileReader.readAsDataURL(file);
+
+        fileReader.onload = () => {
+          resolve(fileReader.result);
+        };
+
+        fileReader.onerror = (error) => {
+          reject(error);
+        };
       });
+    };
+
+    console.log(e, e.files);
+
+    const repair = e.files.map(async (f, i) => {
+      return {
+        name: f.name,
+        size: f.size,
+        type: f.type,
+        base64: await convertBase64(f),
+        uploadDate: Date.now(),
+      };
+    });
+
+    Promise.all(repair).then(async (data) => {
+      await fetch(`${constant.URL_API}/assignments/submit-ass`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          files: data,
+          group,
+          assignment,
+        }),
+      })
+        .then((respone) => respone.json())
+        .then((data) => {
+          setAssignment(data.assignment);
+          toast.current.show({
+            severity: "success",
+            summary: "Thông báo",
+            detail: "Nộp file thành công",
+          });
+          e.options.clear();
+        });
+    })
+    
   };
   return (
     <div>
@@ -178,7 +199,7 @@ export default function UploadAssignment({ group, assignment, setAssignment }) {
         ref={fileUploadRef}
         multiple
         accept="*"
-        // url="http://localhost:3002/groups/Ney3wninx"
+        url="http://localhost:3002/assignments/submit-ass"
         maxFileSize={1000000}
         // onUpload={onTemplateUpload}
         onSelect={onTemplateSelect}
@@ -190,6 +211,7 @@ export default function UploadAssignment({ group, assignment, setAssignment }) {
         chooseOptions={chooseOptions}
         uploadOptions={uploadOptions}
         cancelOptions={cancelOptions}
+        // onUpload={myUploader}
         customUpload
         uploadHandler={myUploader}
       />

@@ -7,6 +7,8 @@ const shortid = require("shortid");
 module.exports = {
   submitAssignment: async (req, res) => {
     const { files, group, assignment } = req.body;
+    // console.log(files, assignment)
+
     const participants = group.participants;
     const ass = await AssignmentModel.findOne({
       assignmentToken: assignment.assignmentToken,
@@ -24,6 +26,8 @@ module.exports = {
             data.assignmented.push({
               name: f.name,
               size: f.size,
+              type: f.type,
+              base64: f.base64,
               uploadDate: Date.now(),
             });
           });
@@ -36,7 +40,15 @@ module.exports = {
 
       ass.userStatus.push({
         participants: convertParticipants,
-        assignmented: files,
+        assignmented: files.map(f => {
+          return {
+            name: f.name,
+              size: f.size,
+              type: f.type,
+              base64: "aaa",
+              uploadDate: Date.now(),
+          }
+        }),
         status: true,
         dateSubmit: Date.now()
       });

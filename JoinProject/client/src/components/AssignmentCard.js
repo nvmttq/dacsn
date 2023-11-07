@@ -26,7 +26,7 @@ export default function AssignmentCard({
         }
       })
     }
-  }, [assignment])
+  }, [])
   const convertDateMongodb = (date) => {
     return moment(date).format("DD-MM-YYYY HH:mm:ss");
   };

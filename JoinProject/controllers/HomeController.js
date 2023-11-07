@@ -377,6 +377,38 @@ class HomeController {
     });
     return res.json(ret);
   }
+
+  async saveContentCourse(req, res) {
+    const {username, courseInformation} = req.body;
+    const user = await userModel.findOne({username});
+
+    const checkExistLND = user.repositories.find(store => store.id === "LND");
+    if(!checkExistLND) {
+      user.repositories.push({
+        id: "LND",
+        name: "Nội dung khóa học",
+        data: []
+      })
+    }
+    user.repositories.find(store => {
+      if(store.id === "LND") {
+        store.data.push({
+          title: courseInformation.title,
+          courseToken: courseInformation.token,
+          contentCourse: courseInformation.contentCourse
+        })
+      }
+    });
+    
+
+    await user.save();
+
+    return res.json({
+      user,
+      code: 200,
+      msg: "Luu noi dung khoa hoc thanh cong",
+    })
+  }
 }
 
 module.exports = new HomeController();

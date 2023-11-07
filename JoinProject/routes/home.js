@@ -14,6 +14,8 @@ router.put('/exam/start-exam', homeController.startExam);
 router.put('/exam/edit', homeController.editExam);
 //user
 router.post('/users/get-user', homeController.getUser);
+router.post('/users/save-content-course', homeController.saveContentCourse);
+
 
 router.post('/groups', homeController.getGroupWithUserName);
 

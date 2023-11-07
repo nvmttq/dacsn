@@ -1,19 +1,26 @@
 import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
 import { Dropdown } from "primereact/dropdown";
 import { Dialog } from "primereact/dialog";
 import { Tree } from "primereact/tree";
 import { InputTextarea } from "primereact/inputtextarea";
+import { ConfirmDialog } from "primereact/confirmdialog";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { Fieldset } from "primereact/fieldset";
 import { Link } from "react-router-dom";
 import "primeicons/primeicons.css";
-import axios from "axios";
+
+import * as constant from "../constant.js";
 
 const shortid = require("shortid");
 
 export default function Contents() {
   const toast = useRef(null);
+  const [visibleConfirmSave, setVisibleConfirmSave] = useState(false);
+  const user = localStorage.getItem("user")
+    ? JSON.parse(localStorage.getItem("user"))
+    : null;
 
   const [currentKeySelect, setCurrentKeySelect] = useState("");
 
@@ -113,22 +120,44 @@ export default function Contents() {
     }
   };
 
+  const addChildrenAssignFromKey = ({ tree, key }) => {
+    if(!tree) return;
+    for (var i = 0; i < tree.length; i++) {
+      if (tree[i].key === key) {
+        tree[i].children.push({
+          key: shortid.generate(),
+          label: "",
+          type: "BT",
+          children: [],
+        });
+      } else {
+        addChildrenAssignFromKey({ tree: tree[i].children, key: key });
+      }
+    }
+  };
+
   const nodeTemplate = (node, options) => {
     let typeLabel;
-    if (node.type === "VB") {
+    if (node.type === "BT") {
       typeLabel = (
-        <InputTextarea
-          autoResize
-          cols={100}
-          rows={1}
-          defaultValue={node.label}
-          onChange={(e) => {
-            solveContent({ newValue: e.target.value, key: node.key });
-            setTreeContentEdit(
-              treeContentEdit.filter((x) => x.key !== "?????")
-            );
-          }}
-        />
+        <div className="flex items-center">
+          <i
+            className="pi pi-book mr-5"
+            style={{ fontSize: "2rem", color: "#4338CA" }}
+          ></i>
+          <InputTextarea
+            autoResize
+            cols={100}
+            rows={1}
+            defaultValue={node.label}
+            onChange={(e) => {
+              solveContent({ newValue: e.target.value, key: node.key });
+              setTreeContentEdit(
+                treeContentEdit.filter((x) => x.key !== "?????")
+              );
+            }}
+          />
+        </div>
       );
     } else if (node.type === "TN") {
       typeLabel = (
@@ -151,7 +180,23 @@ export default function Contents() {
           />
         </div>
       );
+    } else {
+      typeLabel = (
+        <InputTextarea
+          autoResize
+          cols={100}
+          rows={1}
+          defaultValue={node.label}
+          onChange={(e) => {
+            solveContent({ newValue: e.target.value, key: node.key });
+            setTreeContentEdit(
+              treeContentEdit.filter((x) => x.key !== "?????")
+            );
+          }}
+        />
+      );
     }
+
     let label = (
       <div className="flex">
         {typeLabel}
@@ -195,9 +240,7 @@ export default function Contents() {
 
   const nodeTemplateCourseInformation = (node, options) => {
     let label;
-    if (node.type === "VB") {
-      label = node.label;
-    } else if (node.type === "TN") {
+    if (node.type === "TN") {
       label = (
         <div className="flex items-center">
           <i className="pi pi-book mr-3" style={{ color: "#4338CA" }}></i>
@@ -214,6 +257,25 @@ export default function Contents() {
         //   <Button icon="pi pi-book" label={node.label} type="submit" link/>;
         // </form>
       );
+    } else if (node.type === "BT") {
+      label = (
+        <div className="flex items-center">
+          <i className="pi pi-book mr-3" style={{ color: "#4338CA" }}></i>
+          <Link
+            to={"/assignments/assToken2"}
+            style={{ color: "#4338CA" }}
+            className="hover:underline hover:decoration-4"
+          >
+            {node.label}
+          </Link>
+        </div>
+
+        // <form action={}>
+        //   <Button icon="pi pi-book" label={node.label} type="submit" link/>;
+        // </form>
+      );
+    } else {
+      label = node.label;
     }
     return <span className={options.className}>{label}</span>;
   };
@@ -223,7 +285,7 @@ export default function Contents() {
     : null;
   const [courseInformation, setCourseInformation] = useState({});
   const [treeContentEdit, setTreeContentEdit] = useState([]);
-  
+
   useEffect(() => {
     axios
       .get("http://localhost:3002/get-course", {})
@@ -241,16 +303,49 @@ export default function Contents() {
       });
   }, [currentCourses]);
 
-  const actions = [{ name: "Chỉnh sửa nội dung", code: "CSND" }];
+  const actions = [
+    { name: "Chỉnh sửa nội dung", code: "CSND" },
+    { name: "Lưu nội dung", code: "LND" },
+  ];
   const solveAction = (e) => {
     if (e.value.code === "CSND") {
       showModalEditContent();
+    } else if (e.value.code === "LND") {
+      showModalSaveContent();
     }
   };
   const [editContentModal, setEditContentModal] = useState(false);
   const showModalEditContent = () => {
     setEditContentModal(true);
   };
+
+  const showModalSaveContent = () => {
+    setVisibleConfirmSave(true);
+  };
+
+  const acceptSaveContentCourse = async () => {
+    await fetch(`${constant.URL_API}/users/save-content-course`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: user.username,
+        courseInformation,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => console.log(data))
+      .catch((err) => console.log(err));
+
+    toast.current.show({
+      severity: "success",
+      summary: "Thông báo",
+      detail: "Lưu thành công",
+      life: 3000,
+    });
+  };
+
   const cancelModalEditContent = () => {
     fetchContentCourse();
     setEditContentModal(false);
@@ -365,9 +460,26 @@ export default function Contents() {
                 cancelModalAddChildrenContent();
               }}
             />
+
+            <Button
+              label="Bài tập"
+              icon="pi pi-book"
+              text
+              onClick={() => {
+                addChildrenAssignFromKey({
+                  tree: treeContentEdit,
+                  key: currentKeySelect,
+                });
+                addChildrenAssignFromKey(
+                  treeContentEdit.filter((x) => x.key !== "?????")
+                );
+                cancelModalAddChildrenContent();
+              }}
+            />
           </div>
         </Fieldset>
       </Dialog>
+
       <Dialog
         header="CHỈNH SỬA NỘI DUNG"
         visible={editContentModal}
@@ -398,7 +510,7 @@ export default function Contents() {
           />
           <div className="flex">
             <Button
-              label="Thêm văn bản"
+              label="Thêm mục mới"
               onClick={AddToTreeContent}
               className="mt-5"
               severity="info"
@@ -406,6 +518,16 @@ export default function Contents() {
           </div>
         </div>
       </Dialog>
+
+      <ConfirmDialog
+        visible={visibleConfirmSave}
+        onHide={() => setVisibleConfirmSave(false)}
+        message="Xác nhận lưu?"
+        header="Bạn có chắc muốn lưu không ? "
+        icon="pi pi-exclamation-triangle"
+        accept={acceptSaveContentCourse}
+      />
+
       <div className="w-auto mt-4 ml-10">
         <div className="absolute end-5">
           <Dropdown

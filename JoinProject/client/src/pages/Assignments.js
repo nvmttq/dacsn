@@ -9,7 +9,7 @@ export default function Assignments({assignments, group}) {
 
   return (
     <>
-        {!assignments || assignments.length === 0 ? (
+        {!assignments ? (
         <div className="assignments flex flex-col gap-y-2 px-3">Chưa có bài tập nào</div>
       ) : (
         <div className="assignments flex flex-col gap-y-2 px-3">

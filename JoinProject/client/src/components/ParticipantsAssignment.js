@@ -13,7 +13,7 @@ export default function ParticipantsAssignmentForTeacher({ assignment }) {
     : null;
   const toastGrade = useRef(null);
   const [participants, setParticipants] = useState([]);
-  console.log(participants)
+  console.log(participants);
   const [loading, setLoading] = useState(false);
   const [totalRecords, setTotalRecords] = useState(0);
   const [selectAll, setSelectAll] = useState(false);
@@ -182,13 +182,17 @@ export default function ParticipantsAssignmentForTeacher({ assignment }) {
         })
           .then((res) => res.json())
           .then(async (ret) => {
+            if (ret.code === 500) {
+              await toastGrade.current.show({
+                severity: "warn",
+                summary: "Cảnh báo",
+                detail: "Chỉ có thể điền điểm ở dạng số và >= 0 && <= 10",
+                life: 3000,
+              });
 
-            if(ret.code === 500) {
-              await toastGrade.current.show({severity:'warn', summary: 'Cảnh báo', detail:'Chỉ có thể điền điểm ở dạng số và >= 0 && <= 10', life: 3000});
-           
               return ret;
             }
-            console.log(ret)
+            console.log(ret);
             setParticipants((prev) =>
               prev.map((p) => {
                 if (p.users.find((u) => u.username === user.username)) {
@@ -197,15 +201,27 @@ export default function ParticipantsAssignmentForTeacher({ assignment }) {
                 return p;
               })
             );
-            toastGrade.current.show({severity:'success', summary: 'Success', detail:'Message Content', life: 3000});
-          }).catch(err=> console.log(err));
+            toastGrade.current.show({
+              severity: "success",
+              summary: "Success",
+              detail: "Message Content",
+              life: 3000,
+            });
+          })
+          .catch((err) => console.log(err));
       }
       e.target.classList.toggle("pi-check");
       console.log(e.target.parentNode.querySelector("span input"));
     };
     return (
       <div className="flex gap-2 items-center ">
-        <InputNumber type="number" min={0} max={10} value={rowData.grade} disabled={true}></InputNumber>
+        <InputNumber
+          type="number"
+          min={0}
+          max={10}
+          value={rowData.grade}
+          disabled={true}
+        ></InputNumber>
         <i
           className="pi pi-pencil bg-blue-500 p-2 text-white cursor-pointer"
           onClick={enableInputnumber}
@@ -217,10 +233,24 @@ export default function ParticipantsAssignmentForTeacher({ assignment }) {
   const filesBodyTemplate = (rowData) => {
     return (
       <div>
-        {rowData.assignmented && rowData.assignmented.length > 0 ? 
+        {rowData.assignmented && rowData.assignmented.length > 0 ? (
           rowData.assignmented.map((f, i) => (
-          <div key={i}>{f.name}</div>
-        )) : <div>Chưa nộp</div>}
+            <a
+              key={i}
+              href={f.base64}
+              download={f.name}
+              style={{
+                color: "rgb(67, 56, 202)",
+                textUnderlineOffset: "under",
+              }}
+              className="hover:underline block"
+            >
+              {i+1}. {f.name}
+            </a>
+          ))
+        ) : (
+          <div>Chưa nộp</div>
+        )}
       </div>
     );
   };
@@ -243,9 +273,9 @@ export default function ParticipantsAssignmentForTeacher({ assignment }) {
 
   return (
     <div className="card">
-      <Toast ref={toastGrade}/>
+      <Toast ref={toastGrade} />
       <DataTable
-      size={'small'}
+        size={"small"}
         value={participants}
         lazy
         filterDisplay="row"
@@ -267,8 +297,6 @@ export default function ParticipantsAssignmentForTeacher({ assignment }) {
         onSelectionChange={onSelectionChange}
         selectAll={selectAll}
         onSelectAllChange={onSelectAllChange}
-
-        
       >
         <Column selectionMode="multiple" headerStyle={{ width: "3rem" }} />
 
@@ -280,7 +308,6 @@ export default function ParticipantsAssignmentForTeacher({ assignment }) {
             filter
             filterField="group"
             filterPlaceholder="Search"
-            
           />
         )}
 

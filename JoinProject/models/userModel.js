@@ -7,6 +7,11 @@ const user = new mongoose.Schema({
   role: String,
   courses: [],
   groups: [],
+  repositories: [{
+    id: String,
+    name: String,
+    data: []
+  }]
 });
 
 module.exports = mongoose.model("user", user);

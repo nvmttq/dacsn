@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { TabMenu } from "primereact/tabmenu";
-import { Dropdown } from "primereact/dropdown";
 
 import Posts from "../components/Posts";
 import Contents from "../components/Contents";
@@ -22,7 +21,7 @@ export default function NoiDung() {
       .get("http://localhost:3002/get-course", {})
       .then(function (response) {
         setCourseInformation(
-          response.data.dataCourse.filter((x) => x.token == currentCourses)[0]
+          response.data.dataCourse.filter((x) => x.token === currentCourses)[0]
         );
       })
       .catch(function (error) {
