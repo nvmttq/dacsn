@@ -21,7 +21,7 @@ export default function CourseCard() {
         .then((res) => res.json())
         .then((result) => setCourses(result));
     }
-  }, [user]);
+  }, []);
 
 
 

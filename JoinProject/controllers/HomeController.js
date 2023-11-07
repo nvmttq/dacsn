@@ -313,8 +313,8 @@ class HomeController {
     try {
       await DkmhModel.find({}).then((documents) => {
         documents.forEach(async (docs) => {
-          console.log(docs);
-          const contentSubject = await ContentSubjectModel.find({
+          // console.log(docs);
+          const contentSubject = await ContentSubjectModel.findOne({
             id: docs.contentSubjectID,
           });
 

@@ -5,9 +5,11 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const bodyParser = require("body-parser");
+
 const posts = require("./routes/posts");
 const comments = require("./routes/comment");
 const submitHistory = require("./routes/submitHistory");
+
 
 const http = require("http");
 const app = express();
@@ -40,6 +42,7 @@ const assignment = require("./routes/assignment.js");
 const grade = require("./routes/grade.js");
 
 route(app);
+
 app.use(grade);
 app.use(assignment);
 app.use(posts);
@@ -67,7 +70,6 @@ const AssignmentModel = require("./models/assignmentModel.js");
 //   timeEnd: (new Date()).setDate((new Date()).getDate() + 10),
 //   userStatus: [
 //     {participants: ["gv002", "admin000"]},
-
 
 //   ]
 // });
@@ -191,10 +193,8 @@ io.on("connection", (socket) => {
   });
 });
 
-
-io.of('/group').on("connection", (socket) => {
-
-  socket.on("send message", async ({message, user, socketID, groupToken}) => {
+io.of("/group").on("connection", (socket) => {
+  socket.on("send message", async ({ message, user, socketID, groupToken }) => {
     const group = await GroupModel.findOne({ token: groupToken });
 
     if (group) {
@@ -214,14 +214,11 @@ io.of('/group').on("connection", (socket) => {
         },
         isOwn: user.username,
       };
-      
-      
-      io.of("/group").emit("abc",group.conversations);
+
+      io.of("/group").emit("abc", group.conversations);
     }
   });
-})
-
-
+});
 
 const port = process.env.PORT || 3002;
 server.listen(port, () => {

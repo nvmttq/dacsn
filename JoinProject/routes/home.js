@@ -23,5 +23,5 @@ router.get('/', homeController.index)
 router.post('/course/content', homeController.getContentCourse);
 
 router.get('/load-dkmh', homeController.loadDkmh);
-
+router.post('/load-tkb-user')
 module.exports = router
