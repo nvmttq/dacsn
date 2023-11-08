@@ -246,7 +246,6 @@ class HomeController {
       });
       await exam.save();
 
-      
       console.log(correct, wrong);
       const grade = new GradesModel({
         id: "gradetest",
@@ -276,24 +275,13 @@ class HomeController {
   }
 
   async editExam(req, res) {
-    const {
-      textQuesCurrent,
-      choiceCurrent,
-      answerCurrent,
-      examToken,
-      minutes,
-      title,
-    } = req.body;
+    const { examToken, exam } = req.body;
 
-    const exam = await ExamModel.findOne({ id: examToken });
-    exam.timelimit = minutes;
-    exam.name = title;
-    exam.questions.forEach((item, index) => {
-      item.textQues = textQuesCurrent[index];
-      item.choice = choiceCurrent[index];
-      item.answer = answerCurrent[index];
-    });
-    await exam.save();
+    const examCurrent = await ExamModel.findOne({ id: examToken });
+    examCurrent.questions = exam.questions;
+    examCurrent.timelimit = exam.timelimit;
+    examCurrent.name = exam.name;
+    await examCurrent.save();
     return res.json({
       severity: "success",
       msg: "Cập nhật thành công",
@@ -366,15 +354,16 @@ class HomeController {
   async getUser(req, res) {
     const { participants } = req.body;
 
-    
     const users = await userModel.find({});
-    const ret = (users.filter( u => participants.find(userID => userID === u.username))).map(data => {
-      return {
-        username: data.username,
-        nameDisplay: data.name,
-        role: data.role
-      }
-    });
+    const ret = users
+      .filter((u) => participants.find((userID) => userID === u.username))
+      .map((data) => {
+        return {
+          username: data.username,
+          nameDisplay: data.name,
+          role: data.role,
+        };
+      });
     return res.json(ret);
   }
 

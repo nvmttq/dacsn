@@ -121,7 +121,7 @@ export default function Contents() {
   };
 
   const addChildrenAssignFromKey = ({ tree, key }) => {
-    if(!tree) return;
+    if (!tree) return;
     for (var i = 0; i < tree.length; i++) {
       if (tree[i].key === key) {
         tree[i].children.push({
@@ -142,7 +142,7 @@ export default function Contents() {
       typeLabel = (
         <div className="flex items-center">
           <i
-            className="pi pi-book mr-5"
+            className="pi pi-folder-open mr-5"
             style={{ fontSize: "2rem", color: "#4338CA" }}
           ></i>
           <InputTextarea
@@ -260,7 +260,10 @@ export default function Contents() {
     } else if (node.type === "BT") {
       label = (
         <div className="flex items-center">
-          <i className="pi pi-book mr-3" style={{ color: "#4338CA" }}></i>
+          <i
+            className="pi pi-folder-open mr-3"
+            style={{ color: "#4338CA" }}
+          ></i>
           <Link
             to={"/assignments/assToken2"}
             style={{ color: "#4338CA" }}
@@ -463,7 +466,7 @@ export default function Contents() {
 
             <Button
               label="Bài tập"
-              icon="pi pi-book"
+              icon="pi pi-folder-open"
               text
               onClick={() => {
                 addChildrenAssignFromKey({

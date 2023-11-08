@@ -28,10 +28,7 @@ export default function IndexExam({ setIdReview }) {
   const [dataSubmit, setDataSubmit] = useState([]);
   const navigate = useNavigate();
 
-  const settingOptions = [
-    { name: "Chỉnh sửa", code: "CS" },
-    { name: "Xem trước", code: "XT" },
-  ];
+  const settingOptions = [{ name: "Chỉnh sửa", code: "CS" }];
 
   useEffect(() => {
     setDataSubmit([]);

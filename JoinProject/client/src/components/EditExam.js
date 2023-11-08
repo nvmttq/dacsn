@@ -4,8 +4,6 @@ import * as constant from "../constant.js";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Dropdown } from "primereact/dropdown";
-import { Link } from "react-router-dom";
 import { InputTextarea } from "primereact/inputtextarea";
 import { InputText } from "primereact/inputtext";
 import { RadioButton } from "primereact/radiobutton";
@@ -13,8 +11,9 @@ import { InputNumber } from "primereact/inputnumber";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import "primeicons/primeicons.css";
-import moment from "moment";
 import axios from "axios";
+
+const shortid = require("shortid");
 
 export default function EditExam() {
   const user = localStorage.getItem("user")
@@ -27,11 +26,6 @@ export default function EditExam() {
   const [nameCourse, setNameCourse] = useState("");
   const [exam, setExam] = useState({});
   const [questions, setQuestions] = useState([]);
-  const [textQuesCurrent, setTextQuesCurrent] = useState([]);
-  const [choiceCurrent, setChoiceCurrent] = useState([]);
-  const [answerCurrent, setAnswerCurrent] = useState([]);
-  const [minutes, setMinutes] = useState(0);
-  const [title, setTitle] = useState("");
   const navigate = useNavigate();
 
   const [loadingSaveChanges, setLoadingSaveChanges] = useState(false);
@@ -45,34 +39,57 @@ export default function EditExam() {
   };
 
   const changeQuestion = ({ id, value }) => {
-    let arr = [];
-    textQuesCurrent.forEach((item) => {
-      arr.push(item);
-    });
-    arr[id] = value;
-    setTextQuesCurrent(arr);
+    let arr = exam;
+    arr.questions[id].textQues = value;
+    setExam(arr);
+    fetchQuestions();
   };
   const changeChoice = ({ id, idCol, value }) => {
-    let arr = [];
-    choiceCurrent.forEach((item) => {
-      arr.push(item);
-    });
-    arr[id][idCol].textChoice = value;
-    setChoiceCurrent(arr);
+    let arr = exam;
+    arr.questions[id].choice[idCol].textChoice = value;
+    setExam(arr);
+    fetchQuestions();
   };
-  const changeAnswer = ({ id, answerCorrect }) => {
-    let arr = [];
-    answerCurrent.forEach((item) => {
-      arr.push(item);
+
+  const removeChoice = ({ id, idRemove, idCol }) => {
+    let limit = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
+    let arr = exam;
+    for (var i = 0; i < limit.length; i++) {
+      if (limit[i] === arr.questions[id].answer) {
+        if (i > idCol) {
+          arr.questions[id].answer = limit[i - 1];
+        } else if (i === idCol) {
+          arr.questions[id].answer = "";
+        }
+      }
+    }
+    let remove = arr.questions[id].choice.filter((x) => x._id !== idRemove);
+    arr.questions[id].choice = remove;
+    arr.questions[id].choice.forEach((element, index) => {
+      element.name = limit[index];
     });
-    arr[id] = answerCorrect;
-    setAnswerCurrent(arr);
+    setExam(arr);
+    fetchQuestions();
+  };
+
+  const changeAnswer = ({ id, answerCorrect }) => {
+    let arr = exam;
+    arr.questions[id].answer = answerCorrect;
+    setExam(arr);
+    fetchQuestions();
   };
   const changeTitleExam = ({ value }) => {
-    setTitle(value);
+    exam.name = value;
   };
   const changeTimeLimit = ({ value }) => {
-    setMinutes(Number(value));
+    exam.timelimit = Number(value);
+  };
+
+  const removeQuestion = ({ id }) => {
+    let arr = exam;
+    arr.questions.splice(id, 1);
+    setExam(arr);
+    fetchQuestions();
   };
   const SaveChangeButton = async () => {
     setLoadingSaveChanges(true);
@@ -80,12 +97,8 @@ export default function EditExam() {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        textQuesCurrent,
-        choiceCurrent,
-        answerCurrent,
         examToken,
-        minutes,
-        title,
+        exam,
       }),
     })
       .then((response) => response.json())
@@ -97,14 +110,14 @@ export default function EditExam() {
       .catch((err) => console.log(err));
   };
 
-  useEffect(() => {
+  const fetchQuestions = () => {
     let arr = [];
-    questions.forEach((element, index) => {
+    exam.questions.forEach((element, index) => {
       arr.push({
         textQues: (
           <InputTextarea
             autoResize
-            defaultValue={textQuesCurrent[index]}
+            value={element.textQues}
             onChange={(e) =>
               changeQuestion({
                 id: index,
@@ -117,45 +130,88 @@ export default function EditExam() {
         ),
         choice: (
           <div>
-            {choiceCurrent[index].map((item, ind) => (
-              <div className="flex items-center">
-                <div className="mr-2">{item.name}.</div>
-                <InputText
-                  defaultValue={item.textChoice}
-                  onChange={(e) =>
-                    changeChoice({
-                      id: index,
-                      idCol: ind,
-                      value: e.target.value,
-                    })
-                  }
-                  className="w-full"
-                />
-              </div>
-            ))}
+            {element.choice.length > 0 &&
+              element.choice.map((item, ind) => (
+                <div className="flex items-center">
+                  <div className="mr-2">{item.name}.</div>
+                  <InputText
+                    value={item.textChoice}
+                    onChange={(e) =>
+                      changeChoice({
+                        id: index,
+                        idCol: ind,
+                        value: e.target.value,
+                      })
+                    }
+                    className="w-full"
+                  />
+                  <Button
+                    label="Xóa"
+                    link
+                    pt={{ label: { className: "text-red-500" } }}
+                    onClick={() =>
+                      removeChoice({
+                        id: index,
+                        idRemove: item._id,
+                        idCol: ind,
+                      })
+                    }
+                  />
+                </div>
+              ))}
+            {element.choice.length < 10 ? (
+              <Button
+                icon="pi pi-plus"
+                className="mt-5"
+                severity="help"
+                onClick={() => addChoice({ id: index })}
+              />
+            ) : (
+              <Button
+                icon="pi pi-plus"
+                className="mt-5"
+                severity="help"
+                disabled
+              />
+            )}
           </div>
         ),
         answer: (
           <div>
-            {choiceCurrent[index].map((item, ind) => (
-              <div className="flex items-center">
-                <RadioButton
-                  name={element.id}
-                  value={item.name}
-                  onChange={(e) =>
-                    changeAnswer({ id: index, answerCorrect: e.value })
-                  }
-                  checked={answerCurrent[index] === item.name}
-                />
-                <InputText value={item.name} disabled className="ml-5 w-1/5" />
-              </div>
-            ))}
+            {element.choice.length > 0 &&
+              element.choice.map((item, ind) => (
+                <div className="flex items-center">
+                  <RadioButton
+                    name={element.id}
+                    value={item.name}
+                    onChange={(e) => {
+                      changeAnswer({ id: index, answerCorrect: e.value });
+                    }}
+                    checked={exam.questions[index].answer === item.name}
+                  />
+                  <InputText
+                    value={item.name + ". " + item.textChoice}
+                    disabled
+                    className="ml-5 w-full"
+                  />
+                </div>
+              ))}
+          </div>
+        ),
+        action: (
+          <div className="flex items-center">
+            <Button
+              icon="pi pi-trash"
+              label="Xóa"
+              severity="danger"
+              onClick={() => removeQuestion({ id: index })}
+            />
           </div>
         ),
       });
     });
     setQuestions(arr);
-  }, [answerCurrent]);
+  };
 
   const [check, setCheck] = useState(false);
   useEffect(() => {
@@ -166,26 +222,13 @@ export default function EditExam() {
       .then((result) => {
         setCheck(true);
         setExam(result);
-        setMinutes(result.timelimit);
-        setTitle(result.name);
-        let arrTextQues = [];
-        let arrChoice = [];
-        let arrAnswer = [];
-        result.questions.forEach((ele, index) => {
-          arrTextQues.push(ele.textQues);
-          arrChoice.push(ele.choice);
-          arrAnswer.push(ele.answer);
-        });
-        setTextQuesCurrent(arrTextQues);
-        setChoiceCurrent(arrChoice);
-        setAnswerCurrent(arrAnswer);
         let arr = [];
         result.questions.forEach((element, index) => {
           arr.push({
             textQues: (
               <InputTextarea
                 autoResize
-                defaultValue={element.textQues}
+                value={element.textQues}
                 onChange={(e) =>
                   changeQuestion({
                     id: index,
@@ -198,44 +241,82 @@ export default function EditExam() {
             ),
             choice: (
               <div>
-                {element.choice.map((item, ind) => (
-                  <div className="flex items-center">
-                    <div className="mr-2">{item.name}.</div>
-                    <InputText
-                      defaultValue={item.textChoice}
-                      onChange={(e) =>
-                        changeChoice({
-                          id: index,
-                          idCol: ind,
-                          value: e.target.value,
-                        })
-                      }
-                      className="w-full"
-                    />
-                  </div>
-                ))}
+                {element.choice.length > 0 &&
+                  element.choice.map((item, ind) => (
+                    <div className="flex items-center">
+                      <div className="mr-2">{item.name}.</div>
+                      <InputText
+                        value={item.textChoice}
+                        onChange={(e) =>
+                          changeChoice({
+                            id: index,
+                            idCol: ind,
+                            value: e.target.value,
+                          })
+                        }
+                        className="w-full"
+                      />
+                      <Button
+                        label="Xóa"
+                        link
+                        pt={{ label: { className: "text-red-500" } }}
+                        onClick={() =>
+                          removeChoice({
+                            id: index,
+                            idRemove: item._id,
+                            idCol: ind,
+                          })
+                        }
+                      />
+                    </div>
+                  ))}
+                {element.choice.length < 10 ? (
+                  <Button
+                    icon="pi pi-plus"
+                    className="mt-5"
+                    severity="help"
+                    onClick={() => addChoice({ id: index })}
+                  />
+                ) : (
+                  <Button
+                    icon="pi pi-plus"
+                    className="mt-5"
+                    severity="help"
+                    disabled
+                  />
+                )}
               </div>
             ),
             answer: (
               <div>
-                {element.choice.map((item, ind) => (
-                  <div className="flex items-center">
-                    <RadioButton
-                      name={element.id}
-                      value={item.name}
-                      onChange={(e) => {
-                        console.log(e);
-                        changeAnswer({ id: index, answerCorrect: e.value });
-                      }}
-                      checked={answerCurrent[index] === item.name}
-                    />
-                    <InputText
-                      value={item.name}
-                      disabled
-                      className="ml-5 w-1/5"
-                    />
-                  </div>
-                ))}
+                {element.choice.length > 0 &&
+                  element.choice.map((item, ind) => (
+                    <div className="flex items-center">
+                      <RadioButton
+                        name={element.id}
+                        value={item.name}
+                        onChange={(e) => {
+                          changeAnswer({ id: index, answerCorrect: e.value });
+                        }}
+                        checked={result.questions[index].answer === item.name}
+                      />
+                      <InputText
+                        value={item.name + ". " + item.textChoice}
+                        disabled
+                        className="ml-5 w-full"
+                      />
+                    </div>
+                  ))}
+              </div>
+            ),
+            action: (
+              <div className="flex items-center">
+                <Button
+                  icon="pi pi-trash"
+                  label="Xóa"
+                  severity="danger"
+                  onClick={() => removeQuestion({ id: index })}
+                />
               </div>
             ),
           });
@@ -257,6 +338,75 @@ export default function EditExam() {
       })
       .catch((err) => console.log(err));
   }, [check]);
+
+  const AddQuestion = () => {
+    let arr = [];
+    questions.forEach((element) => {
+      arr.push(element);
+    });
+    arr.push({
+      textQues: (
+        <InputTextarea
+          value=""
+          autoResize
+          onChange={(e) =>
+            changeQuestion({
+              id: questions.length,
+              value: e.target.value,
+            })
+          }
+          rows={10}
+          className="w-full"
+        />
+      ),
+      choice: (
+        <div>
+          <Button
+            icon="pi pi-plus"
+            className="mt-5"
+            severity="help"
+            onClick={() => addChoice({ id: questions.length })}
+          />
+        </div>
+      ),
+      answer: <div></div>,
+      action: (
+        <div className="flex items-center">
+          <Button
+            icon="pi pi-trash"
+            label="Xóa"
+            severity="danger"
+            onClick={() => removeQuestion({ id: questions.length })}
+          />
+        </div>
+      ),
+    });
+    setQuestions(arr);
+    exam.questions.push({
+      id: shortid.generate(),
+      textQues: "",
+      choice: [],
+      answer: "",
+      gradeQues: 0,
+    });
+  };
+
+  const addChoice = ({ id }) => {
+    //console.log(id);
+    let limit = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
+    let examCopy = exam;
+    let currLength = examCopy.questions[id].choice.length;
+    if (currLength < 10) {
+      examCopy.questions[id].choice.push({
+        name: limit[currLength],
+        textChoice: "",
+        userChoose: [],
+      });
+    }
+    setExam(examCopy);
+    fetchQuestions();
+    //console.log(exam);
+  };
 
   return (
     <div className="px-6 py-7">
@@ -323,7 +473,14 @@ export default function EditExam() {
         <Column field="textQues" header="Câu hỏi"></Column>
         <Column field="choice" header="Lựa chọn"></Column>
         <Column field="answer" header="Đáp án"></Column>
+        <Column field="action" header="Hành động"></Column>
       </DataTable>
+      <Button
+        icon="pi pi-plus"
+        label="Thêm câu hỏi"
+        className="mt-5"
+        onClick={AddQuestion}
+      />
     </div>
   );
 }

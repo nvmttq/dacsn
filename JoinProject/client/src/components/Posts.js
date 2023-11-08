@@ -9,7 +9,6 @@ import axios from "axios";
 import moment from "moment";
 import { useParams } from "react-router-dom";
 
-
 export default function Posts() {
   const { courseToken } = useParams();
   const toast = useRef(null);
@@ -21,11 +20,35 @@ export default function Posts() {
       life: 3000,
     });
   };
+  const showSuccessDeletePost = () => {
+    toast.current.show({
+      severity: "success",
+      summary: "Success",
+      detail: "Xóa bài thành công",
+      life: 3000,
+    });
+  };
+  const showSuccessEditPost = () => {
+    toast.current.show({
+      severity: "success",
+      summary: "Success",
+      detail: "Chỉnh sửa bài thành công",
+      life: 3000,
+    });
+  };
   const showError = () => {
     toast.current.show({
       severity: "error",
       summary: "Error",
       detail: "Đăng bài thất bại",
+      life: 3000,
+    });
+  };
+  const showWarningEmpty = () => {
+    toast.current.show({
+      severity: "error",
+      summary: "Error",
+      detail: "Không được bỏ trống tiêu đề hoặc nội dung!!",
       life: 3000,
     });
   };
@@ -47,7 +70,7 @@ export default function Posts() {
   const [checkLike, setCheckLike] = useState(false);
 
   const [listPosts, setListPosts] = useState([]);
-  const [tempPost,setTempPost] = useState([]);
+  const [tempPost, setTempPost] = useState([]);
 
   const author = localStorage.getItem("user")
     ? JSON.parse(localStorage.getItem("user"))._id
@@ -63,15 +86,14 @@ export default function Posts() {
         let tmp = response.data.dataPosts.reverse();
         // setListPosts(response.data.dataPosts.reverse());
         let tmp1 = [];
-        tmp.map(item=>{
-          if(item.idCourse === courseToken)
-          {
+        tmp.map((item) => {
+          if (item.idCourse === courseToken) {
             tmp1.push(item);
           }
-        })
+        });
         setListPosts(tmp1);
-        tmp1=[];
-        console.log(listPosts)
+        tmp1 = [];
+        console.log(listPosts);
       })
       .catch(function (error) {
         console.log(error);
@@ -86,7 +108,7 @@ export default function Posts() {
       .catch(function (error) {
         console.log(error);
       });
-  }
+  };
 
   const fetchDataComment = ({ id }) => {
     axios
@@ -126,14 +148,18 @@ export default function Posts() {
   };
 
   const AddPosts = () => {
+    if (title === "" || content === "") {
+      showWarningEmpty();
+      return;
+    }
     axios
       .post("http://localhost:3002/posts", {
         title: title,
         content: content,
         author: author,
         nameAuthor: nameUser,
-        createDate: moment().format("DD-MM-YYYY HH:MM"),
-        idCourse: courseToken
+        createDate: moment().format("DD-MM-YYYY HH:mm"),
+        idCourse: courseToken,
       })
       .then(function (response) {
         fetchDataPosts();
@@ -146,6 +172,9 @@ export default function Posts() {
   };
 
   const AddComment = () => {
+    if (contentCommentPost === "") {
+      return;
+    }
     axios
       .post("http://localhost:3002/comments", {
         idPost: idDetailPost,
@@ -167,6 +196,9 @@ export default function Posts() {
 
   const [contentReply, setContentReply] = useState("");
   const AddReply = ({ id }) => {
+    if (contentReply === "") {
+      return;
+    }
     axios
       .get("http://localhost:3002/comments", {})
       .then(function (response) {
@@ -235,8 +267,7 @@ export default function Posts() {
       .catch(function (error) {
         console.log(error);
       });
-  }
-
+  };
 
   const [postsModal, setPostModal] = useState(false);
   const showModalPosts = ({ id }) => {
@@ -246,12 +277,12 @@ export default function Posts() {
   const cancelModal = () => {
     setPostModal(false);
     setCheckLike(false);
-  }
+  };
 
   const [visible, setVisible] = useState(false);
 
-  const [editPost, setEditPost] = useState('');
-  const [editContent, setEditContent] = useState('');
+  const [editPost, setEditPost] = useState("");
+  const [editContent, setEditContent] = useState("");
   const [editId, setEditId] = useState(null);
 
   const DeletePost = () => {
@@ -260,15 +291,20 @@ export default function Posts() {
         _id: editId,
       })
       .then(function () {
+        setVisible(false);
+        showSuccessDeletePost();
         fetchDataPosts();
       })
       .catch(function (e) {
         console.log(e);
-      })
-  }
+      });
+  };
 
   const EditPost = () => {
-
+    if (editPost === "" || editContent === "") {
+      showWarningEmpty();
+      return;
+    }
     axios
       .put("http://localhost:3002/posts-edit", {
         _id: editId,
@@ -276,29 +312,75 @@ export default function Posts() {
         content: editContent,
       })
       .then(function (response) {
+        setVisible(false);
+        showSuccessEditPost();
         fetchDataPosts();
-        setEditContent('');
+        setEditContent("");
         setEditId(null);
-        setEditPost('');
+        setEditPost("");
       })
       .catch(function (error) {
         console.log(error);
       });
-  }
+  };
   const LoadContentPost = () => {
     if (editId !== null) {
-      listPosts.map(item => {
+      listPosts.map((item) => {
         if (item._id === editId) {
           setEditPost(item.title);
           setEditContent(item.content);
         }
-      })
+      });
       // console.log(editId, editContent, editPost);
     }
-  }
+  };
 
   return (
     <>
+      <Dialog
+        header="Chỉnh sửa bài viết"
+        visible={visible}
+        className="w-[900px] h-auto"
+        onHide={() => {
+          setVisible(false);
+        }}
+      >
+        <div className="rounded-lg h-auto mt-5 ml-10 mr-10 bg-white">
+          <div className="w-full mb-4 border border-gray-200 rounded-lg bg-gray-50">
+            <div className="px-4 py-2 bg-white rounded-t-lg">
+              <InputText
+                value={editPost}
+                onChange={(e) => setEditPost(e.target.value)}
+                className="w-full"
+              />
+              <InputTextarea
+                id="comment"
+                rows="4"
+                className="w-full text-sm text-gray-900 bg-white border-0 focus:ring-0"
+                value={editContent}
+                onChange={(e) => setEditContent(e.target.value)}
+              />
+            </div>
+            <div className="flex items-center px-3 py-2 border-t">
+              <Button
+                label="Lưu thay đổi"
+                onClick={() => {
+                  EditPost();
+                }}
+                severity="success"
+              />
+              <Button
+                label="Xóa bài viết"
+                className="ml-[10px]"
+                onClick={() => {
+                  DeletePost();
+                }}
+                severity="danger"
+              />
+            </div>
+          </div>
+        </div>
+      </Dialog>
       <Dialog
         header={titleDetailPost}
         visible={postsModal}
@@ -490,7 +572,7 @@ export default function Posts() {
               </div>
               <div className="mt-2">
                 <div
-                  className="text-2xl text-gray-700 font-bold hover:underline cursor-pointer border-[1px] "
+                  className="text-2xl text-gray-700 font-bold hover:underline cursor-pointer "
                   onClick={() => showModalPosts({ id: post._id })}
                 >
                   {post.title}
@@ -511,34 +593,23 @@ export default function Posts() {
                 </div>
               </div>
             </div>
-            {
-              post.author === author &&
+            {post.author === author && (
               <>
                 <div className="grid justify-items-end w-full h-[30px]">
-
-                  <Button className="" onClick={() => { setEditId(post._id); setVisible(true); LoadContentPost(); }}>
-                    <i className="pi pi-ellipsis-v" ></i>
+                  <Button
+                    className=""
+                    onClick={() => {
+                      setEditId(post._id);
+                      setVisible(true);
+                      setEditPost(post.title);
+                      setEditContent(post.content);
+                    }}
+                  >
+                    <i className="pi pi-ellipsis-v"></i>
                   </Button>
-                  <Dialog header="Chỉnh sửa bài viết" visible={visible} className="w-[900px] h-auto" onHide={() => { setVisible(false); }}>
-                    <div className="border-[2px]">
-                      <span>
-                        <p className="ml-[350px] text-xl">Chỉnh sửa bài viết </p>
-                        <p>Tiêu đề: </p>
-                        <InputTextarea className="mt-[10px]" value={editPost} onChange={(e) => setEditPost(e.target.value)} />
-                      </span>
-                      <span>
-                        <p>Nội dung: </p>
-                        <InputTextarea className="mt-[10px]" value={editContent} onChange={(e) => setEditContent(e.target.value)} />
-                      </span>
-                      <Button label="Xác nhận" className="ml-[10px]" onClick={() => { EditPost() }} />
-                      <Button label="Xóa bài viết" className="ml-[10px]" onClick={() => { DeletePost() }} />
-
-                    </div>
-
-                  </Dialog>
                 </div>
               </>
-            }
+            )}
           </div>
         ))}
       </div>
