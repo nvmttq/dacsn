@@ -40,9 +40,9 @@ const group = require("./routes/group.js");
 const calendar = require("./routes/calendar");
 const assignment = require("./routes/assignment.js");
 const grade = require("./routes/grade.js");
-
+const atten = require("./routes/attendance.js");
 route(app);
-
+app.use(atten);
 app.use(grade);
 app.use(assignment);
 app.use(posts);

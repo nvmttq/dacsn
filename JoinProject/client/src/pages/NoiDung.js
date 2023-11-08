@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { TabMenu } from "primereact/tabmenu";
+import { Dropdown } from "primereact/dropdown";
 
 import Posts from "../components/Posts";
 import Contents from "../components/Contents";
@@ -8,6 +9,7 @@ import Participants from "../components/Participants.js";
 import CourseDetails from "../pages/CourseDetails.js";
 import Meeting from "../pages/Meeting.js";
 import Grade from "../pages/Grade.js";
+import Attendance from "../pages/Attendance";
 import { Link } from "react-router-dom";
 
 export default function NoiDung() {
@@ -21,7 +23,7 @@ export default function NoiDung() {
       .get("http://localhost:3002/get-course", {})
       .then(function (response) {
         setCourseInformation(
-          response.data.dataCourse.filter((x) => x.token === currentCourses)[0]
+          response.data.dataCourse.filter((x) => x.token == currentCourses)[0]
         );
       })
       .catch(function (error) {
@@ -85,6 +87,7 @@ export default function NoiDung() {
       {activeIndex === 2 && <Meeting />}
       {activeIndex === 3 && <Participants />}
       {activeIndex === 4 && <Grade />}
+      {activeIndex === 5 && <Attendance />}
     </div>
   );
 }
