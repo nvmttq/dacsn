@@ -5,7 +5,8 @@ import { Menu } from "primereact/menu";
 import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
 import { TieredMenu } from "primereact/tieredmenu";
-import axios from "axios"
+
+
 // PAGES
 import Login from "../pages/Login.js";
 import MenuItemSidebar from "./MenuItemSidebar.js";

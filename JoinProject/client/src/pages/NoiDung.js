@@ -87,7 +87,7 @@ export default function NoiDung() {
       {activeIndex === 2 && <Meeting />}
       {activeIndex === 3 && <Participants />}
       {activeIndex === 4 && <Grade />}
-      {activeIndex === 5 && <Attendance />}
+      {activeIndex === 5 && <Attendance courseToken={courseInformation.token}/>}
     </div>
   );
 }

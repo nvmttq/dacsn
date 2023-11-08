@@ -60,7 +60,7 @@ function KhoaHoc() {
   };
 
   return (
-    <div className="courses p-2 w-full flex flex-col">
+    <div className="courses p-2 w-full h-screen flex flex-col">
       <div className="courses-header flex justify-between items-center">
         <span className="font-bold text-primary">Các khóa học theo TKB</span>
         <div className="join-course flex gap-2">

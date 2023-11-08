@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-import { Card } from "primereact/card";
 import * as constant from "../constant.js";
 
 export default function CourseCard() {
@@ -21,34 +20,17 @@ export default function CourseCard() {
     }
   }, []);
 
-  const header = (
-    <img
-      alt="Card"
-      src="https://primefaces.org/cdn/primereact/images/usercard.png"
-    />
-  );
   const getToken = ({ token }) => {
     localStorage.setItem("currentCourses", JSON.stringify(token));
   };
-  const footer = (courseToken) => {
-    return (
-      <Link
-        to={`/courses/${courseToken}`}
-        label="Vào lớp"
-        icon="pi pi-book"
-        onClick={() => getToken({ token: courseToken })}
-      >
-        Vào lớp
-      </Link>
-    );
-  };
+
 
   return (
     <>
       {courses.length !== 0 ? (
-        <div className="courses-content mt-2 h-[calc(100vh-34px-25px)] flex flex-wrap gap-4 items-stretch">
+        <div className="courses-content mt-2 flex flex-wrap gap-4 h-max">
           {courses.map((course, index) => (
-            <div key={index} className="card1 bg-white flex flex-col w-[25%] h-[60%] rounded-md">
+            <div key={index} className="card1 bg-white flex flex-col w-[25%] rounded-md">
               <div className="card-top">
                 <img
                   alt="Card"
@@ -59,32 +41,34 @@ export default function CourseCard() {
                   }}
                 />
               </div>
+
               <div className="card-body p-4 flex flex-col flex-grow">
-                <div className="card-title text-lg text-black font-bold break-words">{course.title}</div>
-                <div className="card-content flex justify-between mt-auto">
+                <div className="card-title text-lg text-zinc-600 font-bold break-words">{course.title}</div>
+                <div className="card-content flex justify-between mt-auto pt-3">
                   <div className="course-token flex items-center gap-2">
-                    <i className="icon pi pi-key text-green-600 text-xl"></i>
+                    <i className="icon pi pi-key text-icon-color text-xl"></i>
                     <div className="token flex flex-col">
-                      <span className="font-bold">{course.token}</span>
+                      <span className="font-bold text-secondary">{course.token}</span>
                       <span>Mã khóa học</span>
                     </div>
                   </div>
                   <div className="course-assigment flex items-center gap-2">
-                    <i className="pi pi-book text-green-600 text-xl" />
+                    <i className="pi pi-book text-icon-color text-xl" />
                     <div className="flex flex-col">
-                      <span className="font-bold">{course.assignment}</span>
+                      <span className="font-bold text-secondary">{course.assignment}</span>
                       <span className="label">Bài tập</span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="card-footer p-4">
+              <div className="card-footer px-4 py-2">
                 <Link
                   to={`/courses/${course.token}`}
                   label="Vào lớp"
                   icon="pi pi-book"
                   onClick={() => getToken({ token: course.token })}
+                  className="p-button p-component p-button-link font-medium p-0 underline"
                 >
                   Vào lớp
                 </Link>

@@ -199,7 +199,7 @@ export default function UploadAssignment({ group, assignment, setAssignment }) {
         ref={fileUploadRef}
         multiple
         accept="*"
-        url="http://localhost:3002/assignments/submit-ass"
+        // url="http://localhost:3002/assignments/submit-ass"
         maxFileSize={1000000}
         // onUpload={onTemplateUpload}
         onSelect={onTemplateSelect}

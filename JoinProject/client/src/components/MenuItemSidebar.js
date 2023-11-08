@@ -15,17 +15,15 @@ export default function MenuItemSidebar({
       to={linkTo}
       className={classNames(
         options.className,
-        isActiveMenu === item.id ? "active text-white" : "",
+        isActiveMenu === item.id ? "!text-icon-color" : "",
         "font-[500]",
       )}
       onClick={(e) => {
-        console.log(isActiveMenu);
         setActiveMenuItem(item.id);
       }}
     >
       <span
-        className={classNames(options.iconClassName, item.icon)}
-        style={{ color: "#76C044" }}
+        className={classNames(options.iconClassName, item.icon, "!text-icon-color")}
       ></span>
 
       <span className={options.labelClassName}>{item.label}</span>
