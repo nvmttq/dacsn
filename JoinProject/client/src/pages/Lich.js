@@ -7,7 +7,7 @@ import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { InputText } from "primereact/inputtext";
 
-var evenmain = [];
+
 
 function Lich() {
   const [timeStart, setTimeStart] = useState(null);
@@ -15,26 +15,26 @@ function Lich() {
   const [datee, setDatee] = useState(null);
   const [visible, setVisible] = useState(false);
   const [value, setValue] = useState('');
-
+  const [EVENTS, setEVENTS] = useState([]);
+  console.log(EVENTS)
   useEffect(() => {
     axios
       .get("http://localhost:3002/lich", {})
       .then(function (response) {
         let temp = response.data.dataPosts;
-        evenmain = [];
-        temp.map(item => {
-          let endtime = moment(item.end).format("YYYY/MM/DD HH:MM");
-          let starttime = moment(item.start).format("YYYY/MM/DD HH:MM");
-
-          const obj = {
-            id: item.id,
-            end: moment(endtime),
-            start: moment(starttime),
+        var rr = [];
+        temp.forEach((item, i) => {
+          const ts = moment(new Date(item.start)).format("YYY MM DD HH:mm");
+          const te = moment(new Date(item.end)).format("YYY MM DD HH:mm");
+          rr.push({
+            event_id: i+1,
             title: item.title,
-          }
-          evenmain.push(obj);
+            start: new Date(ts),
+            end: new Date(te),
+          })
         })
-        // console.log(evenmain);
+        setEVENTS(rr);
+        // console.log(EVENTS);
       })
       .catch(function (ex) {
         console.log(ex);
@@ -72,27 +72,26 @@ function Lich() {
       .then(function (response) {
         console.log(response);
         let temp = response.data.dataPosts;
-        evenmain = [];
-        temp.map(item => {
-          let endtime = moment(item.end).format("YYYY/MM/DD HH:MM");
-          let starttime = moment(item.start).format("YYYY/MM/DD HH:MM");
+        setEVENTS(temp.map(item => {
+          let endtime = moment(item.end).format("YYYY/MM/DD HH:mm");
+          let starttime = moment(item.start).format("YYYY/MM/DD HH:mm");
 
           const obj = {
             id: item.id,
-            end: moment(endtime),
-            start: moment(starttime),
+            end: endtime,
+            start: starttime,
             title: item.title,
           }
-          evenmain.push(obj);
-        })
-        // console.log(evenmain);
+          return obj;
+        }))
+        // console.log(EVENTS);
       })
       .catch(function (ex) {
         console.log(ex);
       });
   }
   const changeTime = () => {
-    if (datee != null && timeEnd != null && timeStart != null && value != '') {
+    if (datee !== null && timeEnd !== null && timeStart !== null && value !== '') {
 
       let td = moment(datee).format("YYYY/MM/DD");
       let ts = moment(timeStart).format("HH:MM");
@@ -114,9 +113,8 @@ function Lich() {
     <div className="mt-5">
 
       {/* dialog */}
-      <div className="card flex justify-content-center ml-[20px]">
+      <div className="card s flex justify-center ml-[20px]">
         <Button label="Chọn lịch học" icon="pi pi-external-link" onClick={() => setVisible(true)} />
-
         <Dialog header="Header" visible={visible} className="w-[1100px] " onHide={() => setVisible(false)}>
           <div className="ml-[30px] flex flex-row border-[2px] w-[1000px]">
             <div className="flex-auto">
@@ -154,14 +152,16 @@ function Lich() {
       {/* calendar */}
       <Scheduler
         week={{
-          weekDays: [0, 1, 2, 3, 4, 5, 6],
+          weekDays: [0,1,2,3,4,5,6],
           weekStartOn: 6,
           startHour: 7,
           endHour: 18,
         }}
         view="week"
-        events={evenmain}
+        events={EVENTS}
       />
+
+      
     </div>
   );
 }
