@@ -9,6 +9,7 @@ const postSchema = new mongoose.Schema(
     author: { type: String, required: true },
     nameAuthor: { type: String },
     like: { type: Array },
+    notification: { type: Boolean },
     createDate: { type: String },
     idCourse: { type: String, required: false },
   },

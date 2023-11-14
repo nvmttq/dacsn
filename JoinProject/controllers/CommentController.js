@@ -64,3 +64,23 @@ exports.updateComment = (req, res) => {
       });
     });
 };
+exports.updateLikeComment = (req, res) => {
+  const { like } = req.body;
+  CommentModel.findByIdAndUpdate(req.body.id, {
+    like: like,
+  })
+    .then(() => {
+      return res.status(204).json({
+        success: true,
+        message: "Update like comment successfully",
+      });
+    })
+    .catch((error) => {
+      console.log(error);
+      res.status(500).json({
+        success: false,
+        message: "Server error. Please try again.",
+        error: error.message,
+      });
+    });
+};

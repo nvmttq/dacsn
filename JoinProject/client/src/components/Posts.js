@@ -4,12 +4,16 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { Dialog } from "primereact/dialog";
+import { TabMenu } from "primereact/tabmenu";
 import "primeicons/primeicons.css";
 import axios from "axios";
 import moment from "moment";
 import { useParams } from "react-router-dom";
 
 export default function Posts() {
+  const user = localStorage.getItem("user")
+    ? JSON.parse(localStorage.getItem("user"))
+    : null;
   const { courseToken } = useParams();
   const toast = useRef(null);
   const showSuccess = () => {
@@ -53,6 +57,9 @@ export default function Posts() {
     });
   };
 
+  const items = [{ label: "Học tập" }, { label: "Thông báo" }];
+  const [activeIndex, setActiveIndex] = useState(0);
+
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
@@ -70,6 +77,7 @@ export default function Posts() {
   const [checkLike, setCheckLike] = useState(false);
 
   const [listPosts, setListPosts] = useState([]);
+  const [listNotificationPosts, setListNotificationPosts] = useState([]);
   const [tempPost, setTempPost] = useState([]);
 
   const author = localStorage.getItem("user")
@@ -83,17 +91,20 @@ export default function Posts() {
     axios
       .get("http://localhost:3002/posts", {})
       .then(function (response) {
-        let tmp = response.data.dataPosts.reverse();
-        // setListPosts(response.data.dataPosts.reverse());
-        let tmp1 = [];
-        tmp.map((item) => {
-          if (item.idCourse === courseToken) {
-            tmp1.push(item);
-          }
-        });
-        setListPosts(tmp1);
-        tmp1 = [];
-        console.log(listPosts);
+        setListPosts(
+          response.data.dataPosts
+            .filter(
+              (x) => x.idCourse === courseToken && x.notification === false
+            )
+            .reverse()
+        );
+        setListNotificationPosts(
+          response.data.dataPosts
+            .filter(
+              (x) => x.idCourse === courseToken && x.notification === true
+            )
+            .reverse()
+        );
       })
       .catch(function (error) {
         console.log(error);
@@ -103,13 +114,31 @@ export default function Posts() {
     axios
       .get("http://localhost:3002/posts", {})
       .then(function (response) {
-        setListPosts(response.data.dataPosts.reverse());
+        setListPosts(
+          response.data.dataPosts
+            .filter(
+              (x) => x.idCourse === courseToken && x.notification === false
+            )
+            .reverse()
+        );
+        setListNotificationPosts(
+          response.data.dataPosts
+            .filter(
+              (x) => x.idCourse === courseToken && x.notification === true
+            )
+            .reverse()
+        );
       })
       .catch(function (error) {
         console.log(error);
       });
   };
+  function compare(a, b) {
+    if (a.like.length < b.like.length) return 1;
+    if (a.like.length > b.like.length) return -1;
 
+    return 0;
+  }
   const fetchDataComment = ({ id }) => {
     axios
       .get("http://localhost:3002/posts", {})
@@ -132,11 +161,11 @@ export default function Posts() {
         axios
           .get("http://localhost:3002/comments", {})
           .then(function (res) {
-            setCommentPost(
-              res.data.dataComments
-                .filter((x) => x.idPost === post[0]._id)
-                .reverse()
+            let comment = res.data.dataComments.filter(
+              (x) => x.idPost === post[0]._id
             );
+            comment.sort(compare);
+            setCommentPost(comment);
           })
           .catch(function (error) {
             console.log(error);
@@ -147,7 +176,7 @@ export default function Posts() {
       });
   };
 
-  const AddPosts = () => {
+  const AddPosts = ({ check }) => {
     if (title === "" || content === "") {
       showWarningEmpty();
       return;
@@ -158,6 +187,7 @@ export default function Posts() {
         content: content,
         author: author,
         nameAuthor: nameUser,
+        notification: check,
         createDate: moment().format("DD-MM-YYYY HH:mm"),
         idCourse: courseToken,
       })
@@ -182,7 +212,7 @@ export default function Posts() {
         nameUser: nameUser,
         imagePath: "",
         content: contentCommentPost,
-        createDate: moment().format("DD-MM-YYYY HH:MM"),
+        createDate: moment().format("DD-MM-YYYY HH:mm"),
         reply: [],
       })
       .then(function (response) {
@@ -207,7 +237,7 @@ export default function Posts() {
         const reply = {
           idUser: author,
           nameUser: nameUser,
-          createDate: moment().format("DD-MM-YYYY HH:MM"),
+          createDate: moment().format("DD-MM-YYYY HH:mm"),
           content: contentReply,
         };
         check.push(reply);
@@ -243,7 +273,42 @@ export default function Posts() {
         console.log(error);
       });
   };
+  const addLikeComment = ({ listLikeComment, idComment }) => {
+    let arr = listLikeComment;
+    arr.push(author);
+    axios
+      .put("http://localhost:3002/like-comments", {
+        id: idComment,
+        like: arr,
+      })
+      .then(function (response) {
+        fetchDataComment({ id: idDetailPost });
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
 
+  const removeLikeComment = ({ listLikeComment, idComment }) => {
+    let arr = listLikeComment;
+    for (var i = 0; i < listLikeComment.length; i++) {
+      if (listLikeComment[i] === author) {
+        listLikeComment.splice(i, 1);
+        break;
+      }
+    }
+    axios
+      .put("http://localhost:3002/like-comments", {
+        id: idComment,
+        like: arr,
+      })
+      .then(function (response) {
+        fetchDataComment({ id: idDetailPost });
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
   const removeLike = () => {
     axios
       .get("http://localhost:3002/posts", {})
@@ -469,17 +534,41 @@ export default function Posts() {
                 </div>
                 <p className="mt-4 text-gray-800">{comment.content}</p>
                 <div className="mt-4 flex items-center space-x-2">
-                  <button className="text-gray-500 hover:text-gray-800">
-                    <i className="pi pi-reply"></i>
-                    <div>Trả lời</div>
-                  </button>
+                  {comment.like.filter((x) => x === author).length > 0 ? (
+                    <button
+                      className="text-gray-500 hover:text-gray-800"
+                      onClick={() =>
+                        removeLikeComment({
+                          listLikeComment: comment.like,
+                          idComment: comment._id,
+                        })
+                      }
+                    >
+                      <i className="pi pi-heart-fill text-red-600"></i>
+                      <div>
+                        Yêu thích <strong>({comment.like.length})</strong>
+                      </div>
+                    </button>
+                  ) : (
+                    <button
+                      className="text-gray-500 hover:text-gray-800"
+                      onClick={() =>
+                        addLikeComment({
+                          listLikeComment: comment.like,
+                          idComment: comment._id,
+                        })
+                      }
+                    >
+                      <i className="pi pi-heart"></i>
+                      <div>
+                        Yêu thích <strong>({comment.like.length})</strong>
+                      </div>
+                    </button>
+                  )}
                   <button className="text-gray-500 hover:text-gray-800">
                     <i className="pi pi-comments"></i>
                     <div>
-                      Câu trả lời{" "}
-                      <strong className="text-">
-                        ({comment.reply.length})
-                      </strong>
+                      Câu trả lời <strong>({comment.reply.length})</strong>
                     </div>
                   </button>
                 </div>
@@ -534,85 +623,180 @@ export default function Posts() {
         </div>
       </Dialog>
       <Toast ref={toast} />
-      <div className="overflow-y-auto h-[500px] mt-5">
-        <div className="rounded-lg h-auto mt-5 ml-10 mr-10 bg-white">
-          <div className="w-full mb-4 border border-gray-200 rounded-lg bg-gray-50">
-            <div className="px-4 py-2 bg-white rounded-t-lg">
-              <InputText
-                placeholder="Nhập tiêu đề"
-                className="w-full"
-                onChange={(e) => setTitle(e.target.value)}
-              />
-              <InputTextarea
-                id="comment"
-                rows="4"
-                className="w-full text-sm text-gray-900 bg-white border-0 focus:ring-0"
-                placeholder="Viết nội dung..."
-                required
-                onChange={(e) => setContent(e.target.value)}
-              />
-            </div>
-            <div className="flex items-center justify-between px-3 py-2 border-t">
-              <Button
-                className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 hover:bg-blue-800"
-                onClick={AddPosts}
-              >
-                Đăng bài viết
-              </Button>
+      <div className="w-full h-auto mt-2 ">
+        <div className="rounded-lg w-4/5 my-3 bg-white flex justify-start ">
+          <TabMenu
+            className="text-xs"
+            model={items}
+            activeIndex={activeIndex}
+            onTabChange={(e) => setActiveIndex(e.index)}
+          />
+        </div>
+      </div>
+      {activeIndex === 0 && (
+        <div className="overflow-y-auto w-full h-[400px]">
+          <div className="rounded-lg h-auto mr-10 bg-white w-4/5">
+            <div className="w-full mb-4 border border-gray-200 rounded-lg bg-gray-50">
+              <div className="px-4 py-2 bg-white rounded-t-lg">
+                <InputText
+                  placeholder="Nhập tiêu đề"
+                  className="w-full"
+                  onChange={(e) => setTitle(e.target.value)}
+                />
+                <InputTextarea
+                  id="comment"
+                  rows="4"
+                  className="w-full text-sm text-gray-900 bg-white border-0 focus:ring-0"
+                  placeholder="Viết nội dung..."
+                  required
+                  onChange={(e) => setContent(e.target.value)}
+                />
+              </div>
+              <div className="flex items-center justify-between px-3 py-2 border-t">
+                <Button
+                  className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 hover:bg-blue-800"
+                  onClick={() => AddPosts({ check: false })}
+                >
+                  Đăng bài viết
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
-        {listPosts.map((post, index) => (
-          <div className="px-10 py-6 bg-white rounded-lg shadow-md h-auto mt-5 ml-10 mr-10 flex flex-row">
-            <div>
-              <div className="flex justify-between items-center">
-                <span className="font-light text-gray-600">
-                  {post.createDate}
-                </span>
-              </div>
-              <div className="mt-2">
-                <div
-                  className="text-2xl text-gray-700 font-bold hover:underline cursor-pointer "
-                  onClick={() => showModalPosts({ id: post._id })}
-                >
-                  {post.title}
+          {listPosts.map((post, index) => (
+            <div className="px-10 py-6 bg-white rounded-lg shadow-md h-auto mt-5 mr-10 flex flex-row w-4/5">
+              <div>
+                <div className="flex justify-between items-center">
+                  <span className="font-light text-gray-600">
+                    {post.createDate}
+                  </span>
                 </div>
-                <p className="mt-2 text-gray-600">{post.content}</p>
-              </div>
-              <div className="flex justify-between items-center mt-4">
-                <div>
-                  <a className="flex items-center" href="#">
-                    <img
-                      className="mx-4 w-10 h-10 object-cover rounded-full hidden sm:block"
-                      alt="avatar"
-                      src="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
-                    />
-
-                    {post.nameAuthor}
-                  </a>
-                </div>
-              </div>
-            </div>
-            {post.author === author && (
-              <>
-                <div className="grid justify-items-end w-full h-[30px]">
-                  <Button
-                    className=""
-                    onClick={() => {
-                      setEditId(post._id);
-                      setVisible(true);
-                      setEditPost(post.title);
-                      setEditContent(post.content);
-                    }}
+                <div className="mt-2">
+                  <div
+                    className="text-2xl text-gray-700 font-bold hover:underline cursor-pointer "
+                    onClick={() => showModalPosts({ id: post._id })}
                   >
-                    <i className="pi pi-ellipsis-v"></i>
+                    {post.title}
+                  </div>
+                  <p className="mt-2 text-gray-600">{post.content}</p>
+                </div>
+                <div className="flex justify-between items-center mt-4">
+                  <div>
+                    <a className="flex items-center" href="#">
+                      <img
+                        className="mx-4 w-10 h-10 object-cover rounded-full hidden sm:block"
+                        alt="avatar"
+                        src="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
+                      />
+
+                      {post.nameAuthor}
+                    </a>
+                  </div>
+                </div>
+              </div>
+              {post.author === author && (
+                <>
+                  <div className="grid justify-items-end w-full h-[30px]">
+                    <Button
+                      className=""
+                      onClick={() => {
+                        setEditId(post._id);
+                        setVisible(true);
+                        setEditPost(post.title);
+                        setEditContent(post.content);
+                      }}
+                    >
+                      <i className="pi pi-ellipsis-v"></i>
+                    </Button>
+                  </div>
+                </>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+      {activeIndex === 1 && (
+        <div className="overflow-y-auto w-full h-[400px]">
+          {user.role === "Giảng Viên" && (
+            <div className="rounded-lg h-auto mr-10 bg-white w-4/5">
+              <div className="w-full mb-4 border border-gray-200 rounded-lg bg-gray-50">
+                <div className="px-4 py-2 bg-white rounded-t-lg">
+                  <InputText
+                    placeholder="Nhập tiêu đề"
+                    className="w-full"
+                    onChange={(e) => setTitle(e.target.value)}
+                  />
+                  <InputTextarea
+                    id="comment"
+                    rows="4"
+                    className="w-full text-sm text-gray-900 bg-white border-0 focus:ring-0"
+                    placeholder="Viết nội dung..."
+                    required
+                    onChange={(e) => setContent(e.target.value)}
+                  />
+                </div>
+                <div className="flex items-center justify-between px-3 py-2 border-t">
+                  <Button
+                    className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 hover:bg-blue-800"
+                    onClick={() => AddPosts({ check: true })}
+                  >
+                    Đăng bài viết
                   </Button>
                 </div>
-              </>
-            )}
-          </div>
-        ))}
-      </div>
+              </div>
+            </div>
+          )}
+          {listNotificationPosts.map((post, index) => (
+            <div className="px-10 py-6 bg-white rounded-lg shadow-md h-auto mt-5 mr-10 flex flex-row w-4/5">
+              <div>
+                <div className="flex justify-between items-center">
+                  <span className="font-light text-gray-600">
+                    {post.createDate}
+                  </span>
+                </div>
+                <div className="mt-2">
+                  <div
+                    className="text-2xl text-gray-700 font-bold hover:underline cursor-pointer "
+                    onClick={() => showModalPosts({ id: post._id })}
+                  >
+                    {post.title}
+                  </div>
+                  <p className="mt-2 text-gray-600">{post.content}</p>
+                </div>
+                <div className="flex justify-between items-center mt-4">
+                  <div>
+                    <a className="flex items-center" href="#">
+                      <img
+                        className="mx-4 w-10 h-10 object-cover rounded-full hidden sm:block"
+                        alt="avatar"
+                        src="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
+                      />
+
+                      {post.nameAuthor}
+                    </a>
+                  </div>
+                </div>
+              </div>
+              {post.author === author && (
+                <>
+                  <div className="grid justify-items-end w-full h-[30px]">
+                    <Button
+                      className=""
+                      onClick={() => {
+                        setEditId(post._id);
+                        setVisible(true);
+                        setEditPost(post.title);
+                        setEditContent(post.content);
+                      }}
+                    >
+                      <i className="pi pi-ellipsis-v"></i>
+                    </Button>
+                  </div>
+                </>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </>
   );
 }

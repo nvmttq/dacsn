@@ -16,12 +16,21 @@ exports.getAll = (req, res) => {
 };
 
 exports.create = async (req, res) => {
-  const { title, content, author, nameAuthor, createDate, idCourse } = req.body;
+  const {
+    title,
+    content,
+    author,
+    nameAuthor,
+    notification,
+    createDate,
+    idCourse,
+  } = req.body;
   const posts = new PostsModel({
     title: title,
     content: content,
     author: author,
     nameAuthor: nameAuthor,
+    notification: notification,
     createDate: createDate,
     idCourse: idCourse,
   });
@@ -64,7 +73,6 @@ exports.updatePosts = (req, res) => {
     });
 };
 exports.editPost = (req, res) => {
-
   // console.log(req.body);
   PostsModel.findByIdAndUpdate(req.body._id, {
     title: req.body.title,
@@ -84,13 +92,10 @@ exports.editPost = (req, res) => {
         error: error.message,
       });
     });
-}
+};
 
 exports.deletePost = (req, res) => {
-
-  PostsModel.findByIdAndDelete(req.body._id, {
-
-  })
+  PostsModel.findByIdAndDelete(req.body._id, {})
     .then(() => {
       return res.status(204).json({
         success: true,
@@ -105,4 +110,4 @@ exports.deletePost = (req, res) => {
         error: error.message,
       });
     });
-}
+};

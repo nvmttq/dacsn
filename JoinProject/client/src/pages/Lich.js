@@ -94,8 +94,8 @@ function Lich() {
     if (datee !== null && timeEnd !== null && timeStart !== null && value !== '') {
 
       let td = moment(datee).format("YYYY/MM/DD");
-      let ts = moment(timeStart).format("HH:MM");
-      let te = moment(timeEnd).format("HH:MM");
+      let ts = moment(timeStart).format("HH:mm");
+      let te = moment(timeEnd).format("HH:mm");
 
       setCheckNull(true);
       postTime(td + " " + ts, td + " " + te, value);
