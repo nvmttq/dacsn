@@ -16,9 +16,9 @@ import axios from "axios";
 const shortid = require("shortid");
 
 export default function EditExam() {
-  const user = localStorage.getItem("user")
-    ? JSON.parse(localStorage.getItem("user"))
-    : null;
+  // const user = localStorage.getItem("user")
+  //   ? JSON.parse(localStorage.getItem("user"))
+  //   : null;
 
   const toast = useRef(null);
 
@@ -84,7 +84,10 @@ export default function EditExam() {
   const changeTimeLimit = ({ value }) => {
     exam.timelimit = Number(value);
   };
-
+  
+  const changePercent = ({value}) => {
+    exam.percent = Number(value);
+  }
   const removeQuestion = ({ id }) => {
     let arr = exam;
     arr.questions.splice(id, 1);
@@ -413,11 +416,11 @@ export default function EditExam() {
       <Toast ref={toast} />
       <button
         id="back-to-course"
-        className="flex items-center text-primary font-bold mb-4"
+        className="flex items-center font-bold mb-4"
         onClick={() => navigate(-1)}
       >
-        <i className="pi pi-angle-left"></i>
-        <span>GO BACK</span>
+        <i className="pi pi-angle-left text-secondary"></i>
+        <span className="text-icon-color">GO BACK</span>
       </button>
       <div
         className="bg-white flex justify-between gap-5 rounded-lg shadow p-4 md:px-6"
@@ -448,6 +451,17 @@ export default function EditExam() {
               max={1000000000}
             />{" "}
             phút
+          </div>
+          <div className="percent flex items-center gap-x-2">
+            <AccessTimeIcon className="text-primary" />
+            <InputNumber
+              value={exam.percent}
+              onValueChange={(e) => changePercent({ value: e.value })}
+              mode="decimal"
+              min={0}
+              max={100}
+            />{" "}
+            %
           </div>
         </div>
         <div className="flex">

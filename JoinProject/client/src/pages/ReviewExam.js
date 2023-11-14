@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import React, { useEffect,  useState } from "react";
+import {  useNavigate} from "react-router-dom";
 import axios from "axios";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 
@@ -7,7 +7,7 @@ import * as constant from "../constant.js";
 import ReviewQuestionCard from "../components/ReviewQuestionCard.js";
 
 export default function Exam({ idReview }) {
-  const { examToken } = useParams();
+  // const { examToken } = useParams();
   const user = localStorage.getItem("user")
     ? JSON.parse(localStorage.getItem("user"))
     : null;
@@ -67,11 +67,11 @@ export default function Exam({ idReview }) {
     <div className="px-10 py-3">
       <button
         id="back-to-course"
-        className="flex items-center text-primary font-bold mb-4"
+        className="flex items-center font-bold mb-4"
         onClick={() => navigate(-1)}
       >
-        <i className="pi pi-angle-left"></i>
-        <span>GO BACK</span>
+        <i className="pi pi-angle-left text-secondary"></i>
+        <span className="text-icon-color">GO BACK</span>
       </button>
 
       <div className="bg-white flex justify-between gap-5 rounded-lg shadow p-4 md:px-6">

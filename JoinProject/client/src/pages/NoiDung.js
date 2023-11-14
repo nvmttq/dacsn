@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { TabMenu } from "primereact/tabmenu";
-import { Dropdown } from "primereact/dropdown";
 
 import Posts from "../components/Posts";
 import Contents from "../components/Contents";
 import Participants from "../components/Participants.js";
-import CourseDetails from "../pages/CourseDetails.js";
 import Meeting from "../pages/Meeting.js";
 import Grade from "../pages/Grade.js";
 import Attendance from "../pages/Attendance";
@@ -23,7 +21,7 @@ export default function NoiDung() {
       .get("http://localhost:3002/get-course", {})
       .then(function (response) {
         setCourseInformation(
-          response.data.dataCourse.filter((x) => x.token == currentCourses)[0]
+          response.data.dataCourse.filter((x) => x.token === currentCourses)[0]
         );
       })
       .catch(function (error) {
@@ -48,31 +46,19 @@ export default function NoiDung() {
         <Link
           to="/"
           id="back-to-course"
-          className="flex items-center text-primary font-bold mb-4"
+          className="flex items-center font-bold mb-4"
         >
-          <i className="pi pi-angle-left"></i>
-          <span>GO BACK</span>
+          <i className="pi pi-angle-left text-secondary"></i>
+        <span className="text-icon-color">GO BACK</span>
         </Link>
-        <Link
-          to={`/assignments/assToken2`}
-        >
-          <span>Bài tập chương 1</span>
-        </Link>
-        <span className="font-bold">
-          <span
-            style={{
-              fontSize: 18,
-            }}
-          >
-            {courseInformation
+        <span className="font-bold text-xl text-secondary">
+        {courseInformation
               ? courseInformation.title
               : "Chưa vào lớp học nào!!"}
-          </span>
         </span>
       </div>
 
       <div className="w-full h-auto mt-5 ">
-        <CourseDetails />
         <div className="rounded-lg w-4/5 my-3 bg-white flex justify-start ">
           <TabMenu
             className="text-xs"

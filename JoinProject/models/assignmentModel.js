@@ -9,6 +9,7 @@ const AssignmentSchema = new mongoose.Schema({
     text: { type: String, default: "" },
     file: [String],
   },
+  percent: {type: Number, default: 0},
   timeStart: { type: Date },
   timeEnd: { type: Date },
   userStatus: [

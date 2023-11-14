@@ -13,6 +13,7 @@ const examSchema = new mongoose.Schema({
       gradeQues: { type: Number, default: 0 },
     },
   ],
+  percent: {type: Number, default: 0},
   isReview: { type: Boolean, default: true },
   startAt: { type: Date, default: Date.now },
   endAt: { type: Date, default: Date.now },

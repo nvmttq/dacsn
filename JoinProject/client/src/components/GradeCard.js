@@ -4,9 +4,9 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { Link } from "react-router-dom";
 import "../style/GradeStyle.css";
 
-export default function Grade({ grade }) {
+export default function Grade(props) {
 
-  const user = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null;
+  // const user = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null;
   const handleCalcDateDiff = (start, end) => {
     const s = new Date(start);
     const e = new Date(end); // Replace with your desired exam date
@@ -14,36 +14,35 @@ export default function Grade({ grade }) {
     const daysRemaining = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
     return daysRemaining;
   };
-  console.log(grade);
+
   return (
     <div className="grade flex items-center justify-around bg-white py-2 rounded-md">
-      <div className="grade-header flex flex-col">
-        <span className="title text-[#115E59] font-bold text-lg">
-          {grade.name}
+      <div className="grade-header flex flex-col w-[200px] break-words">
+        <span className="title text-secondary font-bold text-lg">
+          {props.title}
         </span>
 
         <span className="time flex items-center gap-x-2">
-          <AccessAlarmsIcon /> con lai{" "}
-          {handleCalcDateDiff(grade.createAt, grade.endAt)} ngay
+          <AccessAlarmsIcon className="text-icon-color" /> còn lại {handleCalcDateDiff(props.startAt, props.endAt)} ngày
         </span>
       </div>
 
-      <div className="grade-status flex flex-col">
+      <div className="grade-status flex flex-col w-[150px] break-words">
         <span className="title text-secondary">Trạng thái</span>
-        <span className="status">{grade.status}</span>
+       <span className="status">{props.status ? "Đã hoàn thành" : "Chưa làm bài"}</span>
       </div>
 
-      <div className="grade-mark flex flex-col">
+      <div className="grade-mark flex flex-col w-[150px] break-words">
         <span className="title text-secondary">Điểm</span>
-        <span className="mark">{grade.grade === -1 ? "" : grade.grade}</span>
+        <span className="mark">{props.status ? props.grade : "Chưa làm bài"}</span>
       </div>
 
-      <div className="grade-percent flex flex-col">
+      <div className="grade-percent flex flex-col w-[150px] break-words">
         <span className="title text-secondary">Phần trăm</span>
-        <span className="percent">{grade.percent}</span>
+        <span className="percent">{props.percent}</span>
       </div>
 
-      <Link to={`/exam/review/${grade.examToken}`}>
+      <Link to={props.linkTo}>
         <ChevronRightIcon
           className="view-details cursor-pointer"
           color="#76C044"

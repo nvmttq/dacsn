@@ -57,7 +57,7 @@ function Nhom() {
   return (
     <div className="courses p-2 w-full flex flex-col mt-5 h-screen">
       <div className="courses-header flex justify-between items-center">
-        <span className="font-bold text-white">Các nhóm đã tham gia</span>
+        <span className="font-bold text-secondary">Các nhóm đã tham gia</span>
         <div className="join-course flex items-center gap-2">
           <FormJoinCourse
             idInput={"groupToken"}

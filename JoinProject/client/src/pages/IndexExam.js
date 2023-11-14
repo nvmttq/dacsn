@@ -9,7 +9,6 @@ import { Column } from "primereact/column";
 import { Dropdown } from "primereact/dropdown";
 import { Link } from "react-router-dom";
 import "primeicons/primeicons.css";
-import moment from "moment";
 import axios from "axios";
 
 export default function IndexExam({ setIdReview }) {
@@ -108,11 +107,11 @@ export default function IndexExam({ setIdReview }) {
     <div className="px-6 py-7">
       <button
         id="back-to-course"
-        className="flex items-center text-primary font-bold mb-4"
+        className="flex items-center font-bold mb-4"
         onClick={() => navigate(-1)}
       >
-        <i className="pi pi-angle-left"></i>
-        <span>GO BACK</span>
+        <i className="pi pi-angle-left text-secondary"></i>
+        <span className="text-icon-color">GO BACK</span>
       </button>
       <div
         className="bg-white flex justify-between gap-5 rounded-lg shadow p-4 md:px-6"

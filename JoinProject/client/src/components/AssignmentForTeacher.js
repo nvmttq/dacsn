@@ -32,10 +32,10 @@ export default function AssignmentForTeacher() {
       <Link
         to="/"
         id="back-to-course"
-        className="flex items-center text-primary font-bold mb-4"
+        className="flex items-center font-bold mb-4"
       >
-        <i className="pi pi-angle-left"></i>
-        <span>GO BACK</span>
+        <i className="pi pi-angle-left text-secondary"></i>
+        <span className="text-icon-color">Quay trở lại</span>
       </Link>
       <span className="font-medium text-xl">
         Khóa học : {course.title}

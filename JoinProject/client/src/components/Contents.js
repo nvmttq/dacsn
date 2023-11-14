@@ -9,6 +9,7 @@ import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { Fieldset } from "primereact/fieldset";
 import { Link } from "react-router-dom";
+import { FileUpload } from 'primereact/fileupload';
 import "primeicons/primeicons.css";
 
 import * as constant from "../constant.js";
@@ -23,7 +24,7 @@ export default function Contents() {
     : null;
 
   const [currentKeySelect, setCurrentKeySelect] = useState("");
-
+  const filesRefEdit = useRef({});
   const examToken = "examToken1";
 
   const showSuccess = () => {
@@ -39,7 +40,12 @@ export default function Contents() {
   const editContent = ({ tree, index, key, newValue }) => {
     if (index < tree.length) {
       if (tree[index].key === key) {
-        tree[index].label = newValue;
+        if(tree[index].type === "FILE") {
+          tree[index].label = newValue.label;
+          tree[index].base64 = newValue.base64;
+        } else {
+          tree[index].label = newValue;
+        }
       } else {
         if (tree[index].children) {
           editContent({
@@ -136,6 +142,23 @@ export default function Contents() {
     }
   };
 
+  const addChildrenFileFromKey = ({tree, key}) => {
+    if (!tree) return;
+    for (var i = 0; i < tree.length; i++) {
+      if (tree[i].key === key) {
+        tree[i].children.push({
+          key: shortid.generate(),
+          label: "",
+          type: "FILE",
+          base64: "",
+          children: [],
+        });
+      } else {
+        addChildrenFileFromKey({ tree: tree[i].children, key: key });
+      }
+    }
+  }
+
   const nodeTemplate = (node, options) => {
     let typeLabel;
     if (node.type === "BT") {
@@ -178,6 +201,55 @@ export default function Contents() {
               );
             }}
           />
+        </div>
+      );
+    } else if(node.type === "FILE") {
+      const myUploader = async (e) => {
+        console.log(e)
+        const convertBase64 = (file) => {
+          return new Promise((resolve, reject) => {
+            const fileReader = new FileReader();
+            fileReader.readAsDataURL(file);
+    
+            fileReader.onload = () => {
+              resolve(fileReader.result);
+            };
+    
+            fileReader.onerror = (error) => {
+              reject(error);
+            };
+          });
+        };
+        
+        const a = document.querySelector(".p-fileupload")[0];
+        console.log(a)
+       
+        const b = await convertBase64(e.files[0])
+        filesRefEdit.current[node.key] = b;
+        console.log(e, e.files,b);
+        console.log(filesRefEdit)
+        
+      };
+      typeLabel = (
+        <div>
+
+          <div className="name-file flex items-center">
+            <span>Tên file: </span>
+            <InputTextarea
+              autoResize
+              cols={100}
+              rows={1}
+              defaultValue={node.label}
+              onChange={(e) => {
+                solveContent({ newValue: {label: e.target.value, base64: filesRefEdit.current[node.key]}, key: node.key });
+                setTreeContentEdit(
+                  treeContentEdit.filter((x) => x.key !== "?????")
+                );
+              }}
+            />
+          </div>
+          <FileUpload mode="basic" name="demo[]" accept="*" auto customUpload uploadHandler={myUploader} />
+
         </div>
       );
     } else {
@@ -272,6 +344,21 @@ export default function Contents() {
             {node.label}
           </Link>
         </div>
+
+        // <form action={}>
+        //   <Button icon="pi pi-book" label={node.label} type="submit" link/>;
+        // </form>
+      );
+    } else if (node.type === "FILE") {
+      label = (
+        <a
+              href={node.base64}
+              download={node.label}
+              style={{ color: "#4338CA" }}
+            className="hover:underline hover:decoration-4 block"
+            >
+              {node.label}
+            </a>
 
         // <form action={}>
         //   <Button icon="pi pi-book" label={node.label} type="submit" link/>;
@@ -423,6 +510,9 @@ export default function Contents() {
     setTreeContentEdit(arr);
   };
 
+
+  
+
   return (
     <>
       <Toast ref={toast} />
@@ -473,7 +563,23 @@ export default function Contents() {
                   tree: treeContentEdit,
                   key: currentKeySelect,
                 });
-                addChildrenAssignFromKey(
+                setTreeContentEdit(
+                  treeContentEdit.filter((x) => x.key !== "?????")
+                );
+                cancelModalAddChildrenContent();
+              }}
+            />
+
+            <Button
+              label="File"
+              icon="pi pi-folder-open"
+              text
+              onClick={() => {
+                addChildrenFileFromKey({
+                  tree: treeContentEdit,
+                  key: currentKeySelect,
+                });
+                setTreeContentEdit(
                   treeContentEdit.filter((x) => x.key !== "?????")
                 );
                 cancelModalAddChildrenContent();

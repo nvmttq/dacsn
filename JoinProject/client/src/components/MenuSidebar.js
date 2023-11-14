@@ -6,7 +6,7 @@ import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
 import { TieredMenu } from "primereact/tieredmenu";
 
-
+import logotdm from "../images/logotdm.png"
 // PAGES
 import Login from "../pages/Login.js";
 import MenuItemSidebar from "./MenuItemSidebar.js";
@@ -74,38 +74,6 @@ export default function MenuSidebar() {
     },
     {
       id: 4,
-      label: "Tin nhắn",
-      icon: "pi pi-fw pi-comment",
-      template: (item, options) => {
-        return (
-          <MenuItemSidebar
-            linkTo={"/messages"}
-            item={item}
-            options={options}
-            isActiveMenu={activeMenuItem}
-            setActiveMenuItem={setActiveMenuItem}
-          />
-        );
-      },
-    },
-    {
-      id: 5,
-      label: "Nội dung",
-      icon: "pi pi-fw pi-cog",
-      template: (item, options) => {
-        return (
-          <MenuItemSidebar
-            linkTo={"/content"}
-            item={item}
-            options={options}
-            isActiveMenu={activeMenuItem}
-            setActiveMenuItem={setActiveMenuItem}
-          />
-        );
-      },
-    },
-    {
-      id: 6,
       label: "Cài đặt",
       icon: "pi pi-fw pi-cog",
       template: (item, options) => {
@@ -120,10 +88,18 @@ export default function MenuSidebar() {
         );
       },
     },
+    {
+      id: 5,
+      label: "LOAD DKMH",
+      icon: "pi pi-fw pi-refresh",
+      command: () => {
+        loadDkmh();
+      }
+    },
   ];
   const ITEMS_MENU_USER = [
     {
-      label: "File",
+      label: "Thông báo",
       icon: "pi pi-fw pi-file",
     },
     {
@@ -155,48 +131,15 @@ export default function MenuSidebar() {
       });
   };
 
-  const loadTkb = async () => {
-    
-    await fetch(`https://dkmh.tdmu.edu.vn/api/sch/w-locdstkbtuanusertheohocky`, {
-      method: "POST",
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        filter: {
-          hoc_ky: 20231,
-          ten_hoc_ky: "",
-        },
-        additional: {
-          paging: {
-            limit: 100,
-            page: 1,
-          },
-          ordering: [
-            {
-              name: null,
-              order_type: null,
-            },
-          ],
-        },
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => console.log(data))
-      .catch((err) => console.log("ĐÁ " ,err));
-  };
 
   return (
     <div className="card h-full">
       <div className="w-full h-[40px] flex items-center justify-center gap-2">
-        <span className="text-black font-bold">TDMU COLLECT</span>
-        <Button onClick={loadDkmh}>LOAD DANH SÁCH DKMH</Button>
-        <Button onClick={loadTkb}>LOAD TKB</Button>
+        <img src={logotdm} className="h-full"></img>
       </div>
       <Menu
         model={items}
-        className="w-full h-[calc(100%-110px)] rounded-none border-0 border-b-[1px] border-t-[1px] border-r-[2px]"
+        className="w-full h-[calc(100%-110px)] rounded-none border-0 border-b-[1px] border-t-[1px] shadow-sm"
       />
       {user ? (
         <div className="card flex justify-content-center">

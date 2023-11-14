@@ -30,11 +30,11 @@ export default function GroupCard() {
   return (
     <>
       {groups.length !== 0 ? (
-        <div className="courses-content mt-2 flex flex-wrap gap-4 h-max">
+        <div className="courses-content mt-2 flex flex-wrap gap-5 h-max">
           {groups.map((group, index) => (
             <div
               key={index}
-              className="card1 bg-white flex flex-col w-[25%] rounded-md"
+              className="card1 bg-white flex flex-col w-[25%] rounded-md transition duration-300 ease-in-out hover:scale-110 shadow-lg"
             >
               <div className="card-top">
                 <img

@@ -60,9 +60,9 @@ function KhoaHoc() {
   };
 
   return (
-    <div className="courses p-2 w-full h-screen flex flex-col">
+    <div className="courses p-2 mt-5 w-full h-screen flex flex-col">
       <div className="courses-header flex justify-between items-center">
-        <span className="font-bold text-primary">Các khóa học theo TKB</span>
+        <span className="font-bold text-secondary text-xl">Các khóa học theo Thời Khóa Biểu</span>
         <div className="join-course flex gap-2">
           <FormJoinCourse
             idInput={"courseToken"}

@@ -281,6 +281,7 @@ class HomeController {
     examCurrent.questions = exam.questions;
     examCurrent.timelimit = exam.timelimit;
     examCurrent.name = exam.name;
+    examCurrent.percent = exam.percent;
     await examCurrent.save();
     return res.json({
       severity: "success",

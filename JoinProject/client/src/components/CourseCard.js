@@ -28,9 +28,9 @@ export default function CourseCard() {
   return (
     <>
       {courses.length !== 0 ? (
-        <div className="courses-content mt-2 flex flex-wrap gap-4 h-max">
+        <div className="courses-content mt-4 flex flex-wrap gap-5 h-max">
           {courses.map((course, index) => (
-            <div key={index} className="card1 bg-white flex flex-col w-[25%] rounded-md">
+            <div key={index} className="card1 bg-white flex flex-col w-[25%] rounded-md transition duration-300 ease-in-out hover:scale-110 shadow-lg">
               <div className="card-top">
                 <img
                   alt="Card"

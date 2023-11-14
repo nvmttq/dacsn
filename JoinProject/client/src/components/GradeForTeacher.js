@@ -95,10 +95,12 @@ export default function ParticipantsAssignmentForTeacher({ courseToken }) {
                     grade: 0,
                     fileName: "",
                     fileToken: "",
+                    percent: 0,
                     status: false
                   }
                   temp.fileName = assign.title;
                   temp.fileToken = assign.assignmentToken;
+                  temp.percent = assign.percent;
                   temp.grade = u.grade;
                   temp.status = (u.status ? true : false);
                   gradesUser.fileAssignments.push(temp);
@@ -119,10 +121,12 @@ export default function ParticipantsAssignmentForTeacher({ courseToken }) {
                     grade: 0,
                     quizName: "",
                     quizToken: "",
+                    percent: 0,
                     status: false
                   }
 
                   temp.grade = u.grade;
+                  temp.percent = exam.percent;
                   temp.quizName = exam.name;
                   temp.quizToken = exam.id;
                   temp.status = (u.status === 2 ? true : false);
@@ -275,6 +279,21 @@ const header = (
     );
   };
 
+  const summaryGradeTemplate = (e) => {
+    let grade = 0;
+    (e.quizAssignments.forEach(q => {
+      grade += parseFloat((q.percent*q.grade)/100.0)
+      console.log(parseFloat((q.percent*q.grade)/100.0))
+
+    }));
+    (e.fileAssignments.forEach(f => {
+      grade += parseFloat((f.percent*f.grade)/100.0)
+      console.log(parseFloat((f.percent*f.grade)/100.0))
+    }));
+    return (
+      <span>{grade}</span>
+    );
+  };
 
   return (
     <div className="card">
@@ -349,6 +368,13 @@ const header = (
             body={(e) => examBodyTemplate(e, exam)}
           />
         ))}
+
+        <Column
+        field="Summary Grade"
+        header={"Tổng điểm"}
+        body={(e) => summaryGradeTemplate(e)}>
+
+        </Column>
       </DataTable>
     </div>
   );

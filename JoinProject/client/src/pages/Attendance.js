@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 // import { ProductService } from './service/ProductService';
-import { Rating } from "primereact/rating";
 import { Button } from "primereact/button";
 import { Tag } from "primereact/tag";
 import { Toast } from "primereact/toast";
@@ -158,7 +157,7 @@ export default function Attendance({ courseToken }) {
           ></Column>
           <Column
             field="status"
-            header="Status"
+            header="Trạng thái"
             body={statusBodyTemplate}
             sortable
           ></Column>

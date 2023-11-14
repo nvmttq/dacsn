@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import Countdown from "react-countdown";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import {  useNavigate, useParams } from "react-router-dom";
 import moment from "moment";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
@@ -260,11 +260,11 @@ export default function Exam() {
 
       <button
         id="back-to-course"
-        className="flex items-center text-primary font-bold mb-4"
+        className="flex items-center font-bold mb-4"
         onClick={() => navigate(-1)}
       >
-        <i className="pi pi-angle-left"></i>
-        <span>GO BACK</span>
+        <i className="pi pi-angle-left text-secondary"></i>
+        <span className="text-icon-color">GO BACK</span>
       </button>
       <div
         className="bg-white flex justify-between gap-5 rounded-lg shadow p-4 md:px-6"

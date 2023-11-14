@@ -73,13 +73,13 @@ function Lich() {
         console.log(response);
         let temp = response.data.dataPosts;
         setEVENTS(temp.map(item => {
-          let endtime = moment(item.end).format("YYYY/MM/DD HH:mm");
-          let starttime = moment(item.start).format("YYYY/MM/DD HH:mm");
+          let te = moment(item.end).format("YYYY MM DD HH:mm");
+          let ts = moment(item.start).format("YYYY MM DD HH:mm");
 
           const obj = {
             id: item.id,
-            end: endtime,
-            start: starttime,
+            end: new Date(te),
+            start: new Date(ts),
             title: item.title,
           }
           return obj;
@@ -93,7 +93,7 @@ function Lich() {
   const changeTime = () => {
     if (datee !== null && timeEnd !== null && timeStart !== null && value !== '') {
 
-      let td = moment(datee).format("YYYY/MM/DD");
+      let td = moment(datee).format("YYYY MM DD");
       let ts = moment(timeStart).format("HH:mm");
       let te = moment(timeEnd).format("HH:mm");
 

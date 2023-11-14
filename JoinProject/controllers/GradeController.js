@@ -20,5 +20,25 @@ module.exports = {
       exams,
       assignments
     })
+  },
+
+  gradeForStudent: async (req, res) => {
+    const {courseToken, username} = req.body;
+
+    const exams = await ExamModel.find({courseToken: courseToken, 'userStatus.userID': username});
+    const assignments = await AssignmentModel.find({courseToken: courseToken, 'userStatus.participants':  username});
+
+    res.json({
+      exams: exams.map(ex => {
+        ex.userStatus = ex.userStatus.filter(us => us.userID === username);
+        return ex;
+      }),
+      assignments: assignments.map(assign => {
+        assign.userStatus = assign.userStatus.filter(us => {
+          return us.participants.find(us => us === username)
+        }); 
+        return assign;
+      }),
+    })
   }
 };
