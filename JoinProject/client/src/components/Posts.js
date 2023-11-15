@@ -282,6 +282,28 @@ export default function Posts() {
         .catch(function (error) {
           console.log(error);
         });
+    } else {
+      axios
+        .post("http://localhost:3002/posts", {
+          title: title,
+          content: content,
+          author: author,
+          nameAuthor: nameUser,
+          notification: check,
+          createDate: moment().format("DD-MM-YYYY HH:mm"),
+          listUnseenUser: [],
+          idCourse: courseToken,
+        })
+        .then(function (response) {
+          setTitle("");
+          setContent("");
+          fetchDataPosts();
+          showSuccess();
+        })
+        .catch(function (error) {
+          console.log(error);
+          showError();
+        });
     }
   };
 
