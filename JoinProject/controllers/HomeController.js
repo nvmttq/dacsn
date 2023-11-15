@@ -374,7 +374,7 @@ class HomeController {
   }
 
   async saveContentCourse(req, res) {
-    const { username, courseInformation } = req.body;
+    const { username, courseInformation, name } = req.body;
     const user = await userModel.findOne({ username });
 
     const checkExistLND = user.repositories.find((store) => store.id === "LND");
@@ -388,7 +388,7 @@ class HomeController {
     user.repositories.find((store) => {
       if (store.id === "LND") {
         store.data.push({
-          title: courseInformation.title,
+          title: (name ? name : courseInformation.title),
           courseToken: courseInformation.token,
           contentCourse: courseInformation.contentCourse,
         });
@@ -401,6 +401,26 @@ class HomeController {
       user,
       code: 200,
       msg: "Luu noi dung khoa hoc thanh cong",
+    });
+  }
+
+  async getRepository (req, res) {
+    const { user } = req.body;
+
+    const a = await userModel
+      .findOne({ username: user.username })
+    
+      if(a) {
+        console.log(a)
+        res.json({
+          msg: "Get repositoty thanh cong",
+          code: 200,
+          data: a,
+        });
+      }
+    res.json({
+      msg: "Khong tim thay nguoi dung trong csdl",
+      code: 404,
     });
   }
 }

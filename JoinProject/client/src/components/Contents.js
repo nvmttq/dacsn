@@ -4,7 +4,7 @@ import { Dropdown } from "primereact/dropdown";
 import { Dialog } from "primereact/dialog";
 import { Tree } from "primereact/tree";
 import { InputTextarea } from "primereact/inputtextarea";
-import { ConfirmDialog } from "primereact/confirmdialog";
+import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { Fieldset } from "primereact/fieldset";
@@ -13,16 +13,103 @@ import { FileUpload } from "primereact/fileupload";
 import "primeicons/primeicons.css";
 
 import * as constant from "../constant.js";
+import { InputText } from "primereact/inputtext";
 
 const shortid = require("shortid");
 
-export default function Contents() {
-  const toast = useRef(null);
-  const [visibleConfirmSave, setVisibleConfirmSave] = useState(false);
-  const user = localStorage.getItem("user")
-    ? JSON.parse(localStorage.getItem("user"))
-    : null;
+const DialogRestoreContent = ({
+  visibleDialog,
+  setVisibleDialog,
+  user,
+  courseInformation,
+  fetchContentCourse,
+  nodeTemplate
+}) => {
+  const [repositories, setRepositories] = useState([]);
+  const [sub, setSub] = useState({});
+  console.log("USER DIALONG RÉTORE", user)
+  useEffect(() => {
+    setRepositories(user.repositories.filter((r) => r.id === "LND"));
+  }, [user.repositories]);
 
+  const acceptRestoreContentCourse = async (sub) => {
+    await axios
+      .put(`${constant.URL_API}/update-course`, {
+        token: courseInformation.token,
+        contentCourse: sub.contentCourse,
+      })
+      .then((res) => {
+        console.log(res);
+        // setCourseInformation(res.data.courseUpdate)
+        fetchContentCourse();
+      })
+      .catch((err) => console.log(err));
+  };
+
+  const confirm1 = (sub) => {
+    console.log(sub);
+    confirmDialog({
+      message:
+        "Khi tải lên nội dung khác nội dung cũ sẽ bị ghi đè. Bạn có xác nhận tải lên nội dung này?",
+      header: "Thông báo ?",
+      icon: "pi pi-exclamation-triangle",
+      accept: () => {
+        acceptRestoreContentCourse(sub);
+        setVisibleDialog("?");
+      },
+      acceptLabel: "Xác nhận",
+      rejectLabel: "Từ chối"
+    });
+  };
+  return (
+    <Dialog
+      header="Các nội dung hiện có"
+      visible={visibleDialog === "TND"}
+      style={{ width: "50vw" }}
+      onHide={() => setVisibleDialog("?")}
+    >
+
+      <Dialog
+        header="Xem trước nội dung"
+      visible={!(Object.keys(sub).length === 0 && sub.constructor === Object)}
+      style={{ width: "50vw" }}
+      onHide={() => setSub({})}
+      >
+        <Tree
+            value={sub.contentCourse}
+            className="w-full md:w-30rem"
+            nodeTemplate={nodeTemplate}
+          />
+      </Dialog>
+
+      <ConfirmDialog />
+      {repositories !== null &&
+        repositories.length > 0 &&
+        repositories[0].data.map((sub, i) => (
+          <div key={i} className="flex justify-between items-center ml-4">
+            <span className="sub-name">{sub.title}</span>
+            <div className="action-sub-restore">
+              <Button className="underline" link onClick={() => setSub(sub)}>
+                Xem
+              </Button>
+
+              <Button className="underline" link onClick={() => confirm1(sub)}>
+                Sử dụng
+              </Button>
+            </div>
+          </div>
+        ))}
+    </Dialog>
+  );
+};
+export default function Contents() {
+
+  const toast = useRef(null);
+  const [visibleDialog, setVisibleDialog] = useState("?");
+  const [user, setUser] = useState(localStorage.getItem("user")
+  ? JSON.parse(localStorage.getItem("user"))
+  : null); 
+  console.log(user)
   const [currentKeySelect, setCurrentKeySelect] = useState("");
   const filesRefEdit = useRef({});
   const examToken = "examToken1";
@@ -117,6 +204,7 @@ export default function Contents() {
         tree[i].children.push({
           key: shortid.generate(),
           label: "",
+          icon: "pi pi-book mr-5 text-2xl text-icon-color",
           type: "TN",
           children: [],
         });
@@ -133,6 +221,7 @@ export default function Contents() {
         tree[i].children.push({
           key: shortid.generate(),
           label: "",
+          icon: "pi pi-folder-open mr-5 text-2xl text-icon-color",
           type: "BT",
           children: [],
         });
@@ -149,6 +238,7 @@ export default function Contents() {
         tree[i].children.push({
           key: shortid.generate(),
           label: "",
+          icon: "pi pi-file mr-5 text-2xl text-icon-color",
           type: "FILE",
           base64: "",
           children: [],
@@ -164,10 +254,6 @@ export default function Contents() {
     if (node.type === "BT") {
       typeLabel = (
         <div className="flex items-center">
-          <i
-            className="pi pi-folder-open mr-5"
-            style={{ fontSize: "2rem", color: "#4338CA" }}
-          ></i>
           <InputTextarea
             autoResize
             cols={100}
@@ -185,10 +271,10 @@ export default function Contents() {
     } else if (node.type === "TN") {
       typeLabel = (
         <div className="flex items-center">
-          <i
+          {/* <i
             className="pi pi-book mr-5"
             style={{ fontSize: "2rem", color: "#4338CA" }}
-          ></i>
+          ></i> */}
           <InputTextarea
             autoResize
             cols={100}
@@ -401,29 +487,20 @@ export default function Contents() {
       .catch(function (error) {
         console.log(error);
       });
-  }, [currentCourses]);
+  }, [currentCourses, user]);
 
   const actions = [
     { name: "Chỉnh sửa nội dung", code: "CSND" },
     { name: "Lưu nội dung", code: "LND" },
+    { name: "Tải lên nội dung khóa học", code: "TND" },
   ];
   const solveAction = (e) => {
-    if (e.value.code === "CSND") {
-      showModalEditContent();
-    } else if (e.value.code === "LND") {
-      showModalSaveContent();
-    }
-  };
-  const [editContentModal, setEditContentModal] = useState(false);
-  const showModalEditContent = () => {
-    setEditContentModal(true);
-  };
-
-  const showModalSaveContent = () => {
-    setVisibleConfirmSave(true);
+    setVisibleDialog(e.value.code);
   };
 
   const acceptSaveContentCourse = async () => {
+
+    const name = document.getElementById("accept-save-content").value;
     await fetch(`${constant.URL_API}/users/save-content-course`, {
       method: "POST",
       headers: {
@@ -432,11 +509,20 @@ export default function Contents() {
       body: JSON.stringify({
         username: user.username,
         courseInformation,
+        name
       }),
     })
       .then((res) => res.json())
-      .then((data) => console.log(data))
-      .catch((err) => console.log(err));
+      .then((data) => {
+        console.log(data);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        setUser(data.user)
+      })
+      .catch((err) => console.log(err))
+      .finally(() => {
+        setVisibleDialog("?");
+        fetchContentCourse();
+      });
 
     toast.current.show({
       severity: "success",
@@ -448,7 +534,7 @@ export default function Contents() {
 
   const cancelModalEditContent = () => {
     fetchContentCourse();
-    setEditContentModal(false);
+    setVisibleDialog(0);
   };
 
   const [addChildrenContentModal, setAddChildrenContentModal] = useState(false);
@@ -598,7 +684,7 @@ export default function Contents() {
 
       <Dialog
         header="CHỈNH SỬA NỘI DUNG"
-        visible={editContentModal}
+        visible={visibleDialog === "CSND"}
         className="w-4/5"
         onHide={cancelModalEditContent}
       >
@@ -641,13 +727,44 @@ export default function Contents() {
       </Dialog>
 
       <ConfirmDialog
-        visible={visibleConfirmSave}
-        onHide={() => setVisibleConfirmSave(false)}
-        message="Xác nhận lưu?"
+        visible={visibleDialog === "LND"}
+        onHide={() => setVisibleDialog("?")}
+        pt={{
+          content: {
+            className: "w-full"
+          },
+          message: {
+            className: "w-full"
+          },
+          acceptButton: {
+            label: "Xác nhận"
+          },
+          rejectButton: {
+            label: "Từ chối"
+          }
+        }}
+        message={(
+          <div className="flex flex-col gap-y-2 w-full">
+            <span>Xác nhận lưu ? </span>
+            <InputText autoFocus={true} className="w-full" id="accept-save-content" placeholder="Nhập tên cho nội dung lưu .... "></InputText>
+          </div>
+        )}
         header="Bạn có chắc muốn lưu không ? "
         icon="pi pi-exclamation-triangle"
-        accept={acceptSaveContentCourse}
-      />
+        className="w-3/6"
+        accept={acceptSaveContentCourse} >
+        </ConfirmDialog>
+      
+
+      <DialogRestoreContent
+        visibleDialog={visibleDialog}
+        setVisibleDialog={setVisibleDialog}
+        user={user}
+        courseInformation={courseInformation}
+        setCourseInformation={setCourseInformation}
+        fetchContentCourse={fetchContentCourse}
+        nodeTemplate={nodeTemplateCourseInformation}
+      ></DialogRestoreContent>
 
       <div className="w-auto mt-4 ml-10">
         <div className="absolute end-5">

@@ -58,26 +58,30 @@ exports.CreateCourse = async (req, res) => {
     });
   }
 };
-exports.updateContent = (req, res) => {
+exports.updateContent = async (req, res) => {
   const { token, contentCourse } = req.body;
-  CourseModel.findOneAndUpdate(
+  await CourseModel.findOneAndUpdate(
     { token: token },
     { contentCourse: contentCourse }
   )
-    .then(() => {
-      return res.status(204).json({
+    .then((docs) => {
+      return res.json({
+        status: 204,
         success: true,
         message: "Update content successfully",
+        courseUpdate: docs
       });
     })
     .catch((error) => {
       console.log(error);
-      res.status(500).json({
+      res.json({
+        status: 500,
         success: false,
         message: "Server error. Please try again.",
         error: error.message,
       });
     });
+    
 };
 
 exports.divGroup = async (req, res) => {

@@ -90,6 +90,22 @@ export default function MenuSidebar() {
     },
     {
       id: 5,
+      label: "Kho lưu trữ",
+      icon: "pi pi-fw pi-refresh",
+      template: (item, options) => {
+        return (
+          <MenuItemSidebar
+            linkTo={"/repositories"}
+            item={item}
+            options={options}
+            isActiveMenu={activeMenuItem}
+            setActiveMenuItem={setActiveMenuItem}
+          />
+        );
+      },
+    },
+    {
+      id: 6,
       label: "LOAD DKMH",
       icon: "pi pi-fw pi-refresh",
       command: () => {

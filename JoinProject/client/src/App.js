@@ -13,7 +13,8 @@ import Exam from "./pages/Exam.js";
 import EditExam from "./components/EditExam.js";
 import ViewGroup from "./components/ViewGroup.js";
 import AssignmentForTeacher from "./components/AssignmentForTeacher.js"
-
+import Test from "./pages/Test.js";
+import Repository from "./pages/Repository.js";
 function App() {
   const [idReview, setIdReview] = useState("");
   return (
@@ -26,7 +27,7 @@ function App() {
           <Routes>
             <Route path="/" element={<KhoaHoc />}></Route>
             <Route path="/courses/:courseToken" element={<NoiDung />} />
-
+            <Route path="/test" element={<Test />} />
             <Route
               path="/exam/:examToken"
               element={<IndexExam setIdReview={setIdReview} />}
@@ -59,6 +60,8 @@ function App() {
 
             <Route path="/groups" element={<Nhom />} />
             <Route path="/lich" element={<Lich />} />
+            <Route path="/repositories" element={<Repository/>}></Route>
+          
           </Routes>
         </div>
       </div>
