@@ -11,6 +11,7 @@ const postSchema = new mongoose.Schema(
     like: { type: Array },
     notification: { type: Boolean },
     createDate: { type: String },
+    listUnseenUser: { type: Array },
     idCourse: { type: String, required: false },
   },
   {

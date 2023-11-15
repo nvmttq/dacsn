@@ -9,7 +9,7 @@ import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { Fieldset } from "primereact/fieldset";
 import { Link } from "react-router-dom";
-import { FileUpload } from 'primereact/fileupload';
+import { FileUpload } from "primereact/fileupload";
 import "primeicons/primeicons.css";
 
 import * as constant from "../constant.js";
@@ -40,7 +40,7 @@ export default function Contents() {
   const editContent = ({ tree, index, key, newValue }) => {
     if (index < tree.length) {
       if (tree[index].key === key) {
-        if(tree[index].type === "FILE") {
+        if (tree[index].type === "FILE") {
           tree[index].label = newValue.label;
           tree[index].base64 = newValue.base64;
         } else {
@@ -142,7 +142,7 @@ export default function Contents() {
     }
   };
 
-  const addChildrenFileFromKey = ({tree, key}) => {
+  const addChildrenFileFromKey = ({ tree, key }) => {
     if (!tree) return;
     for (var i = 0; i < tree.length; i++) {
       if (tree[i].key === key) {
@@ -157,7 +157,7 @@ export default function Contents() {
         addChildrenFileFromKey({ tree: tree[i].children, key: key });
       }
     }
-  }
+  };
 
   const nodeTemplate = (node, options) => {
     let typeLabel;
@@ -203,36 +203,34 @@ export default function Contents() {
           />
         </div>
       );
-    } else if(node.type === "FILE") {
+    } else if (node.type === "FILE") {
       const myUploader = async (e) => {
-        console.log(e)
+        console.log(e);
         const convertBase64 = (file) => {
           return new Promise((resolve, reject) => {
             const fileReader = new FileReader();
             fileReader.readAsDataURL(file);
-    
+
             fileReader.onload = () => {
               resolve(fileReader.result);
             };
-    
+
             fileReader.onerror = (error) => {
               reject(error);
             };
           });
         };
-        
+
         const a = document.querySelector(".p-fileupload")[0];
-        console.log(a)
-       
-        const b = await convertBase64(e.files[0])
+        console.log(a);
+
+        const b = await convertBase64(e.files[0]);
         filesRefEdit.current[node.key] = b;
-        console.log(e, e.files,b);
-        console.log(filesRefEdit)
-        
+        console.log(e, e.files, b);
+        console.log(filesRefEdit);
       };
       typeLabel = (
         <div>
-
           <div className="name-file flex items-center">
             <span>Tên file: </span>
             <InputTextarea
@@ -241,15 +239,27 @@ export default function Contents() {
               rows={1}
               defaultValue={node.label}
               onChange={(e) => {
-                solveContent({ newValue: {label: e.target.value, base64: filesRefEdit.current[node.key]}, key: node.key });
+                solveContent({
+                  newValue: {
+                    label: e.target.value,
+                    base64: filesRefEdit.current[node.key],
+                  },
+                  key: node.key,
+                });
                 setTreeContentEdit(
                   treeContentEdit.filter((x) => x.key !== "?????")
                 );
               }}
             />
           </div>
-          <FileUpload mode="basic" name="demo[]" accept="*" auto customUpload uploadHandler={myUploader} />
-
+          <FileUpload
+            mode="basic"
+            name="demo[]"
+            accept="*"
+            auto
+            customUpload
+            uploadHandler={myUploader}
+          />
         </div>
       );
     } else {
@@ -352,13 +362,13 @@ export default function Contents() {
     } else if (node.type === "FILE") {
       label = (
         <a
-              href={node.base64}
-              download={node.label}
-              style={{ color: "#4338CA" }}
-            className="hover:underline hover:decoration-4 block"
-            >
-              {node.label}
-            </a>
+          href={node.base64}
+          download={node.label}
+          style={{ color: "#4338CA" }}
+          className="hover:underline hover:decoration-4 block"
+        >
+          {node.label}
+        </a>
 
         // <form action={}>
         //   <Button icon="pi pi-book" label={node.label} type="submit" link/>;
@@ -510,9 +520,6 @@ export default function Contents() {
     setTreeContentEdit(arr);
   };
 
-
-  
-
   return (
     <>
       <Toast ref={toast} />
@@ -615,6 +622,11 @@ export default function Contents() {
           <Tree
             value={treeContentEdit}
             nodeTemplate={nodeTemplate}
+            onDragDrop={(e) => {
+              console.log(e.value);
+              setTreeContentEdit(e.value);
+            }}
+            dragdropScope="demo"
             className="w-full md:w-30rem"
           />
           <div className="flex">

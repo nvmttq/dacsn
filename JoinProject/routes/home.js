@@ -13,6 +13,7 @@ router.put('/exam/submit-exam', homeController.submitExam);
 router.put('/exam/start-exam', homeController.startExam);
 router.put('/exam/edit', homeController.editExam);
 //user
+router.get('/users/get-alluser', homeController.getAllUser);
 router.post('/users/get-user', homeController.getUser);
 router.post('/users/save-content-course', homeController.saveContentCourse);
 

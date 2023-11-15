@@ -23,6 +23,7 @@ exports.create = async (req, res) => {
     nameAuthor,
     notification,
     createDate,
+    listUnseenUser,
     idCourse,
   } = req.body;
   const posts = new PostsModel({
@@ -32,6 +33,7 @@ exports.create = async (req, res) => {
     nameAuthor: nameAuthor,
     notification: notification,
     createDate: createDate,
+    listUnseenUser: listUnseenUser,
     idCourse: idCourse,
   });
   return posts
@@ -100,6 +102,25 @@ exports.deletePost = (req, res) => {
       return res.status(204).json({
         success: true,
         message: "Update like successfully",
+      });
+    })
+    .catch((error) => {
+      console.log(error);
+      res.status(500).json({
+        success: false,
+        message: "Server error. Please try again.",
+        error: error.message,
+      });
+    });
+};
+
+exports.updateNotification = (req, res) => {
+  const { listUnseenUser } = req.body;
+  PostsModel.findByIdAndUpdate(req.body.id, { listUnseenUser: listUnseenUser })
+    .then(() => {
+      return res.status(204).json({
+        success: true,
+        message: "Update notification successfully",
       });
     })
     .catch((error) => {

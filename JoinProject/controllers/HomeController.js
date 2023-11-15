@@ -352,6 +352,11 @@ class HomeController {
     }
   }
 
+  async getAllUser(req, res) {
+    const users = await userModel.find({});
+    return res.json(users);
+  }
+
   async getUser(req, res) {
     const { participants } = req.body;
 
@@ -369,27 +374,26 @@ class HomeController {
   }
 
   async saveContentCourse(req, res) {
-    const {username, courseInformation} = req.body;
-    const user = await userModel.findOne({username});
+    const { username, courseInformation } = req.body;
+    const user = await userModel.findOne({ username });
 
-    const checkExistLND = user.repositories.find(store => store.id === "LND");
-    if(!checkExistLND) {
+    const checkExistLND = user.repositories.find((store) => store.id === "LND");
+    if (!checkExistLND) {
       user.repositories.push({
         id: "LND",
         name: "Nội dung khóa học",
-        data: []
-      })
+        data: [],
+      });
     }
-    user.repositories.find(store => {
-      if(store.id === "LND") {
+    user.repositories.find((store) => {
+      if (store.id === "LND") {
         store.data.push({
           title: courseInformation.title,
           courseToken: courseInformation.token,
-          contentCourse: courseInformation.contentCourse
-        })
+          contentCourse: courseInformation.contentCourse,
+        });
       }
     });
-    
 
     await user.save();
 
@@ -397,7 +401,7 @@ class HomeController {
       user,
       code: 200,
       msg: "Luu noi dung khoa hoc thanh cong",
-    })
+    });
   }
 }
 

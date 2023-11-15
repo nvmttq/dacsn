@@ -5,12 +5,14 @@ import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { Dialog } from "primereact/dialog";
 import { TabMenu } from "primereact/tabmenu";
+import { Badge } from "primereact/badge";
 import "primeicons/primeicons.css";
 import axios from "axios";
 import moment from "moment";
 import { useParams } from "react-router-dom";
 
 export default function Posts() {
+  const [replyChange, setReplyChange] = useState({});
   const user = localStorage.getItem("user")
     ? JSON.parse(localStorage.getItem("user"))
     : null;
@@ -57,7 +59,9 @@ export default function Posts() {
     });
   };
 
-  const items = [{ label: "Học tập" }, { label: "Thông báo" }];
+  const [checkNotification, setCheckNotification] = useState(false);
+
+  const [items, setItems] = useState([]);
   const [activeIndex, setActiveIndex] = useState(0);
 
   const [title, setTitle] = useState("");
@@ -74,6 +78,8 @@ export default function Posts() {
   const [checkBookmark, setCheckBookmark] = useState(false);
   const [commentPost, setCommentPost] = useState([]);
   const [listLikePost, setListLikePost] = useState([]);
+  const [numberOfUnseenNotification, setNumberOfUnseenNotification] =
+    useState(0);
   const [checkLike, setCheckLike] = useState(false);
 
   const [listPosts, setListPosts] = useState([]);
@@ -87,10 +93,73 @@ export default function Posts() {
     ? JSON.parse(localStorage.getItem("user")).name
     : null;
 
+  const setNewItems = ({ num }) => {
+    setItems([
+      { label: "Học tập" },
+      {
+        label: (
+          <div>
+            Thông báo {num > 0 && <Badge value={num} severity="danger"></Badge>}
+          </div>
+        ),
+      },
+    ]);
+  };
+
+  const fetchNotification = ({ list }) => {
+    console.log(list);
+    list.forEach((element) => {
+      axios
+        .put("http://localhost:3002/posts/notification", {
+          id: element._id,
+          listUnseenUser: element.listUnseenUser,
+        })
+        .then(function (res) {})
+        .catch(function (error) {
+          console.log(error);
+        });
+    });
+    setNewItems({ num: 0 });
+  };
+
+  const clearNotification = () => {
+    axios
+      .get("http://localhost:3002/posts", {})
+      .then(function (response) {
+        let arr = response.data.dataPosts.filter(
+          (x) => x.idCourse === courseToken
+        );
+        arr.forEach((element) => {
+          for (var i = 0; i < element.listUnseenUser.length; i++) {
+            if (element.listUnseenUser[i].userID === user.username) {
+              element.listUnseenUser.splice(i, 1);
+              break;
+            }
+          }
+        });
+        fetchNotification({ list: arr });
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
+
   useEffect(() => {
     axios
       .get("http://localhost:3002/posts", {})
       .then(function (response) {
+        let arr = response.data.dataPosts.filter(
+          (x) => x.idCourse === courseToken
+        );
+        let num = 0;
+        arr.forEach((element) => {
+          if (
+            element.listUnseenUser.filter((x) => x.userID === user.username)
+              .length > 0
+          ) {
+            num++;
+          }
+        });
         setListPosts(
           response.data.dataPosts
             .filter(
@@ -105,6 +174,7 @@ export default function Posts() {
             )
             .reverse()
         );
+        setNewItems({ num: num });
       })
       .catch(function (error) {
         console.log(error);
@@ -181,24 +251,38 @@ export default function Posts() {
       showWarningEmpty();
       return;
     }
-    axios
-      .post("http://localhost:3002/posts", {
-        title: title,
-        content: content,
-        author: author,
-        nameAuthor: nameUser,
-        notification: check,
-        createDate: moment().format("DD-MM-YYYY HH:mm"),
-        idCourse: courseToken,
-      })
-      .then(function (response) {
-        fetchDataPosts();
-        showSuccess();
-      })
-      .catch(function (error) {
-        console.log(error);
-        showError();
-      });
+    if (check) {
+      axios
+        .get("http://localhost:3002/get-course", {})
+        .then(function (response) {
+          axios
+            .post("http://localhost:3002/posts", {
+              title: title,
+              content: content,
+              author: author,
+              nameAuthor: nameUser,
+              notification: check,
+              createDate: moment().format("DD-MM-YYYY HH:mm"),
+              listUnseenUser: response.data.dataCourse
+                .filter((x) => x.token === courseToken)[0]
+                .participants.filter((x) => x.userID !== user.username),
+              idCourse: courseToken,
+            })
+            .then(function (response) {
+              setTitle("");
+              setContent("");
+              fetchDataPosts();
+              showSuccess();
+            })
+            .catch(function (error) {
+              console.log(error);
+              showError();
+            });
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    }
   };
 
   const AddComment = () => {
@@ -216,6 +300,7 @@ export default function Posts() {
         reply: [],
       })
       .then(function (response) {
+        setContentCommentPost("");
         fetchDataComment({ id: idDetailPost });
         console.log(commentPost);
       })
@@ -224,9 +309,8 @@ export default function Posts() {
       });
   };
 
-  const [contentReply, setContentReply] = useState("");
   const AddReply = ({ id }) => {
-    if (contentReply === "") {
+    if (!replyChange.hasOwnProperty(id) || replyChange[id] === "") {
       return;
     }
     axios
@@ -238,7 +322,7 @@ export default function Posts() {
           idUser: author,
           nameUser: nameUser,
           createDate: moment().format("DD-MM-YYYY HH:mm"),
-          content: contentReply,
+          content: replyChange[id],
         };
         check.push(reply);
         axios
@@ -247,6 +331,10 @@ export default function Posts() {
             reply: check,
           })
           .then(function (res) {
+            setReplyChange({
+              ...replyChange,
+              [id]: "",
+            });
             fetchDataComment({ id: idDetailPost });
           })
           .catch(function (error) {
@@ -274,6 +362,9 @@ export default function Posts() {
       });
   };
   const addLikeComment = ({ listLikeComment, idComment }) => {
+    if (listLikeComment.filter((x) => x === author).length > 0) {
+      return;
+    }
     let arr = listLikeComment;
     arr.push(author);
     axios
@@ -499,7 +590,7 @@ export default function Posts() {
                   <textarea
                     className="bg-gray-100 rounded border border-gray-400 leading-normal resize-none w-full h-20 py-2 px-3 placeholder-gray-700 focus:outline-none focus:bg-white"
                     placeholder="Nhập bình luận..."
-                    required
+                    value={contentCommentPost}
                     onChange={(e) => setContentCommentPost(e.target.value)}
                   ></textarea>
                 </div>
@@ -603,8 +694,13 @@ export default function Posts() {
                       <textarea
                         className="bg-gray-100 rounded border border-gray-400 leading-normal resize-none w-full h-20 py-2 px-3 placeholder-gray-700 focus:outline-none focus:bg-white"
                         placeholder="Nhập câu trả lời..."
-                        required
-                        onChange={(e) => setContentReply(e.target.value)}
+                        value={replyChange[comment._id]}
+                        onChange={(e) => {
+                          setReplyChange({
+                            ...replyChange,
+                            [comment._id]: e.target.value,
+                          });
+                        }}
                       ></textarea>
                     </div>
                     <div className="w-full flex items-start md:w-full px-3">
@@ -629,7 +725,12 @@ export default function Posts() {
             className="text-xs"
             model={items}
             activeIndex={activeIndex}
-            onTabChange={(e) => setActiveIndex(e.index)}
+            onTabChange={(e) => {
+              if (e.index === 1) {
+                clearNotification();
+              }
+              setActiveIndex(e.index);
+            }}
           />
         </div>
       </div>
@@ -640,6 +741,7 @@ export default function Posts() {
               <div className="px-4 py-2 bg-white rounded-t-lg">
                 <InputText
                   placeholder="Nhập tiêu đề"
+                  value={title}
                   className="w-full"
                   onChange={(e) => setTitle(e.target.value)}
                 />
@@ -648,7 +750,7 @@ export default function Posts() {
                   rows="4"
                   className="w-full text-sm text-gray-900 bg-white border-0 focus:ring-0"
                   placeholder="Viết nội dung..."
-                  required
+                  value={content}
                   onChange={(e) => setContent(e.target.value)}
                 />
               </div>
@@ -723,6 +825,7 @@ export default function Posts() {
                   <InputText
                     placeholder="Nhập tiêu đề"
                     className="w-full"
+                    value={title}
                     onChange={(e) => setTitle(e.target.value)}
                   />
                   <InputTextarea
@@ -730,7 +833,7 @@ export default function Posts() {
                     rows="4"
                     className="w-full text-sm text-gray-900 bg-white border-0 focus:ring-0"
                     placeholder="Viết nội dung..."
-                    required
+                    value={content}
                     onChange={(e) => setContent(e.target.value)}
                   />
                 </div>
