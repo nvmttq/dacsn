@@ -31,7 +31,7 @@ const DialogRestoreContent = ({
   useEffect(() => {
     setRepositories(user.repositories.filter((r) => r.id === "LND"));
   }, [user.repositories]);
-
+  
   const acceptRestoreContentCourse = async (sub) => {
     await axios
       .put(`${constant.URL_API}/update-course`, {
@@ -104,6 +104,10 @@ const DialogRestoreContent = ({
 };
 export default function Contents() {
 
+
+
+ 
+
   const toast = useRef(null);
   const [visibleDialog, setVisibleDialog] = useState("?");
   const [user, setUser] = useState(localStorage.getItem("user")
@@ -113,6 +117,10 @@ export default function Contents() {
   const [currentKeySelect, setCurrentKeySelect] = useState("");
   const filesRefEdit = useRef({});
   const examToken = "examToken1";
+
+  const toast_success = (severity, summary, detail) => {
+    toast.current.show({ severity, summary, detail });
+  }
 
   const showSuccess = () => {
     toast.current.show({
@@ -204,7 +212,7 @@ export default function Contents() {
         tree[i].children.push({
           key: shortid.generate(),
           label: "",
-          icon: "pi pi-book mr-5 text-2xl text-icon-color",
+          icon: "pi pi-book mr-5",
           type: "TN",
           children: [],
         });
@@ -221,7 +229,7 @@ export default function Contents() {
         tree[i].children.push({
           key: shortid.generate(),
           label: "",
-          icon: "pi pi-folder-open mr-5 text-2xl text-icon-color",
+          icon: "pi pi-folder-open mr-5",
           type: "BT",
           children: [],
         });
@@ -238,9 +246,9 @@ export default function Contents() {
         tree[i].children.push({
           key: shortid.generate(),
           label: "",
-          icon: "pi pi-file mr-5 text-2xl text-icon-color",
+          icon: "pi pi-file mr-5",
           type: "FILE",
-          base64: "",
+          base64: "?",
           children: [],
         });
       } else {
@@ -250,6 +258,7 @@ export default function Contents() {
   };
 
   const nodeTemplate = (node, options) => {
+
     let typeLabel;
     if (node.type === "BT") {
       typeLabel = (
@@ -290,6 +299,7 @@ export default function Contents() {
         </div>
       );
     } else if (node.type === "FILE") {
+      
       const myUploader = async (e) => {
         console.log(e);
         const convertBase64 = (file) => {
@@ -314,6 +324,7 @@ export default function Contents() {
         filesRefEdit.current[node.key] = b;
         console.log(e, e.files, b);
         console.log(filesRefEdit);
+        toast_success("success", "Thông báo", "Tải file thành công")
       };
       typeLabel = (
         <div>
@@ -324,6 +335,7 @@ export default function Contents() {
               cols={100}
               rows={1}
               defaultValue={node.label}
+              
               onChange={(e) => {
                 solveContent({
                   newValue: {
@@ -345,6 +357,12 @@ export default function Contents() {
             auto
             customUpload
             uploadHandler={myUploader}
+            pt={{
+              chooseButton: {
+                  label: "Chọn File",
+                        className: "!p-0"
+                    }
+              }}
           />
         </div>
       );
@@ -411,7 +429,6 @@ export default function Contents() {
     if (node.type === "TN") {
       label = (
         <div className="flex items-center">
-          <i className="pi pi-book mr-3" style={{ color: "#4338CA" }}></i>
           <Link
             to={"/exam/" + examToken}
             style={{ color: "#4338CA" }}
@@ -428,10 +445,6 @@ export default function Contents() {
     } else if (node.type === "BT") {
       label = (
         <div className="flex items-center">
-          <i
-            className="pi pi-folder-open mr-3"
-            style={{ color: "#4338CA" }}
-          ></i>
           <Link
             to={"/assignments/assToken2"}
             style={{ color: "#4338CA" }}
@@ -598,7 +611,7 @@ export default function Contents() {
       arr.push(treeContentEdit[i]);
     }
     arr.push({
-      key: treeContentEdit.length.toString(),
+      key: shortid.generate(),
       label: "",
       children: [],
       type: "VB",
@@ -766,7 +779,7 @@ export default function Contents() {
         nodeTemplate={nodeTemplateCourseInformation}
       ></DialogRestoreContent>
 
-      <div className="w-auto mt-4 ml-10">
+      <div className="w-auto mt-4">
         <div className="absolute end-5">
           <Dropdown
             onChange={solveAction}
@@ -776,11 +789,17 @@ export default function Contents() {
             className="w-full md:w-14rem"
           />
         </div>
-        <div className="overflow-y-auto h-[500px] w-4/5 bg-white rounded-[15px]">
+        <div className=" w-4/5 bg-white rounded-[15px]">
           <Tree
             value={courseInformation.contentCourse}
             className="w-full md:w-30rem"
             nodeTemplate={nodeTemplateCourseInformation}
+
+            pt={{
+              nodeIcon: {
+                className: "!text-icon-color text-xl"
+              }
+            }}
           />
         </div>
       </div>
