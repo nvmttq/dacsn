@@ -104,7 +104,7 @@ export default function IndexExam({ setIdReview }) {
   };
 
   return (
-    <div className="px-6 py-7">
+    <div className="px-6 py-7 h-screen">
       <button
         id="back-to-course"
         className="flex items-center font-bold mb-4"
@@ -148,10 +148,15 @@ export default function IndexExam({ setIdReview }) {
           options={settingOptions}
           optionLabel="name"
           placeholder="Cài đặt"
+          className={`${user.role !== "Sinh Viên" ? "block" : "hidden"}`}
         />
         <Link
+          
           to={"/exam/redo/" + examToken}
           className="float-right bg-emerald-400 pt-3 pb-3 pl-6 pr-6 rounded-2xl text-white hover:bg-emerald-600 hover:duration-300"
+          style={{
+            display: `${isDone ? "block" : "none"}`
+          }}
         >
           Làm lại
         </Link>

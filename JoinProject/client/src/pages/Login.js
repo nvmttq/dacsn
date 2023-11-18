@@ -32,14 +32,13 @@ export default function Login( {setVisible} ) {
           
           localStorage.setItem("user", JSON.stringify(result));
           console.log(result)
-          
-        
           setVisible(false);
-          setTimeout(() => {navigate("/")}, 100)
           
         })
         .catch(function (error) {
           console.log(error);
+        }).finally(() => {
+          window.location.reload();
         });
     } else setLogin(false);
   }, [login]);

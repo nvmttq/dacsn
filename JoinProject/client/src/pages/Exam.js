@@ -255,7 +255,7 @@ export default function Exam() {
   };
 
   return (
-    <div className="px-6 py-3">
+    <div className="px-6 py-3 h-screen">
       <Toast ref={toastSubmitExam} position="bottom-right" />
 
       <button
@@ -271,14 +271,14 @@ export default function Exam() {
         style={{ position: "relative" }}
       >
         <div className="space-y-1">
-          <div className="font-bold text-sushi-400 uppercase text-sm text-primary">
+          <div className="font-bold text-icon-color uppercase text-lg">
             Bài tập trắc nghiệm - {nameCourse}
           </div>
           <div className="text-xl text-zinc-600 font-bold leading-6 pb-2">
             {exam.name}
           </div>
           <div className="timelimit flex items-center gap-x-2">
-            <AccessTimeIcon className="text-primary" />
+            <AccessTimeIcon className="text-icon-color" />
             {exam.timelimit} phút
           </div>
 

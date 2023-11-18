@@ -299,6 +299,7 @@ const header = (
     <div className="card">
       <Toast ref={toastGrade} />
       <DataTable
+        emptyMessage="No students found."
         header={header}
         ref={dt}
         size={"small"}

@@ -10,7 +10,6 @@ const posts = require("./routes/posts");
 const comments = require("./routes/comment");
 const submitHistory = require("./routes/submitHistory");
 
-
 const http = require("http");
 const app = express();
 const server = http.createServer(app);
@@ -58,23 +57,419 @@ connectDb();
 const MeetingSchema = require("./models/meetingModel.js");
 const GroupModel = require("./models/groupModel.js");
 const AssignmentModel = require("./models/assignmentModel.js");
+const ExamModel = require("./models/examModel.js");
+const CourseModel = require("./models/courseModel.js");
+const AttendanceModel = require("./models/attendanceModel.js");
 
-// const newCollect = new AssignmentModel({
-//   title: "Bài tập chương 1 - Tìm hiểu về ngôn ngữ C++",
-//   assignmentToken: "assToken2",
-//   courseToken: "AmQEk1",
-//   content: {
-//       text: "1. Ngôn ngữ C++ ra đời vào năm nào ? \n 2. Ngôn ngữ C++ do ai ?",
-//       file: ["file1", "file2"]
-//   },
-//   timeStart: new Date(),
-//   timeEnd: (new Date()).setDate((new Date()).getDate() + 10),
-//   userStatus: [
-//     {participants: ["gv001", "admin000"]},
 
-//   ]
-// });
-// newCollect.save();
+async function create() {
+  const courses = await CourseModel.find({});
+  courses.forEach(async (c) => {
+    const us = c.participants.map(p => {
+      return {
+        userID: p.userID,
+        status: 0,
+        timeStart: Date.now(),
+        timeEnd: Date.now(),
+        grade: 0
+      }
+    })
+    const exam = new ExamModel({
+      id: `exam${c.token}`,
+      name: "Trắc nghiệm chương 1 - Nhập xuất, toán tử logic",
+      questions: [
+        {
+          id: "1",
+          textQues: "C++ là ngôn ngữ lập trình nào?",
+          choice: [
+            {
+              name: "A",
+              textChoice: "C#",
+              userChoose: [],
+              
+            },
+            {
+              name: "B",
+              textChoice: "Java",
+              userChoose: ["admin000"],
+              
+            },
+            {
+              name: "C",
+              textChoice: "C++",
+              userChoose: [],
+              
+            },
+            {
+              name: "D",
+              textChoice: "Python",
+              userChoose: [],
+              
+            },
+          ],
+          answer: "C",
+          gradeQues: 0,
+          
+        },
+        {
+          id: "2",
+          textQues: "C++ được phát triển lần đầu bởi ai?",
+          choice: [
+            {
+              name: "A",
+              textChoice: "Bjarne Stroustrup",
+              userChoose: ["admin000"],
+              
+            },
+            {
+              name: "B",
+              textChoice: "Dennis Ritchie",
+              userChoose: [],
+              
+            },
+            {
+              name: "C",
+              textChoice: "Guido van Rossum",
+              userChoose: [],
+              
+            },
+            {
+              name: "D",
+              textChoice: "Tim Berners-Lee",
+              userChoose: [],
+              
+            },
+          ],
+          answer: "A",
+          gradeQues: 0,
+          
+        },
+        {
+          id: "3",
+          textQues: "C++ có hỗ trợ lập trình hướng đối tượng (OOP) không?",
+          choice: [
+            {
+              name: "A",
+              textChoice: "Có",
+              userChoose: ["admin000"],
+              
+            },
+            {
+              name: "B",
+              textChoice: "Không",
+              userChoose: [],
+              
+            },
+            {
+              name: "C",
+              textChoice: "Tùy tình huống",
+              userChoose: [],
+              
+            },
+            {
+              name: "D",
+              textChoice: "Chưa rõ",
+              userChoose: [],
+              
+            },
+          ],
+          answer: "A",
+          gradeQues: 0,
+          
+        },
+        {
+          id: "4",
+          textQues: "Trong C++, 'cout' được sử dụng để làm gì?",
+          choice: [
+            {
+              name: "A",
+              textChoice: "Nhập dữ liệu từ bàn phím",
+              userChoose: ["admin000"],
+              
+            },
+            {
+              name: "B",
+              textChoice: "In dữ liệu ra màn hình",
+              userChoose: [],
+              
+            },
+            {
+              name: "C",
+              textChoice: "Thực hiện phép tính toán",
+              userChoose: [],
+              
+            },
+            {
+              name: "D",
+              textChoice: "Gửi email",
+              userChoose: [],
+              
+            },
+          ],
+          answer: "B",
+          gradeQues: 0,
+          
+        },
+        {
+          id: "5",
+          textQues: "Câu lệnh 'if' dùng để làm gì trong C++?",
+          choice: [
+            {
+              name: "A",
+              textChoice: "Vòng lặp",
+              userChoose: ["admin000"],
+              
+            },
+            {
+              name: "B",
+              textChoice: "So sánh chuỗi",
+              userChoose: [],
+              
+            },
+            {
+              name: "C",
+              textChoice: "Kiểm tra điều kiện",
+              userChoose: [],
+              
+            },
+            {
+              name: "D",
+              textChoice: "Chạy một hàm",
+              userChoose: [],
+              
+            },
+          ],
+          answer: "C",
+          gradeQues: 0,
+          
+        },
+        {
+          id: "6",
+          textQues: "Dấu '++' trong C++ thể hiện điều gì?",
+          choice: [
+            {
+              name: "A",
+              textChoice: "Tăng giá trị của biến lên 1 đơn vị",
+              userChoose: ["admin000"],
+              
+            },
+            {
+              name: "B",
+              textChoice: "Giảm giá trị của biến xuống 1 đơn vị",
+              userChoose: [],
+              
+            },
+            {
+              name: "C",
+              textChoice: "Không có ý nghĩa gì",
+              userChoose: [],
+              
+            },
+            {
+              name: "D",
+              textChoice: "Là toán tử cộng",
+              userChoose: [],
+              
+            },
+          ],
+          answer: "A",
+          gradeQues: 0,
+          
+        },
+        {
+          id: "7",
+          textQues: "C++ có hỗ trợ đa kế thừa (multiple inheritance) không?",
+          choice: [
+            {
+              name: "A",
+              textChoice: "Có",
+              userChoose: ["admin000"],
+              
+            },
+            {
+              name: "B",
+              textChoice: "Không",
+              userChoose: [],
+              
+            },
+            {
+              name: "C",
+              textChoice: "Chỉ trong phiên bản C++11 trở lên",
+              userChoose: [],
+              
+            },
+            {
+              name: "D",
+              textChoice: "Không rõ",
+              userChoose: [],
+              
+            },
+          ],
+          answer: "A",
+          gradeQues: 0,
+          
+        },
+        {
+          id: "8",
+          textQues:
+            "C++ là một ngôn ngữ tĩnh kiểu (statically-typed) hay động kiểu (dynamically-typed)?",
+          choice: [
+            {
+              name: "A",
+              textChoice: "Kiểu tĩnh (statically-typed)",
+              userChoose: ["admin000"],
+              
+            },
+            {
+              name: "B",
+              textChoice: "Kiểu động (dynamically-typed)",
+              userChoose: [],
+              
+            },
+            {
+              name: "C",
+              textChoice: "Tùy tình huống",
+              userChoose: [],
+              
+            },
+            {
+              name: "D",
+              textChoice: "Không rõ",
+              userChoose: [],
+              
+            },
+          ],
+          answer: "A",
+          gradeQues: 0,
+          
+        },
+        {
+          id: "9",
+          textQues:
+            "Trong C++, 'new' và 'delete' được sử dụng cho mục đích gì?",
+          choice: [
+            {
+              name: "A",
+              textChoice: "Đọc và ghi file",
+              userChoose: ["admin000"],
+              
+            },
+            {
+              name: "B",
+              textChoice: "Xử lý chuỗi",
+              userChoose: [],
+              
+            },
+            {
+              name: "C",
+              textChoice: "Quản lý bộ nhớ động",
+              userChoose: [],
+              
+            },
+            {
+              name: "D",
+              textChoice: "Làm việc với thời gian",
+              userChoose: [],
+              
+            },
+          ],
+          answer: "C",
+          gradeQues: 0,
+          
+        },
+        {
+          id: "10",
+          textQues: "C++ hỗ trợ lập trình đa luồng (multithreading) không?",
+          choice: [
+            {
+              name: "A",
+              textChoice: "Có",
+              userChoose: ["admin000"],
+              
+            },
+            {
+              name: "B",
+              textChoice: "Không",
+              userChoose: [],
+              
+            },
+            {
+              name: "C",
+              textChoice: "Chỉ trong phiên bản C++11 trở lên",
+              userChoose: [],
+              
+            },
+            {
+              name: "D",
+              textChoice: "Không rõ",
+              userChoose: [],
+              
+            },
+          ],
+          answer: "A",
+          gradeQues: 0,
+          
+        },
+      ],
+      isReview: false,
+      startAt: Date.now(),
+      endAt: Date.now(),
+      __v: 232,
+      timelimit: 15,
+      userStatus: us,
+      courseToken: c.token,
+      numberOfTimes: 982,
+      percent: 60,
+    });
+    await exam.save();
+  });
+}
+
+
+async function create_assignment() {
+  const course = await CourseModel.findOne({
+    token: "AmQEk1"
+  });
+  const groups = await GroupModel.find({courseToken: course.token});
+  
+  groups.forEach(async g => {
+    const us = g.participants.map(p => {
+      return p.userID;
+    });
+
+    const assign = await AssignmentModel.findOne({
+      assignmentToken: "assToken2"
+    })
+    assign.userStatus.push({
+      participants: us,
+      assignmented: [],
+      grade: 0,
+      status: false
+    });
+    await assign.save();
+  })
+}
+
+async function createAtten() {
+  const courses = await CourseModel.find({});
+  courses.forEach(async (c) => {
+    const us = c.participants.map(p => {
+      return {
+        userID: p.userID,
+        status: false
+      }
+    });
+    const atten = AttendanceModel.find({courseToken: c.token});
+    (await atten).forEach(async at => {
+      at.userStatus = us;
+      await at.save();
+    })
+      
+  });
+}
+// createAtten();
+// create_assignment();
+// create();
 io.on("connection", (socket) => {
   socket.on("join-room", async (data) => {
     const room = await MeetingSchema.findOne({ idMeeting: data.roomID });

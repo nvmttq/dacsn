@@ -6,10 +6,10 @@ import * as constant from "../constant.js";
 export default function CourseCard() {
   const [courses, setCourses] = useState([]);
 
-  const user = localStorage.getItem("user")
-    ? JSON.parse(localStorage.getItem("user"))
-    : null;
-
+  const [user, setUser] = useState(localStorage.getItem("user")
+  ? JSON.parse(localStorage.getItem("user"))
+  : null);
+  console.log(user);
   useEffect(() => {
     if (user) {
       fetch(`${constant.URL_API}/courses/${user.username}`, {
@@ -18,7 +18,7 @@ export default function CourseCard() {
         .then((res) => res.json())
         .then((result) => setCourses(result));
     }
-  }, []);
+  }, [user]);
 
   const getToken = ({ token }) => {
     localStorage.setItem("currentCourses", JSON.stringify(token));

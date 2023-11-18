@@ -787,6 +787,9 @@ export default function Contents() {
             optionLabel="name"
             placeholder="Hành động"
             className="w-full md:w-14rem"
+            style={{
+              display: `${user.role !== "Sinh Viên" ? "" : "none"}`
+            }}
           />
         </div>
         <div className=" w-4/5 bg-white rounded-[15px]">
