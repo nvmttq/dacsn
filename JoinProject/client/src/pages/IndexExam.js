@@ -148,7 +148,7 @@ export default function IndexExam({ setIdReview }) {
           options={settingOptions}
           optionLabel="name"
           placeholder="Cài đặt"
-          className={`${user.role !== "Sinh Viên" ? "block" : "hidden"}`}
+          className={`${user.role !== "Sinh Viên" ? "" : "hidden"}`}
         />
         <Link
           
