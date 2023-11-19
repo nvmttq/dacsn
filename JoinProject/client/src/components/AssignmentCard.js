@@ -22,7 +22,7 @@ export default function AssignmentCard({
       assignment.userStatus.forEach(g => {
         console.log(g)
         if(g.participants.find(username => user.username === username)) {
-          setIsSubmit(true);
+          if(g.status) setIsSubmit(true);
         }
       })
     }
@@ -42,7 +42,7 @@ export default function AssignmentCard({
               onClick={() => setTypeView(null)}
             >
               <i className="pi pi-angle-left text-gray-400"></i>
-              <span className="text-primary block">Quay trở lại</span>
+              <span className="text-icon-color block">Quay trở lại</span>
             </div>
             <Button className="p-0 px-3 py-2 uppercase font-[500] rounded-md">
               Nộp bài
@@ -62,12 +62,12 @@ export default function AssignmentCard({
           }}
         >
           <div className="grade-header flex flex-col">
-            <span className="title text-[#115E59] font-bold text-lg">
+            <span className="title text-secondary font-bold text-lg">
               {assignment.title}
             </span>
 
             <span className="time flex items-center gap-x-2 ">
-              <AccessAlarmsIcon className="text-primary" />
+              <AccessAlarmsIcon className="text-icon-color" />
               <span className="text-[#E9848F]">
                 Hạn nộp {convertDateMongodb(assignment.timeEnd)}
               </span>
@@ -89,13 +89,13 @@ export default function AssignmentCard({
             )}
           </div>
 
-          <Link to={`/assignments/${assignment.assignmentToken}`}>
+          <span>
             <ChevronRightIcon
               className="view-details cursor-pointer"
               color="#76C044"
-              onClick={(e) => console.log(e)}
+              onClick={() => setTypeView(assignment.assignmentToken)}
             />
-          </Link>
+          </span>
         </div>
       )}
     </>

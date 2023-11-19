@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import moment from "moment";
 
 import UploadAssignment from "../components/UploadAssignment.js";
+
 export default function AssignmentDetails(props) {
   const [assignment, setAssignment] = useState(props.assignment);
   const [group, setGroup] = useState(props.group);
@@ -24,7 +25,7 @@ export default function AssignmentDetails(props) {
     setAssginmented(t[0].assignmented);
   }, [assignment]);
   return (
-    <div className=" mt-[15px] flex flex-row">
+    <div className=" mt-[15px] flex">
       <div className=" w-4/5 mt-[30px]">
         <div className="ass-title mb-4">
           <p className="font-medium text-xl">Tên bài tập: {assignment.title}</p>
@@ -62,7 +63,7 @@ export default function AssignmentDetails(props) {
       </div>
 
       <div className=" w-1/5 mt-[30px]">
-        <p className="font-normal decoration-[#c4c4c4]">Điểm </p>
+        <p className="font-normal decoration-red">Điểm </p>
       </div>
     </div>
   );

@@ -10,6 +10,8 @@ import moment from "moment";
 
 import * as constant from "../constant.js";
 export default function Attendance({ courseToken }) {
+
+  const user = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null;
   const [attendances, setAttendances] = useState([]);
   const [expandedRows, setExpandedRows] = useState(null);
   const toast = useRef(null);
@@ -17,7 +19,7 @@ export default function Attendance({ courseToken }) {
   const [loadingSubmitAttend, setLoadingSubmitAttend] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
   const [selectedParticipants, setSelectedParticipants] = useState([]);
-
+  const [isChange, setIsChange] = useState(false);
   useEffect(() => {
     setLoading(true);
     fetch(`${constant.URL_API}/attendances/${courseToken}`, {
@@ -31,25 +33,9 @@ export default function Attendance({ courseToken }) {
       })
       .catch((err) => console.log(err))
       .finally(() => setLoading(false));
-  }, [courseToken]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [courseToken, isChange]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const onRowExpand = (event) => {
-    toast.current.show({
-      severity: "info",
-      summary: "Product Expanded",
-      detail: event.data.title,
-      life: 3000,
-    });
-  };
 
-  const onRowCollapse = (event) => {
-    toast.current.show({
-      severity: "success",
-      summary: "Product Collapsed",
-      detail: event.data.title,
-      life: 3000,
-    });
-  };
 
   const expandAll = () => {
     let _expandedRows = {};
@@ -161,7 +147,9 @@ export default function Attendance({ courseToken }) {
             body={statusBodyTemplate}
             sortable
           ></Column>
-          <Column selectionMode="multiple" headerStyle={{ width: "3rem" }} />
+          <Column style={{
+            display: `${user.role !== "Sinh Viên" ? "block" : "none"}`
+          }} selectionMode="multiple" headerStyle={{ width: "3rem" }} />
         </DataTable>
       </div>
     );
@@ -191,7 +179,33 @@ export default function Attendance({ courseToken }) {
     );
   };
 
+  const createAttendance = () => {
+    fetch(`${constant.URL_API}/attendances/create`, {
+      method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          courseToken
+        }),
+    }).then(res => res.json()).then(res => {
+      console.log(res);
+      setIsChange(prev => !prev)
+  
+
+
+    }).catch(err => {
+      console.log(err);
+    }).finally( () => {
+      toast.current.show({
+        severity: "success",
+        summary: "Thông báo",
+        detail: "Thêm điểm danh mới thành công"
+      })
+    })
+  }
   const header = (
+    
     <div className="flex flex-wrap justify-content-end gap-2">
       <Button icon="pi pi-plus" label="Mở rộng tất cả" onClick={expandAll} text />
       <Button
@@ -199,6 +213,13 @@ export default function Attendance({ courseToken }) {
         label="Thu nhỏ tất cả"
         onClick={collapseAll}
         text
+      />
+      <Button
+        icon="pi pi-plus"
+        label="Tạo điểm danh"
+        onClick={createAttendance}
+        text
+        className=" float-right block"
       />
     </div>
   );
@@ -213,8 +234,6 @@ export default function Attendance({ courseToken }) {
         tableStyle={{ minWidth: "50rem" }}
         expandedRows={expandedRows}
         onRowToggle={(e) => setExpandedRows(e.data)}
-        onRowExpand={onRowExpand}
-        onRowCollapse={onRowCollapse}
         rowExpansionTemplate={rowExpansionTemplate}
         dataKey="title"
         header={header}

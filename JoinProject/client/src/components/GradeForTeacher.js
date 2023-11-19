@@ -262,7 +262,7 @@ const header = (
     return (
       <div className="fullname-student flex flex-col items-center">
         {/* {rowData.username} */}
-        {fileAssign && fileAssign.status ? fileAssign.grade : "Chưa nộp bài"}
+        {fileAssign && fileAssign.status ? (fileAssign.grade === -1 ? "Chưa chấm điểm" : fileAssign.grade) : "Chưa nộp bài"}
       </div>
     );
   };
@@ -291,7 +291,7 @@ const header = (
       console.log(parseFloat((f.percent*f.grade)/100.0))
     }));
     return (
-      <span>{grade}</span>
+      <span>{grade < 0 ? "?" : grade}</span>
     );
   };
 

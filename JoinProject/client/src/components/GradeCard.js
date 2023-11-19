@@ -34,21 +34,21 @@ export default function Grade(props) {
 
       <div className="grade-mark flex flex-col w-[150px] break-words">
         <span className="title text-secondary">Điểm</span>
-        <span className="mark">{props.status ? props.grade : "Chưa làm bài"}</span>
+        <span className="mark">{props.status && props.grade !== -1 ? props.grade : "Chưa chấm điểm"}</span>
       </div>
 
       <div className="grade-percent flex flex-col w-[150px] break-words">
         <span className="title text-secondary">Phần trăm</span>
         <span className="percent">{props.percent}</span>
       </div>
-
+{/* 
       <Link to={props.linkTo}>
         <ChevronRightIcon
           className="view-details cursor-pointer"
           color="#76C044"
           onClick={(e) => console.log(e)}
         />
-      </Link>
+      </Link> */}
     </div>
   );
 }
