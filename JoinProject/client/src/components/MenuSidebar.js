@@ -74,22 +74,6 @@ export default function MenuSidebar() {
     },
     {
       id: 4,
-      label: "Cài đặt",
-      icon: "pi pi-fw pi-cog",
-      template: (item, options) => {
-        return (
-          <MenuItemSidebar
-            linkTo={"/setting"}
-            item={item}
-            options={options}
-            isActiveMenu={activeMenuItem}
-            setActiveMenuItem={setActiveMenuItem}
-          />
-        );
-      },
-    },
-    {
-      id: 5,
       label: "Kho lưu trữ",
       icon: "pi pi-fw pi-refresh",
       template: (item, options) => {
@@ -105,9 +89,9 @@ export default function MenuSidebar() {
       },
     },
     {
-      id: 6,
+      id: 5,
       label: "LOAD DKMH",
-      icon: "pi pi-fw pi-refresh",
+      icon: "pi pi-fw pi-save",
       command: () => {
         loadDkmh();
       }

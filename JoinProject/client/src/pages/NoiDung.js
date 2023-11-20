@@ -10,7 +10,15 @@ import Grade from "../pages/Grade.js";
 import Attendance from "../pages/Attendance";
 import { Link } from "react-router-dom";
 
+
+
 export default function NoiDung() {
+
+  const [user, setUser] = useState(localStorage.getItem("user")
+  ? JSON.parse(localStorage.getItem("user"))
+  : null);
+  const [isPermissionOnCourse, setIsPermissionOnCourse] = useState(false);
+
   const currentCourses = localStorage.getItem("currentCourses")
     ? JSON.parse(localStorage.getItem("currentCourses"))
     : null;
@@ -20,9 +28,15 @@ export default function NoiDung() {
     axios
       .get("http://localhost:3002/get-course", {})
       .then(function (response) {
+        const course = response.data.dataCourse.filter((x) => x.token === currentCourses)[0];
         setCourseInformation(
-          response.data.dataCourse.filter((x) => x.token === currentCourses)[0]
+          course
         );
+        course.participants.forEach(p => {
+          if(p.isTeacher && p.userID === user.username) {
+            setIsPermissionOnCourse(true);
+          }
+        });
       })
       .catch(function (error) {
         console.log(error);
@@ -68,12 +82,12 @@ export default function NoiDung() {
           />
         </div>
       </div>
-      {activeIndex === 0 && <Contents />}
-      {activeIndex === 1 && <Posts />}
+      {activeIndex === 0 && <Contents isPermissionOnCourse={isPermissionOnCourse}/>}
+      {activeIndex === 1 && <Posts isPermissionOnCourse={isPermissionOnCourse}/>}
       {activeIndex === 2 && <Meeting />}
-      {activeIndex === 3 && <Participants />}
-      {activeIndex === 4 && <Grade />}
-      {activeIndex === 5 && <Attendance courseToken={courseInformation.token}/>}
+      {activeIndex === 3 && <Participants isPermissionOnCourse={isPermissionOnCourse}/>}
+      {activeIndex === 4 && <Grade isPermissionOnCourse={isPermissionOnCourse}/>}
+      {activeIndex === 5 && <Attendance courseToken={courseInformation.token} isPermissionOnCourse={isPermissionOnCourse}/>}
     </div>
   );
 }

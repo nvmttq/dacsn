@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import GradeForTeacher from "../components/GradeForTeacher.js";
 import GradeCard from "../components/GradeCard.js";
 import * as constant from  "../constant.js"
-export default function Grade() {
+export default function Grade({isPermissionOnCourse}) {
   const { courseToken } = useParams();
   const user = localStorage.getItem("user")
     ? JSON.parse(localStorage.getItem("user"))
@@ -51,7 +51,7 @@ export default function Grade() {
             startAt={assign.timeStart} endAt={assign.timeEnd} linkTo={`/assignments/${assign.assignmentToken}`} status={assign.userStatus[0].status} grade={assign.userStatus[0].grade} percent={assign.percent} title={assign.title} />
           ))}
 
-          {user.role !== "Sinh Viên" && <GradeForTeacher courseToken={courseToken}/>}
+          {user.role !== "Sinh Viên" && <GradeForTeacher isPermissionOnCourse={isPermissionOnCourse} courseToken={courseToken}/>}
         </div>
       )}
     </div>

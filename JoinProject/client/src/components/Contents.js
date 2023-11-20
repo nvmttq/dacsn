@@ -102,12 +102,9 @@ const DialogRestoreContent = ({
     </Dialog>
   );
 };
-export default function Contents() {
+export default function Contents({isPermissionOnCourse}) {
 
-
-
- 
-
+  
   const toast = useRef(null);
   const [visibleDialog, setVisibleDialog] = useState("?");
   const [user, setUser] = useState(localStorage.getItem("user")
@@ -495,6 +492,8 @@ export default function Contents() {
         if (course) {
           setCourseInformation(course);
           setTreeContentEdit(course.contentCourse);
+
+       
         }
       })
       .catch(function (error) {
@@ -788,7 +787,7 @@ export default function Contents() {
             placeholder="Hành động"
             className="w-full md:w-14rem"
             style={{
-              display: `${user.role !== "Sinh Viên" ? "" : "none"}`
+              display: `${isPermissionOnCourse ? "" : "none"}`
             }}
           />
         </div>

@@ -11,7 +11,7 @@ import { InputNumber } from "primereact/inputnumber";
 import { ParticipantsDataTableService } from "./service/ParticipantsDataTableService";
 import * as constant from "../constant.js";
 
-export default function LazyLoadDemo() {
+export default function Participants({isPermissionOnCourse}) {
   const ref = useRef("");
   const { courseToken } = useParams();
   const [showDivGroupModal, setShowDivGroupModal] = useState(false);
@@ -239,6 +239,9 @@ export default function LazyLoadDemo() {
           optionLabel="name"
           placeholder="Hành động"
           className="md:w-14rem float-right my-3"
+          style={{
+            display: `${isPermissionOnCourse ? "" : "none"}`
+          }}
         />
         {showDivGroupModal && <DivGroupModal />}
       </div>

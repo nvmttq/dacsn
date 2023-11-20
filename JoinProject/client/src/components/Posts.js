@@ -11,7 +11,9 @@ import axios from "axios";
 import moment from "moment";
 import { useParams } from "react-router-dom";
 
-export default function Posts() {
+
+import * as constant from "../constant.js";
+export default function Posts({isPermissionOnCourse}) {
   const [replyChange, setReplyChange] = useState({});
   const user = localStorage.getItem("user")
     ? JSON.parse(localStorage.getItem("user"))
@@ -840,7 +842,7 @@ export default function Posts() {
       )}
       {activeIndex === 1 && (
         <div className="overflow-y-auto w-full h-[400px]">
-          {user.role === "Giảng Viên" && (
+          {isPermissionOnCourse && (
             <div className="rounded-lg h-auto mr-10 bg-white w-4/5">
               <div className="w-full mb-4 border border-gray-200 rounded-lg bg-gray-50">
                 <div className="px-4 py-2 bg-white rounded-t-lg">

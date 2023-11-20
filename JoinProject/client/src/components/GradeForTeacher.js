@@ -7,7 +7,8 @@ import * as constant from "../constant.js";
 import { Toast } from "primereact/toast";
 import { Button } from "primereact/button";
 
-export default function ParticipantsAssignmentForTeacher({ courseToken }) {
+
+export default function ParticipantsAssignmentForTeacher({ courseToken, isPermissionOnCourse}) {
   // const user = localStorage.getItem("user")
   //   ? JSON.parse(localStorage.getItem("user"))
   //   : null;
@@ -239,6 +240,7 @@ const header = (
       <Button type="button" icon="pi pi-file-excel" severity="success" rounded onClick={exportExcel} data-pr-tooltip="XLS" />
       <Button type="button" icon="pi pi-file-pdf" severity="warning" rounded onClick={exportPdf} data-pr-tooltip="PDF" />
   </div>
+
 );
 
   const mssvBodyTemplate = (rowData) => {
@@ -300,7 +302,7 @@ const header = (
       <Toast ref={toastGrade} />
       <DataTable
         emptyMessage="No students found."
-        header={header}
+        header={isPermissionOnCourse ? header : null}
         ref={dt}
         size={"small"}
         value={grades}

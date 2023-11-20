@@ -15,7 +15,7 @@ export default function IndexExam({ setIdReview }) {
   const user = localStorage.getItem("user")
     ? JSON.parse(localStorage.getItem("user"))
     : null;
-
+  const [isPermissionOnCourse, setIsPermissionOnCourse] = useState(false);
   const { examToken } = useParams();
   const [nameCourse, setNameCourse] = useState("");
   const [isDone, setIsDone] = useState(false);
@@ -37,6 +37,10 @@ export default function IndexExam({ setIdReview }) {
       .then((response) => response.json())
       .then((result) => {
         setExam(result);
+        const exists =  user.courses.find(c => c === result.courseToken);
+        if(exists && user.role === "Giảng Viên") {
+          setIsPermissionOnCourse(true);
+        }
         result.userStatus.forEach((data) => {
           if (data.userID === user.username) {
             if (data.status === 2) {
@@ -148,7 +152,7 @@ export default function IndexExam({ setIdReview }) {
           options={settingOptions}
           optionLabel="name"
           placeholder="Cài đặt"
-          className={`${user.role !== "Sinh Viên" ? "" : "hidden"}`}
+          className={`${isPermissionOnCourse ? "" : "hidden"}`}
         />
         <Link
           

@@ -5,12 +5,13 @@ import { Column } from "primereact/column";
 import { Button } from "primereact/button";
 import { Tag } from "primereact/tag";
 import { Toast } from "primereact/toast";
-
 import moment from "moment";
 
 import * as constant from "../constant.js";
-export default function Attendance({ courseToken }) {
 
+export default function Attendance({ courseToken, isPermissionOnCourse}) {
+
+  
   const user = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null;
   const [attendances, setAttendances] = useState([]);
   const [expandedRows, setExpandedRows] = useState(null);
@@ -220,6 +221,9 @@ export default function Attendance({ courseToken }) {
         onClick={createAttendance}
         text
         className=" float-right block"
+        style={{
+          display: `${isPermissionOnCourse ? "" : "none"}`
+        }}
       />
     </div>
   );

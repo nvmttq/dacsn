@@ -16,12 +16,12 @@ import axios from "axios";
 const shortid = require("shortid");
 
 export default function EditExam() {
-  // const user = localStorage.getItem("user")
-  //   ? JSON.parse(localStorage.getItem("user"))
-  //   : null;
+  const user = localStorage.getItem("user")
+    ? JSON.parse(localStorage.getItem("user"))
+    : null;
 
   const toast = useRef(null);
-
+  
   const { examToken } = useParams();
   const [nameCourse, setNameCourse] = useState("");
   const [exam, setExam] = useState({});
@@ -225,6 +225,7 @@ export default function EditExam() {
       .then((result) => {
         setCheck(true);
         setExam(result);
+        
         let arr = [];
         result.questions.forEach((element, index) => {
           arr.push({
