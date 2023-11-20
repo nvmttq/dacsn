@@ -920,6 +920,9 @@ export default function Posts() {
               )}
             </div>
           ))}
+          {listNotificationPosts.length === 0 && (
+            <div className="text-center w-4/5">Chưa có thông báo nào</div>
+          )}
         </div>
       )}
     </>
