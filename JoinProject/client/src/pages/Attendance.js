@@ -19,7 +19,7 @@ export default function Attendance({ courseToken, isPermissionOnCourse}) {
   const [loading, setLoading] = useState(false);
   const [loadingSubmitAttend, setLoadingSubmitAttend] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
-  const [selectedParticipants, setSelectedParticipants] = useState([]);
+  const [selectedParticipants, setSelectedParticipants] = useState({});
   const [isChange, setIsChange] = useState(false);
   useEffect(() => {
     setLoading(true);
@@ -29,7 +29,24 @@ export default function Attendance({ courseToken, isPermissionOnCourse}) {
       .then((res) => res.json())
       .then((data) => {
         console.log(data);
-        setAttendances(data.attendances);
+        const attendances = data.attendances.map(at => {
+
+          const solveUs = [];
+          at.userStatus.forEach(us => {
+            console.log(us)
+            if(user.role === "Sinh Viên") {
+              if(us.user.username === user.username) solveUs.push(us);
+            } else {
+              solveUs.push(us)
+            }
+            
+          });
+          at.userStatus = solveUs;
+          return at;
+        })
+        console.log(attendances)
+      
+        setAttendances(attendances);
         setSelectedParticipants(data.selectedUsers)
       })
       .catch((err) => console.log(err))
@@ -55,6 +72,8 @@ export default function Attendance({ courseToken, isPermissionOnCourse}) {
   };
 
   const rowExpansionTemplate = (data) => {
+    console.log("ASFASF",data)
+
     const submitAttendance = async (e) => {
       setLoadingSubmitAttend(true);
       await fetch(`${constant.URL_API}/attendances/submit-atten`, {
@@ -76,15 +95,18 @@ export default function Attendance({ courseToken, isPermissionOnCourse}) {
     );
 
     const mssvBodyTemplate = (rowData) => {
+      
       return <span>{rowData.user.username}</span>;
     };
 
     console.log(data);
     const fullNameBodyTemplate = (rowData) => {
+      
       return <span>{rowData.user.name}</span>;
     };
 
     const statusBodyTemplate = (rowData) => {
+      
       const getStatusSeverity = (rowData) => {
         if (rowData.status) return "success";
         return "danger";
@@ -119,15 +141,20 @@ export default function Attendance({ courseToken, isPermissionOnCourse}) {
         <h5>Điểm danh {data.title}</h5>
         <DataTable
           value={data.userStatus}
-          footer={footer}
+          footer={user.role !== "Sinh Viên" ? footer : null}
           lazy
-          dataKey="user.username"
+          dataKey="user._id"
           paginator
           rows={10}
+          totalRecords={data.userStatus.length}
           tableStyle={{ minWidth: "55rem" }}
-          selection={selectedParticipants} onSelectionChange={(e) => {
+          selection={selectedParticipants[data.token]} 
+          onSelectionChange={(e) => {
             console.log(e.value);
-            setSelectedParticipants(e.value)
+            setSelectedParticipants({
+              ...selectedParticipants,
+              [data.token]: e.value
+            })
           }}
         >
           <Column
@@ -237,9 +264,12 @@ export default function Attendance({ courseToken, isPermissionOnCourse}) {
         selectionMode={'sigel'}
         tableStyle={{ minWidth: "50rem" }}
         expandedRows={expandedRows}
-        onRowToggle={(e) => setExpandedRows(e.data)}
+        onRowToggle={(e) => {
+          console.log(e)
+          setExpandedRows(e.data)
+        }}
         rowExpansionTemplate={rowExpansionTemplate}
-        dataKey="title"
+        dataKey="token"
         header={header}
         // tableStyle={{ minWidth: "60rem" }}
       >

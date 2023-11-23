@@ -10,6 +10,7 @@ const user = new mongoose.Schema({
   repositories: [{
     id: String,
     name: String,
+    createAt: {type: Date, default: Date.now},
     data: []
   }]
 });

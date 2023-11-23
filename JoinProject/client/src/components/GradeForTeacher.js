@@ -3,12 +3,18 @@ import React, { useState, useEffect, useRef } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 
+import { Dialog } from "primereact/dialog";
+
 import * as constant from "../constant.js";
 import { Toast } from "primereact/toast";
 import { Button } from "primereact/button";
+import { InputText } from "primereact/inputtext";
+import { InputNumber } from "primereact/inputnumber";
 
-
-export default function ParticipantsAssignmentForTeacher({ courseToken, isPermissionOnCourse}) {
+export default function ParticipantsAssignmentForTeacher({
+  courseToken,
+  isPermissionOnCourse,
+}) {
   // const user = localStorage.getItem("user")
   //   ? JSON.parse(localStorage.getItem("user"))
   //   : null;
@@ -21,9 +27,10 @@ export default function ParticipantsAssignmentForTeacher({ courseToken, isPermis
   const [totalRecords, setTotalRecords] = useState(0);
   const [selectAll, setSelectAll] = useState(false);
   const [selectedParticipants, setSelectedParticipants] = useState(null);
+  const [isOpenEditPercent, setIsOpenEditPercent] = useState(false);
   const cols = useRef([
-    {field: "fullName", header: "Họ và Tên"},
-    {field: "mssv", header: "MSSV"}
+    { field: "fullName", header: "Họ và Tên" },
+    { field: "mssv", header: "MSSV" },
   ]);
   let exportColumns = null;
   const dt = useRef(null);
@@ -65,7 +72,7 @@ export default function ParticipantsAssignmentForTeacher({ courseToken, isPermis
       })
         .then((res) => res.json())
         .then((data) => {
-          console.log(data)
+          console.log(data);
           setExams(data.exams);
           setAssignments(data.assignments);
           // let requests = data;
@@ -87,7 +94,7 @@ export default function ParticipantsAssignmentForTeacher({ courseToken, isPermis
               assign.userStatus.forEach((u, i) => {
                 cols.current.push({
                   field: `Assign${i}`,
-                  header: assign.title
+                  header: assign.title,
                 });
                 if (
                   u.participants.find((username) => user.userID === username)
@@ -97,13 +104,13 @@ export default function ParticipantsAssignmentForTeacher({ courseToken, isPermis
                     fileName: "",
                     fileToken: "",
                     percent: 0,
-                    status: false
-                  }
+                    status: false,
+                  };
                   temp.fileName = assign.title;
                   temp.fileToken = assign.assignmentToken;
                   temp.percent = assign.percent;
                   temp.grade = u.grade;
-                  temp.status = (u.status ? true : false);
+                  temp.status = u.status ? true : false;
                   gradesUser.fileAssignments.push(temp);
                 }
               });
@@ -113,26 +120,23 @@ export default function ParticipantsAssignmentForTeacher({ courseToken, isPermis
               exam.userStatus.forEach((u, i) => {
                 cols.current.push({
                   field: `Exam${i}`,
-                  header: exam.name
+                  header: exam.name,
                 });
-                if (
-                  u.userID === user.userID
-                ) {
+                if (u.userID === user.userID) {
                   const temp = {
                     grade: 0,
                     quizName: "",
                     quizToken: "",
                     percent: 0,
-                    status: false
-                  }
+                    status: false,
+                  };
 
                   temp.grade = u.grade;
                   temp.percent = exam.percent;
                   temp.quizName = exam.name;
                   temp.quizToken = exam.id;
-                  temp.status = (u.status === 2 ? true : false);
+                  temp.status = u.status === 2 ? true : false;
                   gradesUser.quizAssignments.push(temp);
-
                 }
               });
             });
@@ -143,8 +147,11 @@ export default function ParticipantsAssignmentForTeacher({ courseToken, isPermis
           setTotalRecords(gradesUser.length);
           setGrades(gradesUser);
           setLoading(false);
-          console.log(cols)
-          exportColumns = cols.current.map((col) => ({ title: col.header, dataKey: col.field }));
+          console.log(cols);
+          exportColumns = cols.current.map((col) => ({
+            title: col.header,
+            dataKey: col.field,
+          }));
         });
     }, Math.random() * 1000 + 250);
   };
@@ -186,62 +193,190 @@ export default function ParticipantsAssignmentForTeacher({ courseToken, isPermis
     }
   };
 
-
   const exportCSV = (selectionOnly) => {
-    console.log(dt)
+    console.log(dt);
     dt.current.exportCSV({ selectionOnly });
-};
+  };
 
-const exportPdf = () => {
-    import('jspdf').then((jsPDF) => {
-        import('jspdf-autotable').then(() => {
-            const doc = new jsPDF.default(0, 0);
+  const exportPdf = () => {
+    import("jspdf").then((jsPDF) => {
+      import("jspdf-autotable").then(() => {
+        const doc = new jsPDF.default(0, 0);
 
-            doc.autoTable(exportColumns, grades);
-            doc.save('grades.pdf');
-        });
+        doc.autoTable(exportColumns, grades);
+        doc.save("grades.pdf");
+      });
     });
-};
+  };
 
-const exportExcel = () => {
-    import('xlsx').then((xlsx) => {
-        const worksheet = xlsx.utils.json_to_sheet(grades);
-        const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
-        const excelBuffer = xlsx.write(workbook, {
-            bookType: 'xlsx',
-            type: 'array'
-        });
+  const exportExcel = () => {
+    import("xlsx").then((xlsx) => {
+      const worksheet = xlsx.utils.json_to_sheet(grades);
+      const workbook = { Sheets: { data: worksheet }, SheetNames: ["data"] };
+      const excelBuffer = xlsx.write(workbook, {
+        bookType: "xlsx",
+        type: "array",
+      });
 
-        saveAsExcelFile(excelBuffer, 'grades');
+      saveAsExcelFile(excelBuffer, "grades");
     });
-};
+  };
 
-const saveAsExcelFile = (buffer, fileName) => {
-  import('file-saver').then((module) => {
+  const saveAsExcelFile = (buffer, fileName) => {
+    import("file-saver").then((module) => {
       if (module && module.default) {
-        const blob = new Blob(['Hello, World!'], { type: 'text/plain' });
+        const blob = new Blob(["Hello, World!"], { type: "text/plain" });
 
         // Save the Blob as a file
-        module.default.saveAs(blob, 'example.txt');
-          // let EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
-          // let EXCEL_EXTENSION = '.xlsx';
-          // const data = new Blob([buffer], {
-          //     type: EXCEL_TYPE
-          // });
+        module.default.saveAs(blob, "example.txt");
+        // let EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+        // let EXCEL_EXTENSION = '.xlsx';
+        // const data = new Blob([buffer], {
+        //     type: EXCEL_TYPE
+        // });
 
-          // module.default.saveAs(data, fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION);
+        // module.default.saveAs(data, fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION);
       }
-  });
-};
+    });
+  };
 
-const header = (
-  <div className="flex items-center justify-end gap-2">
-      <Button type="button" icon="pi pi-file" rounded onClick={() => exportCSV(true)} data-pr-tooltip="CSV" />
-      <Button type="button" icon="pi pi-file-excel" severity="success" rounded onClick={exportExcel} data-pr-tooltip="XLS" />
-      <Button type="button" icon="pi pi-file-pdf" severity="warning" rounded onClick={exportPdf} data-pr-tooltip="PDF" />
-  </div>
+  const EditPercent = () => {
+    const [save, setSave] = useState(false);
+    const refPercent = useRef({});
+    const [percents, setPercent] = useState({});
+    console.log(exams)
+    useEffect(() => {
+      if (isOpenEditPercent) {
+        const setPP = {};
+        exams.forEach((ex) => {
+          setPP[ex.id] = ex.percent;
+        });
 
-);
+        assignments.forEach((ex) => {
+          setPP[ex.assignmentToken] = ex.percent;
+          
+        });
+        setPercent(setPP);
+      }
+    }, [isOpenEditPercent]);
+    const saveEditPercent = async () => {
+      console.log(percents);
+      let sumPercent = 0;
+      for(var id in percents) {
+        console.log(id)
+        sumPercent += parseInt(percents[id]);
+      }
+      if(sumPercent !== 100) {
+        alert("Tổng % của các bài tập phải = 100 !!! Vui lòng kiểm tra lại");
+        return;
+      } 
+
+      await fetch(`${constant.URL_API}/grades/update-percent`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          idNeedUpdate: percents,
+        }),
+      })
+        .then((res) => res.json())
+        .then((res) => {
+          // send to server
+
+          console.log(res);
+        })
+        .catch((err) => console.log(err));
+    };
+    console.log(percents)
+    const handleChangeInput = (e, id) => {
+      console.log(e.target.value)
+      
+      const PP = percents;
+      setPercent({
+        ...percents,
+        [id]: e.target.value
+      })
+    }
+    return (
+      <div>
+        <Button onClick={saveEditPercent}>Lưu thay đổi</Button>
+        {exams.map((ex, i) => (
+          <div
+            key={i}
+            className="flex gap-3 justify-between items-center py-3 mb-3"
+          >
+            <div>{ex.name}</div>
+            <div>
+              <InputNumber min={10} onBlur={(e) => handleChangeInput(e, ex.id)}
+                max={100}  value={percents[ex.id]}></InputNumber> %
+            </div>
+          </div>
+        ))}
+
+        {assignments.map((assign, i) => (
+          <div
+            key={i}
+            className="flex gap-3 justify-between items-center py-3 mb-3"
+          >
+            <div>{assign.title}</div>
+            <div>
+              <InputNumber
+                min={10}
+                max={100}
+                onBlur={(e) => handleChangeInput(e, assign.assignmentToken)}
+                value={percents[assign.assignmentToken]}
+              ></InputNumber>{" "}
+              %
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const header = () => {
+    return (
+      <div className="flex justify-between items-center">
+        <Button onClick={() => setIsOpenEditPercent(true)}>
+          Chinh sửa % bài tập
+        </Button>
+        <Dialog
+          header="Chỉnh sửa % bài tập"
+          visible={isOpenEditPercent}
+          style={{ width: "50vw" }}
+          onHide={() => setIsOpenEditPercent(false)}
+        >
+          <EditPercent></EditPercent>
+        </Dialog>
+        <div className="flex items-center justify-end gap-2">
+          <Button
+            type="button"
+            icon="pi pi-file"
+            rounded
+            onClick={() => exportCSV(true)}
+            data-pr-tooltip="CSV"
+          />
+          <Button
+            type="button"
+            icon="pi pi-file-excel"
+            severity="success"
+            rounded
+            onClick={exportExcel}
+            data-pr-tooltip="XLS"
+          />
+          <Button
+            type="button"
+            icon="pi pi-file-pdf"
+            severity="warning"
+            rounded
+            onClick={exportPdf}
+            data-pr-tooltip="PDF"
+          />
+        </div>
+      </div>
+    );
+  };
 
   const mssvBodyTemplate = (rowData) => {
     return <div></div>;
@@ -256,22 +391,25 @@ const header = (
     );
   };
 
-
   const assignBodyTemplate = (e, assign) => {
+    const fileAssign = e.fileAssignments.find(
+      (f) => f.fileToken === assign.assignmentToken
+    );
 
-    const fileAssign= (e.fileAssignments.find(f => f.fileToken === assign.assignmentToken));
- 
     return (
       <div className="fullname-student flex flex-col items-center">
         {/* {rowData.username} */}
-        {fileAssign && fileAssign.status ? (fileAssign.grade === -1 ? "Chưa chấm điểm" : fileAssign.grade) : "Chưa nộp bài"}
+        {fileAssign && fileAssign.status
+          ? fileAssign.grade === -1
+            ? "Chưa chấm điểm"
+            : fileAssign.grade
+          : "Chưa nộp bài"}
       </div>
     );
   };
-  
-  const examBodyTemplate = (e, exam) => {
 
-    const quizAssign= (e.quizAssignments.find(q => q.quizToken === exam.id));
+  const examBodyTemplate = (e, exam) => {
+    const quizAssign = e.quizAssignments.find((q) => q.quizToken === exam.id);
     console.log("QUIZ ASSIGN ", quizAssign);
     return (
       <div className="fullname-student flex flex-col items-center">
@@ -283,18 +421,15 @@ const header = (
 
   const summaryGradeTemplate = (e) => {
     let grade = 0;
-    (e.quizAssignments.forEach(q => {
-      grade += parseFloat((q.percent*q.grade)/100.0)
-      console.log(parseFloat((q.percent*q.grade)/100.0))
-
-    }));
-    (e.fileAssignments.forEach(f => {
-      grade += parseFloat((f.percent*f.grade)/100.0)
-      console.log(parseFloat((f.percent*f.grade)/100.0))
-    }));
-    return (
-      <span>{grade < 0 ? "?" : grade}</span>
-    );
+    e.quizAssignments.forEach((q) => {
+      grade += parseFloat((q.percent * q.grade) / 100.0);
+      console.log(parseFloat((q.percent * q.grade) / 100.0));
+    });
+    e.fileAssignments.forEach((f) => {
+      grade += parseFloat((f.percent * f.grade) / 100.0);
+      console.log(parseFloat((f.percent * f.grade) / 100.0));
+    });
+    return <span>{grade < 0 ? "?" : grade}</span>;
   };
 
   return (
@@ -340,7 +475,6 @@ const header = (
           filter
           filterField="mssv"
           filterPlaceholder="Search"
-
         />
 
         <Column
@@ -351,10 +485,10 @@ const header = (
           body={fullNameBodyTemplate}
           filter
           filterPlaceholder="Search"
-          headerStyle={{width: 'max-content'}}
+          headerStyle={{ width: "max-content" }}
         />
 
-        {assignments.map((assign,i) => (
+        {assignments.map((assign, i) => (
           <Column
             key={i}
             field={`Assign${i}`}
@@ -363,7 +497,7 @@ const header = (
           />
         ))}
 
-        {exams.map((exam,i) => (
+        {exams.map((exam, i) => (
           <Column
             key={i}
             field={`Exam${i}`}
@@ -373,11 +507,10 @@ const header = (
         ))}
 
         <Column
-        field="Summary Grade"
-        header={"Tổng điểm"}
-        body={(e) => summaryGradeTemplate(e)}>
-
-        </Column>
+          field="Summary Grade"
+          header={"Tổng điểm"}
+          body={(e) => summaryGradeTemplate(e)}
+        ></Column>
       </DataTable>
     </div>
   );

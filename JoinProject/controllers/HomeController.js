@@ -391,6 +391,7 @@ class HomeController {
         id: "LND",
         name: "Nội dung khóa học",
         data: [],
+        createAt: Date.now()
       });
     }
     user.repositories.find((store) => {
@@ -399,6 +400,7 @@ class HomeController {
           title: (name ? name : courseInformation.title),
           courseToken: courseInformation.token,
           contentCourse: courseInformation.contentCourse,
+          createAt: Date.now()
         });
       }
     });

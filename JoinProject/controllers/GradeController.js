@@ -40,5 +40,29 @@ module.exports = {
         return assign;
       }),
     })
+  },
+
+  updatePercent: async (req, res) => {
+    const {idNeedUpdate} = req.body;
+
+    const exams = await ExamModel.find({});
+    const assignments = await AssignmentModel.find({});
+    console.log(idNeedUpdate)
+    exams.forEach(async ex => {
+      if(idNeedUpdate[ex.id]) {
+        ex.percent = idNeedUpdate[ex.id];
+        await ex.save();
+      }
+    })
+    
+    assignments.forEach(async assign => {
+      if(idNeedUpdate[assign.assignmentToken]) {
+        assign.percent = idNeedUpdate[assign.assignmentToken];
+        await assign.save();
+      }
+    })
+
+    
+    res.json("aaa")
   }
 };

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-
+import moment from "moment";
 import * as constant from "../constant.js";
 import { Link } from "react-router-dom";
 function Repository() {
@@ -20,6 +20,7 @@ function Repository() {
           <div className="sub-reposi">
             {r.data && r && r.data.map((sub, i) => <div key={i} className="flex justify-between ml-4">
                 <span className="sub-name">{sub.title}</span>
+                <span>{moment(sub.createAt).format("DD-MM-YYYY")}</span>
                 <Link to={"/test"} className="underline">dowload</Link>
                 
             </div>)}

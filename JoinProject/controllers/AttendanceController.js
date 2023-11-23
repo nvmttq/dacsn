@@ -24,13 +24,16 @@ exports.getAll = async (req, res) => {
       });
 
       Promise.all(returnData).then((data) => {
-        const selectedUsers = [];
+        const selectedUsers = {};
         data.forEach((data) => {
+          // console.log("AA",data)
+          const select = [];
           data.userStatus.forEach((dataUS) => {
             if (dataUS.status) {
-              selectedUsers.push(dataUS);
+              select.push(dataUS);
             }
           });
+          selectedUsers[data.token] = select;
         });
         res.status(200).json({
           success: true,
@@ -82,7 +85,7 @@ exports.submitAttendance = async (req, res) => {
   let yes = 0,
     no = 0;
   tmpUserStatus.forEach((u) => {
-    if (selectedUsers.find((slu) => slu.user.username === u.userID)) {
+    if (selectedUsers[attendanceToken].find((slu) => slu.user.username === u.userID)) {
       u.status = true;
       yes++;
     } else {
@@ -117,14 +120,18 @@ exports.submitAttendance = async (req, res) => {
         });
 
         Promise.all(returnData).then((data) => {
-          const selectedUsers = [];
+          const selectedUsers = {};
           data.forEach((data) => {
+            // console.log("AA",data)
+            const select = [];
             data.userStatus.forEach((dataUS) => {
               if (dataUS.status) {
-                selectedUsers.push(dataUS);
+                select.push(dataUS);
               }
             });
+            selectedUsers[data.token] = select;
           });
+          // console.log(selectedUsers)
           res.status(200).json({
             success: true,
             attendances: data,
@@ -148,12 +155,12 @@ exports.createAttendance = async (req, res) => {
   const us = course.participants.map((p) => {
     return {
       userID: p.userID,
-      status: false,
+      status: true,
     };
   });
 
   const atten = new AttendanceModel({
-    token: "testAtten",
+    token: shortid.generate(),
     title: `Điểm danh khóa ${course.title}`,
     courseToken: courseToken,
     userStatus: us,
@@ -165,7 +172,7 @@ exports.createAttendance = async (req, res) => {
   await atten
     .save()
     .then(async (docs) => {
-        const attends = await AttendanceModel.find({});
+      const attends = await AttendanceModel.find({});
       return res.json({
         msg: "Ok create Attendance",
         data: attends,
