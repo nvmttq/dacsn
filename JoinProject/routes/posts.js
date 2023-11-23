@@ -9,4 +9,5 @@ router.put("/posts", PostsController.updatePosts);
 router.put("/posts-edit", PostsController.editPost);
 router.put("/posts/delete-post", PostsController.deletePost);
 router.put("/posts/notification", PostsController.updateNotification);
+router.put("/posts/block-comment", PostsController.updateBlockComment);
 module.exports = router;

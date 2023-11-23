@@ -6,14 +6,14 @@ import { Toast } from "primereact/toast";
 import { Dialog } from "primereact/dialog";
 import { TabMenu } from "primereact/tabmenu";
 import { Badge } from "primereact/badge";
+import { InputSwitch } from "primereact/inputswitch";
 import "primeicons/primeicons.css";
 import axios from "axios";
 import moment from "moment";
 import { useParams } from "react-router-dom";
 
-
 import * as constant from "../constant.js";
-export default function Posts({isPermissionOnCourse}) {
+export default function Posts({ isPermissionOnCourse }) {
   const [replyChange, setReplyChange] = useState({});
   const user = localStorage.getItem("user")
     ? JSON.parse(localStorage.getItem("user"))
@@ -61,6 +61,8 @@ export default function Posts({isPermissionOnCourse}) {
     });
   };
 
+  const [checkRole, setCheckRole] = useState(false);
+
   const [checkNotification, setCheckNotification] = useState(false);
 
   const [items, setItems] = useState([]);
@@ -83,6 +85,7 @@ export default function Posts({isPermissionOnCourse}) {
   const [numberOfUnseenNotification, setNumberOfUnseenNotification] =
     useState(0);
   const [checkLike, setCheckLike] = useState(false);
+  const [checked, setChecked] = useState(false);
 
   const [listPosts, setListPosts] = useState([]);
   const [listNotificationPosts, setListNotificationPosts] = useState([]);
@@ -224,6 +227,7 @@ export default function Posts({isPermissionOnCourse}) {
         setAuthorDetailPost(post[0].author);
         setNameAuthorDetailPost(post[0].nameAuthor);
         setListLikePost(post[0].like);
+        setChecked(post[0].isBlockComment);
         let arr = post[0].like.filter((x) => x === author);
         if (arr.length > 0) {
           setCheckLike(true);
@@ -503,16 +507,45 @@ export default function Posts({isPermissionOnCourse}) {
         console.log(error);
       });
   };
-  const LoadContentPost = () => {
-    if (editId !== null) {
-      listPosts.map((item) => {
-        if (item._id === editId) {
-          setEditPost(item.title);
-          setEditContent(item.content);
-        }
+
+  const BlockComment = ({ check }) => {
+    setChecked(check);
+    axios
+      .put("http://localhost:3002/posts/block-comment", {
+        id: idDetailPost,
+        isBlockComment: check,
+      })
+      .then(function (response) {})
+      .catch(function (error) {
+        console.log(error);
       });
-      // console.log(editId, editContent, editPost);
-    }
+  };
+  const DeleteComment = ({ id }) => {
+    axios
+      .put("http://localhost:3002/delete-comments", {
+        id: id,
+      })
+      .then(function (response) {
+        fetchDataComment({ id: idDetailPost });
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
+
+  const DeleteReply = ({ id, indexReply, listReply }) => {
+    listReply.splice(listReply.length - indexReply - 1, 1);
+    axios
+      .put("http://localhost:3002/delete-reply", {
+        id: id,
+        reply: listReply,
+      })
+      .then(function (response) {
+        fetchDataComment({ id: idDetailPost });
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
   };
 
   return (
@@ -569,7 +602,7 @@ export default function Posts({isPermissionOnCourse}) {
       >
         <div className="mx-auto my-10 w-full rounded-xl border px-4 py-6 text-gray-700">
           <div className="mb-5">
-            <div className="flex items-center">
+            <div className="flex items-center relative">
               <img
                 className="h-10 w-10 rounded-full object-cover"
                 src="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
@@ -583,6 +616,15 @@ export default function Posts({isPermissionOnCourse}) {
                   {createdAtDetailPost}
                 </span>
               </p>
+              {(isPermissionOnCourse || authorDetailPost === user._id) && (
+                <div className="absolute right-0 flex items-center">
+                  <div className="mr-3">Khóa bình luận:</div>
+                  <InputSwitch
+                    checked={checked}
+                    onChange={(e) => BlockComment({ check: e.value })}
+                  />
+                </div>
+              )}
             </div>
           </div>
           <div className="mb-3">{contentDetailPost}</div>
@@ -607,139 +649,165 @@ export default function Posts({isPermissionOnCourse}) {
               </button>
             </div>
           )}
-          <div className="flex first-letter:items-center justify-center border rounded mx-auto mt-5">
-            <div className="w-full bg-white rounded-lg px-4 pt-2">
-              <div className="flex flex-wrap -mx-3 mb-6">
-                <div className="w-full md:w-full px-3 mb-2 mt-2">
-                  <textarea
-                    className="bg-gray-100 rounded border border-gray-400 leading-normal resize-none w-full h-20 py-2 px-3 placeholder-gray-700 focus:outline-none focus:bg-white"
-                    placeholder="Nhập bình luận..."
-                    value={contentCommentPost}
-                    onChange={(e) => setContentCommentPost(e.target.value)}
-                  ></textarea>
-                </div>
-                <div className="w-full flex items-start md:w-full px-3">
-                  <div
-                    className="cursor-pointer bg-white text-gray-700 font-medium py-1 px-4 border border-gray-400 rounded-lg tracking-wide mr-1 hover:bg-gray-100"
-                    onClick={AddComment}
-                  >
-                    Gửi bình luận
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          {commentPost.map((comment, index) => (
-            <div className="mx-auto mt-10 w-full">
-              <div className="rounded-md border p-4 bg-white">
-                <div className="flex items-center space-x-4">
-                  <img
-                    className="h-10 w-10 rounded-full"
-                    src="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
-                    alt="Avatar"
-                  />
-                  <div>
-                    <h2 className="text-lg font-semibold">
-                      {comment.nameUser}
-                    </h2>
-                    <p className="text-sm text-gray-500">
-                      {comment.createDate}
-                    </p>
-                  </div>
-                </div>
-                <p className="mt-4 text-gray-800">{comment.content}</p>
-                <div className="mt-4 flex items-center space-x-2">
-                  {comment.like.filter((x) => x === author).length > 0 ? (
-                    <button
-                      className="text-gray-500 hover:text-gray-800"
-                      onClick={() =>
-                        removeLikeComment({
-                          listLikeComment: comment.like,
-                          idComment: comment._id,
-                        })
-                      }
-                    >
-                      <i className="pi pi-heart-fill text-red-600"></i>
-                      <div>
-                        Yêu thích <strong>({comment.like.length})</strong>
-                      </div>
-                    </button>
-                  ) : (
-                    <button
-                      className="text-gray-500 hover:text-gray-800"
-                      onClick={() =>
-                        addLikeComment({
-                          listLikeComment: comment.like,
-                          idComment: comment._id,
-                        })
-                      }
-                    >
-                      <i className="pi pi-heart"></i>
-                      <div>
-                        Yêu thích <strong>({comment.like.length})</strong>
-                      </div>
-                    </button>
-                  )}
-                  <button className="text-gray-500 hover:text-gray-800">
-                    <i className="pi pi-comments"></i>
-                    <div>
-                      Câu trả lời <strong>({comment.reply.length})</strong>
-                    </div>
-                  </button>
-                </div>
-              </div>
-              {comment.reply
-                .slice(0)
-                .reverse()
-                .map((reply, indexReply) => (
-                  <div className="my-4 ml-10 rounded-md border p-4 bg-white">
-                    <div className="flex items-center space-x-4">
-                      <img
-                        className="h-8 w-8 rounded-full"
-                        src="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
-                        alt="Avatar"
-                      />
-                      <div>
-                        <h3 className="text-md font-medium">
-                          {reply.nameUser}
-                        </h3>
-                        <p className="text-sm text-gray-500">
-                          {reply.createDate}
-                        </p>
-                      </div>
-                    </div>
-                    <p className="mt-2 text-gray-800">{reply.content}</p>
-                  </div>
-                ))}
-              <div className="flex first-letter:items-center justify-center border rounded mt-5 my-4 ml-10">
+          {!checked && (
+            <>
+              <div className="flex first-letter:items-center justify-center border rounded mx-auto mt-5">
                 <div className="w-full bg-white rounded-lg px-4 pt-2">
                   <div className="flex flex-wrap -mx-3 mb-6">
                     <div className="w-full md:w-full px-3 mb-2 mt-2">
                       <textarea
                         className="bg-gray-100 rounded border border-gray-400 leading-normal resize-none w-full h-20 py-2 px-3 placeholder-gray-700 focus:outline-none focus:bg-white"
-                        placeholder="Nhập câu trả lời..."
-                        value={replyChange[comment._id]}
-                        onChange={(e) => {
-                          setReplyChange({
-                            ...replyChange,
-                            [comment._id]: e.target.value,
-                          });
-                        }}
+                        placeholder="Nhập bình luận..."
+                        value={contentCommentPost}
+                        onChange={(e) => setContentCommentPost(e.target.value)}
                       ></textarea>
                     </div>
                     <div className="w-full flex items-start md:w-full px-3">
                       <div
                         className="cursor-pointer bg-white text-gray-700 font-medium py-1 px-4 border border-gray-400 rounded-lg tracking-wide mr-1 hover:bg-gray-100"
-                        onClick={() => AddReply({ id: comment._id })}
+                        onClick={AddComment}
                       >
-                        Gửi câu trả lời
+                        Gửi bình luận
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+              {commentPost.map((comment, index) => (
+                <div className="mx-auto mt-10 w-full">
+                  <div className="rounded-md border p-4 bg-white">
+                    <div className="flex items-center space-x-4 w-full relative">
+                      <img
+                        className="h-10 w-10 rounded-full"
+                        src="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
+                        alt="Avatar"
+                      />
+                      <div>
+                        <h2 className="text-lg font-semibold">
+                          {comment.nameUser}
+                        </h2>
+                        <p className="text-sm text-gray-500">
+                          {comment.createDate}
+                        </p>
+                      </div>
+                      <div className="absolute right-0">
+                        <Button
+                          label="Xóa"
+                          severity="danger"
+                          icon="pi pi-trash"
+                          onClick={() => DeleteComment({ id: comment._id })}
+                        />
+                      </div>
+                    </div>
+                    <p className="mt-4 text-gray-800">{comment.content}</p>
+                    <div className="mt-4 flex items-center space-x-2">
+                      {comment.like.filter((x) => x === author).length > 0 ? (
+                        <button
+                          className="text-gray-500 hover:text-gray-800"
+                          onClick={() =>
+                            removeLikeComment({
+                              listLikeComment: comment.like,
+                              idComment: comment._id,
+                            })
+                          }
+                        >
+                          <i className="pi pi-heart-fill text-red-600"></i>
+                          <div>
+                            Yêu thích <strong>({comment.like.length})</strong>
+                          </div>
+                        </button>
+                      ) : (
+                        <button
+                          className="text-gray-500 hover:text-gray-800"
+                          onClick={() =>
+                            addLikeComment({
+                              listLikeComment: comment.like,
+                              idComment: comment._id,
+                            })
+                          }
+                        >
+                          <i className="pi pi-heart"></i>
+                          <div>
+                            Yêu thích <strong>({comment.like.length})</strong>
+                          </div>
+                        </button>
+                      )}
+                      <button className="text-gray-500 hover:text-gray-800">
+                        <i className="pi pi-comments"></i>
+                        <div>
+                          Câu trả lời <strong>({comment.reply.length})</strong>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+                  {comment.reply
+                    .slice(0)
+                    .reverse()
+                    .map((reply, indexReply) => (
+                      <div className="my-4 ml-10 rounded-md border p-4 bg-white">
+                        <div className="flex items-center space-x-4 relative">
+                          <img
+                            className="h-8 w-8 rounded-full"
+                            src="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
+                            alt="Avatar"
+                          />
+                          <div>
+                            <h3 className="text-md font-medium">
+                              {reply.nameUser}
+                            </h3>
+                            <p className="text-sm text-gray-500">
+                              {reply.createDate}
+                            </p>
+                          </div>
+                          <div className="absolute right-0">
+                            <Button
+                              label="Xóa"
+                              severity="danger"
+                              icon="pi pi-trash"
+                              onClick={() =>
+                                DeleteReply({
+                                  id: comment._id,
+                                  indexReply: indexReply,
+                                  listReply: comment.reply,
+                                })
+                              }
+                            />
+                          </div>
+                        </div>
+                        <p className="mt-2 text-gray-800">{reply.content}</p>
+                      </div>
+                    ))}
+                  <div className="flex first-letter:items-center justify-center border rounded mt-5 my-4 ml-10">
+                    <div className="w-full bg-white rounded-lg px-4 pt-2">
+                      <div className="flex flex-wrap -mx-3 mb-6">
+                        <div className="w-full md:w-full px-3 mb-2 mt-2">
+                          <textarea
+                            className="bg-gray-100 rounded border border-gray-400 leading-normal resize-none w-full h-20 py-2 px-3 placeholder-gray-700 focus:outline-none focus:bg-white"
+                            placeholder="Nhập câu trả lời..."
+                            value={replyChange[comment._id]}
+                            onChange={(e) => {
+                              setReplyChange({
+                                ...replyChange,
+                                [comment._id]: e.target.value,
+                              });
+                            }}
+                          ></textarea>
+                        </div>
+                        <div className="w-full flex items-start md:w-full px-3">
+                          <div
+                            className="cursor-pointer bg-white text-gray-700 font-medium py-1 px-4 border border-gray-400 rounded-lg tracking-wide mr-1 hover:bg-gray-100"
+                            onClick={() => AddReply({ id: comment._id })}
+                          >
+                            Gửi câu trả lời
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </>
+          )}
         </div>
       </Dialog>
       <Toast ref={toast} />

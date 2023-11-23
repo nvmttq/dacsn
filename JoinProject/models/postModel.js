@@ -13,6 +13,7 @@ const postSchema = new mongoose.Schema(
     createDate: { type: String },
     listUnseenUser: { type: Array },
     idCourse: { type: String, required: false },
+    isBlockComment: { type: Boolean, default: false },
   },
   {
     timestamps: true,

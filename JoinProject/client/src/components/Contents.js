@@ -10,6 +10,7 @@ import { Toast } from "primereact/toast";
 import { Fieldset } from "primereact/fieldset";
 import { Link } from "react-router-dom";
 import { FileUpload } from "primereact/fileupload";
+import { Editor } from "primereact/editor";
 import "primeicons/primeicons.css";
 
 import * as constant from "../constant.js";
@@ -23,15 +24,15 @@ const DialogRestoreContent = ({
   user,
   courseInformation,
   fetchContentCourse,
-  nodeTemplate
+  nodeTemplate,
 }) => {
   const [repositories, setRepositories] = useState([]);
   const [sub, setSub] = useState({});
-  console.log("USER DIALONG RÉTORE", user)
+  console.log("USER DIALONG RÉTORE", user);
   useEffect(() => {
     setRepositories(user.repositories.filter((r) => r.id === "LND"));
   }, [user.repositories]);
-  
+
   const acceptRestoreContentCourse = async (sub) => {
     await axios
       .put(`${constant.URL_API}/update-course`, {
@@ -58,7 +59,7 @@ const DialogRestoreContent = ({
         setVisibleDialog("?");
       },
       acceptLabel: "Xác nhận",
-      rejectLabel: "Từ chối"
+      rejectLabel: "Từ chối",
     });
   };
   return (
@@ -68,18 +69,17 @@ const DialogRestoreContent = ({
       style={{ width: "50vw" }}
       onHide={() => setVisibleDialog("?")}
     >
-
       <Dialog
         header="Xem trước nội dung"
-      visible={!(Object.keys(sub).length === 0 && sub.constructor === Object)}
-      style={{ width: "50vw" }}
-      onHide={() => setSub({})}
+        visible={!(Object.keys(sub).length === 0 && sub.constructor === Object)}
+        style={{ width: "50vw" }}
+        onHide={() => setSub({})}
       >
         <Tree
-            value={sub.contentCourse}
-            className="w-full md:w-30rem"
-            nodeTemplate={nodeTemplate}
-          />
+          value={sub.contentCourse}
+          className="w-full md:w-30rem"
+          nodeTemplate={nodeTemplate}
+        />
       </Dialog>
 
       <ConfirmDialog />
@@ -102,22 +102,22 @@ const DialogRestoreContent = ({
     </Dialog>
   );
 };
-export default function Contents({isPermissionOnCourse}) {
-
-  
+export default function Contents({ isPermissionOnCourse }) {
   const toast = useRef(null);
   const [visibleDialog, setVisibleDialog] = useState("?");
-  const [user, setUser] = useState(localStorage.getItem("user")
-  ? JSON.parse(localStorage.getItem("user"))
-  : null); 
-  console.log(user)
+  const [user, setUser] = useState(
+    localStorage.getItem("user")
+      ? JSON.parse(localStorage.getItem("user"))
+      : null
+  );
+  console.log(user);
   const [currentKeySelect, setCurrentKeySelect] = useState("");
   const filesRefEdit = useRef({});
   const examToken = "examToken1";
 
   const toast_success = (severity, summary, detail) => {
     toast.current.show({ severity, summary, detail });
-  }
+  };
 
   const showSuccess = () => {
     toast.current.show({
@@ -255,7 +255,6 @@ export default function Contents({isPermissionOnCourse}) {
   };
 
   const nodeTemplate = (node, options) => {
-
     let typeLabel;
     if (node.type === "BT") {
       typeLabel = (
@@ -296,7 +295,6 @@ export default function Contents({isPermissionOnCourse}) {
         </div>
       );
     } else if (node.type === "FILE") {
-      
       const myUploader = async (e) => {
         console.log(e);
         const convertBase64 = (file) => {
@@ -321,7 +319,7 @@ export default function Contents({isPermissionOnCourse}) {
         filesRefEdit.current[node.key] = b;
         console.log(e, e.files, b);
         console.log(filesRefEdit);
-        toast_success("success", "Thông báo", "Tải file thành công")
+        toast_success("success", "Thông báo", "Tải file thành công");
       };
       typeLabel = (
         <div>
@@ -332,7 +330,6 @@ export default function Contents({isPermissionOnCourse}) {
               cols={100}
               rows={1}
               defaultValue={node.label}
-              
               onChange={(e) => {
                 solveContent({
                   newValue: {
@@ -356,22 +353,19 @@ export default function Contents({isPermissionOnCourse}) {
             uploadHandler={myUploader}
             pt={{
               chooseButton: {
-                  label: "Chọn File",
-                        className: "!p-0"
-                    }
-              }}
+                label: "Chọn File",
+                className: "!p-0",
+              },
+            }}
           />
         </div>
       );
     } else {
       typeLabel = (
-        <InputTextarea
-          autoResize
-          cols={100}
-          rows={1}
-          defaultValue={node.label}
-          onChange={(e) => {
-            solveContent({ newValue: e.target.value, key: node.key });
+        <Editor
+          value={node.label}
+          onTextChange={(e) => {
+            solveContent({ newValue: e.htmlValue, key: node.key });
             setTreeContentEdit(
               treeContentEdit.filter((x) => x.key !== "?????")
             );
@@ -381,7 +375,7 @@ export default function Contents({isPermissionOnCourse}) {
     }
 
     let label = (
-      <div className="flex">
+      <div className="flex mb-5">
         {typeLabel}
         <Button
           icon="pi pi-arrow-down-right"
@@ -471,7 +465,7 @@ export default function Contents({isPermissionOnCourse}) {
         // </form>
       );
     } else {
-      label = node.label;
+      label = <div dangerouslySetInnerHTML={{ __html: node.label }}></div>;
     }
     return <span className={options.className}>{label}</span>;
   };
@@ -492,8 +486,6 @@ export default function Contents({isPermissionOnCourse}) {
         if (course) {
           setCourseInformation(course);
           setTreeContentEdit(course.contentCourse);
-
-       
         }
       })
       .catch(function (error) {
@@ -511,7 +503,6 @@ export default function Contents({isPermissionOnCourse}) {
   };
 
   const acceptSaveContentCourse = async () => {
-
     const name = document.getElementById("accept-save-content").value;
     await fetch(`${constant.URL_API}/users/save-content-course`, {
       method: "POST",
@@ -521,14 +512,14 @@ export default function Contents({isPermissionOnCourse}) {
       body: JSON.stringify({
         username: user.username,
         courseInformation,
-        name
+        name,
       }),
     })
       .then((res) => res.json())
       .then((data) => {
         console.log(data);
         localStorage.setItem("user", JSON.stringify(data.user));
-        setUser(data.user)
+        setUser(data.user);
       })
       .catch((err) => console.log(err))
       .finally(() => {
@@ -743,30 +734,34 @@ export default function Contents({isPermissionOnCourse}) {
         onHide={() => setVisibleDialog("?")}
         pt={{
           content: {
-            className: "w-full"
+            className: "w-full",
           },
           message: {
-            className: "w-full"
+            className: "w-full",
           },
           acceptButton: {
-            label: "Xác nhận"
+            label: "Xác nhận",
           },
           rejectButton: {
-            label: "Từ chối"
-          }
+            label: "Từ chối",
+          },
         }}
-        message={(
+        message={
           <div className="flex flex-col gap-y-2 w-full">
             <span>Xác nhận lưu ? </span>
-            <InputText autoFocus={true} className="w-full" id="accept-save-content" placeholder="Nhập tên cho nội dung lưu .... "></InputText>
+            <InputText
+              autoFocus={true}
+              className="w-full"
+              id="accept-save-content"
+              placeholder="Nhập tên cho nội dung lưu .... "
+            ></InputText>
           </div>
-        )}
+        }
         header="Bạn có chắc muốn lưu không ? "
         icon="pi pi-exclamation-triangle"
         className="w-3/6"
-        accept={acceptSaveContentCourse} >
-        </ConfirmDialog>
-      
+        accept={acceptSaveContentCourse}
+      ></ConfirmDialog>
 
       <DialogRestoreContent
         visibleDialog={visibleDialog}
@@ -787,7 +782,7 @@ export default function Contents({isPermissionOnCourse}) {
             placeholder="Hành động"
             className="w-full md:w-14rem"
             style={{
-              display: `${isPermissionOnCourse ? "" : "none"}`
+              display: `${isPermissionOnCourse ? "" : "none"}`,
             }}
           />
         </div>
@@ -796,11 +791,10 @@ export default function Contents({isPermissionOnCourse}) {
             value={courseInformation.contentCourse}
             className="w-full md:w-30rem"
             nodeTemplate={nodeTemplateCourseInformation}
-
             pt={{
               nodeIcon: {
-                className: "!text-icon-color text-xl"
-              }
+                className: "!text-icon-color text-xl",
+              },
             }}
           />
         </div>

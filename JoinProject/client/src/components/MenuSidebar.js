@@ -97,6 +97,66 @@ export default function MenuSidebar() {
       }
     },
   ];
+
+  let itemsForStudent = [
+    {
+      id: 1,
+      label: "Khóa học",
+      icon: "pi pi-fw pi-book",
+      template: (item, options) => {
+        return (
+          <MenuItemSidebar
+            linkTo={"/"}
+            item={item}
+            options={options}
+            isActiveMenu={activeMenuItem}
+            setActiveMenuItem={setActiveMenuItem}
+          />
+        );
+      },
+    },
+    {
+      id: 2,
+      label: "Các nhóm",
+      icon: "pi pi-fw pi-users",
+
+      template: (item, options) => {
+        return (
+          <MenuItemSidebar
+            linkTo={"/groups"}
+            item={item}
+            options={options}
+            isActiveMenu={activeMenuItem}
+            setActiveMenuItem={setActiveMenuItem}
+          />
+        );
+      },
+    },
+    {
+      id: 3,
+      label: "Lịch",
+      icon: "pi pi-fw pi-calendar",
+      template: (item, options) => {
+        return (
+          <MenuItemSidebar
+            linkTo={"/lich"}
+            item={item}
+            options={options}
+            isActiveMenu={activeMenuItem}
+            setActiveMenuItem={setActiveMenuItem}
+          />
+        );
+      },
+    },
+    {
+      id: 4,
+      label: "LOAD DKMH",
+      icon: "pi pi-fw pi-save",
+      command: () => {
+        loadDkmh();
+      }
+    },
+  ];
   const ITEMS_MENU_USER = [
     {
       label: "Thông báo",
@@ -138,7 +198,7 @@ export default function MenuSidebar() {
         <img src={logotdm} className="h-full"></img>
       </div>
       <Menu
-        model={items}
+        model={user && user.role==="Sinh Viên" ? itemsForStudent : items}
         className="w-full h-[calc(100%-110px)] rounded-none border-0 border-b-[1px] border-t-[1px] shadow-sm"
       />
       {user ? (

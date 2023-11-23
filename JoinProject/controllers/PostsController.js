@@ -132,3 +132,21 @@ exports.updateNotification = (req, res) => {
       });
     });
 };
+exports.updateBlockComment = (req, res) => {
+  const { isBlockComment } = req.body;
+  PostsModel.findByIdAndUpdate(req.body.id, { isBlockComment: isBlockComment })
+    .then(() => {
+      return res.status(204).json({
+        success: true,
+        message: "Update block comment successfully",
+      });
+    })
+    .catch((error) => {
+      console.log(error);
+      res.status(500).json({
+        success: false,
+        message: "Server error. Please try again.",
+        error: error.message,
+      });
+    });
+};
