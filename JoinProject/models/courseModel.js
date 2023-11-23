@@ -8,6 +8,9 @@ const courseSchema = new mongoose.Schema({
   assignment: { type: Number, default: 0 },
   countDownTime: { type: Date },
   contentCourse: { type: Array },
+  hk: {type: String, default: ""},
+  yearFrom: {type: String, default: ""},
+  yearTo: {type: String, default: ""},
   participants: [
     {
       userID: { type: String, default: "" },

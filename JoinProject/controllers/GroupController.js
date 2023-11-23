@@ -11,9 +11,8 @@ module.exports = {
       const group = new GroupModel({
         token: groupToken,
         title: nameGroup,
-        participants: [{ idUser: user.username, isCreator: true }],
       });
-
+      group.participants.push({ userID: user.username, nameDisplay: user.name, isCreator: true })
       const saveGroup = await group.save();
       await UserModel.findOneAndUpdate(
         { username: user.username },

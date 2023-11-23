@@ -16,7 +16,7 @@ export default function Participants({isPermissionOnCourse}) {
   const { courseToken } = useParams();
   const [showDivGroupModal, setShowDivGroupModal] = useState(false);
   const [loadingDivGroup, setLoadingDivGroup] = useState(false);
-
+  const user = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null;
   const [loading, setLoading] = useState(false);
   const [totalRecords, setTotalRecords] = useState(0);
   const [participants, setParticipants] = useState(null);
@@ -26,7 +26,7 @@ export default function Participants({isPermissionOnCourse}) {
   const [lazyState, setlazyState] = useState({
     first: 0,
     rows: 10,
-    page: 1,
+    page: 0,
     sortField: null,
     sortOrder: null,
     filters: {
@@ -36,6 +36,7 @@ export default function Participants({isPermissionOnCourse}) {
       role: { value: "", matchMode: "contains" },
       email: { value: "", matchMode: "contains" },
     },
+    courseToken: courseToken,
   });
 
   let networkTimeout = null;
@@ -54,15 +55,23 @@ export default function Participants({isPermissionOnCourse}) {
 
     //imitate delay of a backend call
     networkTimeout = setTimeout(() => {
-      ParticipantsDataTableService.getParticipants({
-        lazyEvent: JSON.stringify(lazyState),
-        courseToken,
-      }).then((data) => {
+      ParticipantsDataTableService.getParticipants({ lazyEvent: JSON.stringify(lazyState) }).then((data) => {
+        const participants = data.pp;
         console.log(data);
-        setTotalRecords(data.length);
-        setParticipants(data);
+
+        setTotalRecords(data.totalRecords);
+        setParticipants(participants);
         setLoading(false);
-      });
+    });
+      // ParticipantsDataTableService.getParticipants({
+      //   lazyEvent: JSON.stringify(lazyState),
+      //   courseToken,
+      // }).then((data) => {
+      //   console.log(data);
+      //   setTotalRecords(data.length);
+      //   setParticipants(data);
+      //   setLoading(false);
+      // });
     }, Math.random() * 1000 + 250);
   };
 
@@ -85,16 +94,24 @@ export default function Participants({isPermissionOnCourse}) {
       });
   };
   const onPage = (event) => {
+    event["courseToken"] = courseToken;
+    console.log(event)
     setlazyState(event);
   };
 
   const onSort = (event) => {
+    event["courseToken"] = lazyState.courseToken;
+    event["page"] = 0;
+    event["first"] = 0;
     console.log(event);
     setlazyState(event);
   };
 
   const onFilter = (event) => {
+    event["courseToken"] = courseToken;
+    event["page"] = 0;
     event["first"] = 0;
+    console.log(event);
     setlazyState(event);
   };
 
@@ -267,7 +284,9 @@ export default function Participants({isPermissionOnCourse}) {
         selectAll={selectAll}
         onSelectAllChange={onSelectAllChange}
       >
-        <Column selectionMode="multiple" headerStyle={{ width: "3rem" }} />
+        <Column selectionMode="multiple" headerStyle={{ width: "3rem" }} style={{
+          display: `${user.role !== "Sinh Viên" ? "" : "none"}`
+        }}/>
         <Column
           field="mssv"
           header="MSSV"
@@ -312,7 +331,9 @@ export default function Participants({isPermissionOnCourse}) {
           filterPlaceholder="Search"
         />
 
-        <Column field="action" header="Thao tác" body={actionBodyTemplate} />
+        <Column field="action" header="Thao tác" body={actionBodyTemplate} style={{
+          display: `${user.role !== "Sinh Viên" ? "" : "none"}`
+        }}/>
       </DataTable>
     </div>
   );

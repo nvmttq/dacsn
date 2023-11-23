@@ -63,20 +63,28 @@ class HomeController {
 
   async getCourseWithUserName(req, res) {
     try {
+      
       let user = await usertest.findOne({ username: req.params.username });
       user = user.toObject();
       // console.log("USER COURSES", user);
       let coursesOfUser = [];
-      const cc = await courses.find({});
-      cc.forEach((data) => {
+      const listCourse = await courses.find({});
+      listCourse.forEach((course) => {
         // console.log("DATA TOEKN ", data, user.courses);
-        if (user.courses.includes(data.token)) {
-          coursesOfUser.push(data);
+        if(req.query.yearFrom) {
+          const {yearFrom, yearTo, hk} = req.query;
+          console.log(yearFrom, yearTo, hk)
+          if(course.yearFrom !== yearFrom || course.yearTo!== yearTo || course.hk!== hk) {
+            return;
+          }
+        }
+        if (user.courses.includes(course.token)) {
+          coursesOfUser.push(course);
         }
       });
       res.json(coursesOfUser);
     } catch (err) {
-      res.json({ msg: "dont have cr" });
+      res.json({ msg: err });
     }
   }
 

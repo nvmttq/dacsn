@@ -44,6 +44,7 @@ export default function Grade({isPermissionOnCourse}) {
           {user.role === "Sinh Viên" && grades.exams && grades.exams.map((ex, index) => (
             <GradeCard key={index} 
             startAt={ex.startAt} endAt={ex.endAt} linkTo={`/exam/${ex.id}`} status={ex.userStatus[0].status} grade={ex.userStatus[0].grade} percent={ex.percent} title={ex.name} />
+            
           ))}
 
           {user.role === "Sinh Viên" && grades.assignments && grades.assignments.map((assign, index) => (

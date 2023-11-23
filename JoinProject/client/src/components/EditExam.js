@@ -421,7 +421,7 @@ export default function EditExam() {
         onClick={() => navigate(-1)}
       >
         <i className="pi pi-angle-left text-secondary"></i>
-        <span className="text-icon-color">GO BACK</span>
+        <span className="text-icon-color">Quay trở lại</span>
       </button>
       <div
         className="bg-white flex justify-between gap-5 rounded-lg shadow p-4 md:px-6"

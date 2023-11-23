@@ -63,7 +63,7 @@ export default function NoiDung() {
           className="flex items-center font-bold mb-4"
         >
           <i className="pi pi-angle-left text-secondary"></i>
-        <span className="text-icon-color">GO BACK</span>
+        <span className="text-icon-color">Quay trở lại</span>
         </Link>
         <span className="font-bold text-xl text-secondary">
         {courseInformation
